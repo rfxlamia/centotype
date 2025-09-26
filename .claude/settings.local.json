@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(chmod +x /home/v/project/centotype/validate_architecture.sh)",
+      "Bash(./validate_architecture.sh)",
+      "Bash(cargo check --workspace)",
+      "Bash(cargo check --workspace --quiet)",
+      "Bash(cargo check)",
+      "Bash(cargo test)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/benchmark_startup.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/benchmark_latency.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/prepare_release.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/publish_crates.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/prepare_npm.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/validate_local.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/compare_performance.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/generate_changelog.sh)",
+      "Bash(chmod +x /home/v/project/centotype/scripts/validate_cicd_setup.sh)",
+      "Bash(./scripts/validate_cicd_setup.sh)",
+      "Bash(cargo check -p centotype-platform)",
+      "Bash(cargo check -p centotype-engine)",
+      "Bash(cargo clean)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(cargo doc --lib --no-deps --quiet)",
+      "Bash(cargo check -p centotype-platform --quiet)",
+      "Bash(cargo check -p centotype-core --quiet)",
+      "Bash(cargo run --bin)",
+      "mcp__memory__create_entities",
+      "mcp__memory__create_relations",
+      "mcp__memory__delete_entities",
+      "mcp__memory__read_graph",
+      "mcp__memory__search_nodes",
+      "mcp__memory__open_nodes"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "memory"
+  ]
+}

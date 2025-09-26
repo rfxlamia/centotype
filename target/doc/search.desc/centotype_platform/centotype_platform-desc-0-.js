@@ -1,0 +1,1 @@
+searchState.loadedDescShard("centotype_platform", 0, "Centotype Platform\\n//!\\n//! Platform-specific …")

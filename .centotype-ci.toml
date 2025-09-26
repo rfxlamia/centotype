@@ -1,0 +1,59 @@
+name: centotype
+version: 1.0.0
+
+# Performance Testing Configuration
+
+[targets]
+# Performance thresholds for different operations
+input_latency_p99_ms = 25
+startup_time_p95_ms = 200
+render_time_p95_ms = 33
+memory_usage_max_mb = 50
+
+# Test configuration
+iterations_latency = 1000
+iterations_startup = 100
+iterations_render = 500
+
+# Benchmark settings
+warmup_iterations = 5
+test_duration_seconds = 30
+
+[security]
+# Input validation settings
+max_input_buffer_size = 1048576  # 1MB
+escape_sequence_filtering = true
+unicode_normalization = true
+
+# Fuzzing configuration
+fuzz_iterations = 10000
+fuzz_timeout_seconds = 300
+
+[build]
+# Cross-compilation targets
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+    "x86_64-pc-windows-msvc",
+    "aarch64-pc-windows-msvc"
+]
+
+# Build profiles to test
+profiles = ["debug", "release", "perf-test"]
+
+[coverage]
+# Code coverage thresholds
+minimum_coverage_percent = 80
+exclude_files = [
+    "*/tests/*",
+    "*/benches/*",
+    "*/examples/*"
+]
+
+[documentation]
+# Documentation requirements
+require_docs = true
+check_links = true
+generate_docs = true

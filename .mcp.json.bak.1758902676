@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "memory": {
+      "type": "stdio",
+      "command": "env",
+      "args": [
+        "MEMORY_FILE_PATH=/home/v/project/centotype/.mcp-memory/memory.json",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "env": {}
+    }
+  }
+}

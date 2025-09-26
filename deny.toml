@@ -1,0 +1,89 @@
+# Configuration file for cargo-deny
+# Used for dependency validation and security scanning
+
+[graph]
+targets = [
+    { triple = "x86_64-unknown-linux-gnu" },
+    { triple = "aarch64-unknown-linux-gnu" },
+    { triple = "x86_64-apple-darwin" },
+    { triple = "aarch64-apple-darwin" },
+    { triple = "x86_64-pc-windows-msvc" },
+    { triple = "aarch64-pc-windows-msvc" },
+]
+
+[advisories]
+# Deny security advisories
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "warn"
+notice = "warn"
+
+# Ignore specific advisories (add RUSTSEC IDs here if needed)
+ignore = [
+    # Example: "RUSTSEC-2020-0001",
+]
+
+[licenses]
+# Allow only specific licenses
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-DFS-2016",
+]
+
+# Deny specific licenses
+deny = [
+    "GPL-2.0",
+    "GPL-3.0",
+    "AGPL-3.0",
+    "LGPL-2.1",
+    "LGPL-3.0",
+    "MPL-2.0",
+]
+
+# Configuration for license exceptions
+[[licenses.exceptions]]
+allow = ["Unicode-DFS-2016"]
+name = "unicode-ident"
+
+[bans]
+# Deny multiple versions of the same crate
+multiple-versions = "warn"
+
+# Deny specific crates
+deny = [
+    # Example: { name = "openssl", version = "*" },
+]
+
+# Skip certain crates for multiple version checking
+skip = [
+    # Common crates that often have multiple versions
+    { name = "windows_aarch64_gnullvm" },
+    { name = "windows_aarch64_msvc" },
+    { name = "windows_i686_gnu" },
+    { name = "windows_i686_msvc" },
+    { name = "windows_x86_64_gnu" },
+    { name = "windows_x86_64_gnullvm" },
+    { name = "windows_x86_64_msvc" },
+]
+
+# Allow certain wildcards
+wildcards = "allow"
+
+[sources]
+# Ensure all crates come from crates.io
+unknown-registry = "deny"
+unknown-git = "deny"
+
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+
+# Allow specific git repositories if needed
+allow-git = [
+    # Example: "https://github.com/rust-lang/git2-rs",
+]

@@ -1,0 +1,250 @@
+{
+  "tier_3_complete": {
+    "tier_name": "Numbers",
+    "description": "Progressive number typing from single digits to complex mathematical expressions and real-world number patterns",
+    "levels": [61, 80],
+    "learning_progression": [
+      "Single digit introduction (0-9)",
+      "Multi-digit numbers and sequences",
+      "Decimal points and scientific notation",
+      "Basic mathematical operators (+, -, *, /, =)",
+      "Complex formulas and expressions",
+      "Real-world number applications (dates, addresses, financial)"
+    ],
+    "content": {
+      "level_61": {
+        "difficulty_score": 8.2,
+        "estimated_wpm": 42,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789",
+        "focus": "Single digit introduction and basic numbers",
+        "number_density": 0.03,
+        "texts": [
+          {
+            "id": "t3l61_001",
+            "content": "Database optimization involves analyzing performance metrics across different scales. Table scans affecting 1000000 rows perform differently than indexed lookups on 100 records. The difference between O(1) and O(n) complexity becomes apparent when datasets contain 50000 or more entries; query response times vary significantly.",
+            "length": 317,
+            "unique_chars": 72,
+            "language": "en",
+            "number_count": 5
+          },
+          {
+            "id": "t3l61_002",
+            "content": "Server monitoring reveals interesting patterns: CPU usage peaks at 85 percent during traffic spikes, memory consumption reaches 12 gigabytes under heavy load, and network throughput exceeds 500 megabits per second. Understanding these metrics helps optimize performance for 24 hour operations.",
+            "length": 295,
+            "unique_chars": 72,
+            "language": "en",
+            "number_count": 6
+          }
+        ]
+      },
+      "level_63": {
+        "difficulty_score": 8.5,
+        "estimated_wpm": 41,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789",
+        "focus": "Multi-digit numbers and sequences",
+        "number_density": 0.04,
+        "texts": [
+          {
+            "id": "t3l63_001",
+            "content": "Application performance benchmarks show significant variations: processing 10000 requests takes 2500 milliseconds on average, while handling 100000 requests requires 28750 milliseconds. Memory allocation peaks at 4096 megabytes during intensive operations, demonstrating the importance of efficient resource management strategies.",
+            "length": 328,
+            "unique_chars": 72,
+            "language": "en",
+            "number_count": 7
+          },
+          {
+            "id": "t3l63_002",
+            "content": "Network security logs reveal 14782 connection attempts daily, with 98765 successful authentications and 1234 failed login attempts. Traffic analysis shows 567890 packets processed hourly, indicating robust system capacity for handling enterprise-level workloads consistently.",
+            "length": 288,
+            "unique_chars": 72,
+            "language": "en",
+            "number_count": 6
+          }
+        ]
+      },
+      "level_65": {
+        "difficulty_score": 8.8,
+        "estimated_wpm": 40,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+",
+        "focus": "Addition operator introduction",
+        "number_density": 0.05,
+        "texts": [
+          {
+            "id": "t3l65_001",
+            "content": "Mathematical calculations require precision: area formulas use 3.14159 + radius measurements, while perimeter calculations involve 2 + 3.14159 + radius operations. Performance analysis shows that 1000 + 2000 operations per second indicate optimal system efficiency for production environments requiring sustained throughput.",
+            "length": 315,
+            "unique_chars": 73,
+            "language": "en",
+            "plus_operators": 4
+          },
+          {
+            "id": "t3l65_002",
+            "content": "Server capacity planning involves complex calculations: baseline load 5000 + peak traffic 15000 + buffer capacity 3000 equals total requirement. Memory allocation follows similar patterns: application heap 2048 + system overhead 512 + cache layer 1024 determines hardware specifications.",
+            "length": 297,
+            "unique_chars": 73,
+            "language": "en",
+            "plus_operators": 5
+          }
+        ]
+      },
+      "level_67": {
+        "difficulty_score": 9.2,
+        "estimated_wpm": 39,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-",
+        "focus": "Addition and subtraction operators",
+        "number_density": 0.06,
+        "texts": [
+          {
+            "id": "t3l67_001",
+            "content": "Financial calculations demonstrate mathematical precision: annual revenue 250000 + quarterly growth 45000 - operational costs 67500 - tax obligations 31250 equals net profit. Investment analysis uses similar formulas: principal 100000 + compound interest 12500 - management fees 1875 shows portfolio performance.",
+            "length": 333,
+            "unique_chars": 74,
+            "language": "en",
+            "math_operators": 7
+          },
+          {
+            "id": "t3l67_002",
+            "content": "Resource allocation requires careful calculation: total memory 16384 - system reserved 2048 - application base 4096 + dynamic allocation 1024 determines available capacity. CPU scheduling follows similar logic: total cores 8 - system processes 2 + user threads 12 affects performance characteristics.",
+            "length": 316,
+            "unique_chars": 74,
+            "language": "en",
+            "math_operators": 6
+          }
+        ]
+      },
+      "level_70": {
+        "difficulty_score": 9.5,
+        "estimated_wpm": 38,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/",
+        "focus": "Complete basic math operators",
+        "number_density": 0.07,
+        "texts": [
+          {
+            "id": "t3l70_001",
+            "content": "Complex algorithm analysis involves multiple calculations: time complexity O(n * log(n)) where n = 1000000 gives approximately 19931569 operations. Space complexity analysis shows memory usage = base_size * factor / optimization_ratio, where base_size = 1024 * element_count / compression_factor affects performance significantly.",
+            "length": 349,
+            "unique_chars": 76,
+            "language": "en",
+            "all_operators": true
+          },
+          {
+            "id": "t3l70_002",
+            "content": "Financial modeling requires precise formulas: monthly_payment = principal * (interest_rate * (1 + interest_rate)^months) / ((1 + interest_rate)^months - 1). For mortgage_amount = 350000 at rate = 4.25 / 100 over period = 30 * 12, this equals approximately 1721.33 per month including escrow.",
+            "length": 337,
+            "unique_chars": 76,
+            "language": "en",
+            "all_operators": true
+          }
+        ]
+      },
+      "level_72": {
+        "difficulty_score": 9.8,
+        "estimated_wpm": 37,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "focus": "Equality operator and equations",
+        "number_density": 0.08,
+        "texts": [
+          {
+            "id": "t3l72_001",
+            "content": "Scientific calculations require absolute precision: avogadro_number = 6.022 * 10^23, while electron_mass = 9.109 * 10^-31 kilograms. Temperature conversions follow strict formulas: celsius = (fahrenheit - 32) * 5 / 9, where 212°F = 100°C and 32°F = 0°C exactly. Physics constants remain immutable = true.",
+            "length": 342,
+            "unique_chars": 77,
+            "language": "en",
+            "equations": 5
+          },
+          {
+            "id": "t3l72_002",
+            "content": "Database performance metrics reveal optimization opportunities: query_time = base_time + (record_count * complexity_factor) / index_efficiency. When record_count = 5000000 and complexity_factor = 0.0012, optimal performance requires index_efficiency = 0.95 or higher for acceptable response times.",
+            "length": 326,
+            "unique_chars": 77,
+            "language": "en",
+            "equations": 4
+          }
+        ]
+      },
+      "level_75": {
+        "difficulty_score": 10.2,
+        "estimated_wpm": 36,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "focus": "Complex mathematical expressions",
+        "number_density": 0.09,
+        "texts": [
+          {
+            "id": "t3l75_001",
+            "content": "Advanced cryptographic algorithms utilize complex mathematical foundations: RSA encryption strength = (p - 1) * (q - 1) where p = 982451653 and q = 1073741827 generate secure key pairs. Hash function performance = input_size * compression_ratio / processing_cycles, demonstrating computational complexity relationships in modern security systems.",
+            "length": 364,
+            "unique_chars": 77,
+            "language": "en",
+            "complex_math": true
+          },
+          {
+            "id": "t3l75_002",
+            "content": "Machine learning model optimization requires statistical precision: accuracy_score = (true_positives + true_negatives) / total_samples * 100. For training_data = 1000000 samples with validation_split = 0.2, cross_validation_folds = 5 ensures robust performance metrics = mean(fold_scores) ± standard_deviation across iterations.",
+            "length": 355,
+            "unique_chars": 77,
+            "language": "en",
+            "complex_math": true
+          }
+        ]
+      },
+      "level_77": {
+        "difficulty_score": 10.5,
+        "estimated_wpm": 35,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "focus": "Real-world number applications - dates and addresses",
+        "number_density": 0.10,
+        "texts": [
+          {
+            "id": "t3l77_001",
+            "content": "System deployment schedules require precise timing: release_date = 2024/03/15 at 14:30:00 UTC, with rollback_window = 2024/03/15 18:45:00 if issues arise. Server configurations include primary_ip = 192.168.1.100, secondary_ip = 192.168.1.101, and load_balancer = 10.0.0.50 for high availability architecture.",
+            "length": 338,
+            "unique_chars": 77,
+            "language": "en",
+            "real_world_numbers": true
+          },
+          {
+            "id": "t3l77_002",
+            "content": "Customer service metrics track performance indicators: call_volume peaked 2023/12/01 with 15847 requests, resolution_time averaged 00:04:32 minutes, and satisfaction_score = 94.7% exceeded targets. Contact information includes phone = +1-555-0123, extension = 4567, and priority_queue = level_2 for enterprise clients.",
+            "length": 343,
+            "unique_chars": 77,
+            "language": "en",
+            "real_world_numbers": true
+          }
+        ]
+      },
+      "level_80": {
+        "difficulty_score": 11.0,
+        "estimated_wpm": 34,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "focus": "Advanced number patterns and financial calculations",
+        "number_density": 0.11,
+        "texts": [
+          {
+            "id": "t3l80_001",
+            "content": "Financial portfolio analysis requires comprehensive calculations: stock_price_AAPL = $175.43 * shares_owned = 2500 equals position_value = $438,575.00. Bond_yield = principal_amount * (interest_rate / 100) / 12 where principal = $500,000.00 at rate = 4.25% generates monthly_income = $1,770.83 before taxes and fees.",
+            "length": 371,
+            "unique_chars": 77,
+            "language": "en",
+            "financial_focus": true
+          },
+          {
+            "id": "t3l80_002",
+            "content": "Enterprise system architecture analysis reveals scaling requirements: concurrent_users = 75000 * peak_multiplier = 2.5 demands infrastructure_capacity = 187500 simultaneous connections. Database_transactions = base_load * user_actions where base_load = 50000 TPS and user_actions = 12.3 average per session equals total_capacity = 615000 TPS minimum.",
+            "length": 390,
+            "unique_chars": 77,
+            "language": "en",
+            "enterprise_focus": true
+          },
+          {
+            "id": "t3l80_003",
+            "content": "Cryptocurrency mining profitability calculations involve multiple variables: hash_rate = 100.5 TH/s * power_efficiency = 3250W * electricity_cost = $0.12/kWh * mining_duration = 24 hours = daily_cost = $9.36. Revenue = block_reward * (hash_rate / network_difficulty) * bitcoin_price where current_price = $42,750.00 determines profit margins.",
+            "length": 376,
+            "unique_chars": 77,
+            "language": "en",
+            "crypto_focus": true
+          }
+        ]
+      }
+    }
+  }
+}

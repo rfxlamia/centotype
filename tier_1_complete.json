@@ -1,0 +1,348 @@
+{
+  "tier_1_complete": {
+    "tier_name": "Letters",
+    "description": "Progressive letter introduction from home row to full alphabet with case variations",
+    "levels": [1, 40],
+    "learning_progression": [
+      "Home row foundation (asdf jkl;)",
+      "Top row addition (qwerty uiop)",
+      "Bottom row completion (zxcvbnm)",
+      "Common word patterns",
+      "Mixed case introduction",
+      "Professional vocabulary"
+    ],
+    "content": {
+      "level_1": {
+        "difficulty_score": 1.0,
+        "estimated_wpm": 25,
+        "character_set": "asdf",
+        "focus": "Home row left hand foundation",
+        "texts": [
+          {
+            "id": "t1l1_001",
+            "content": "asdf fdsa sadf fasd dfas sfad asdf fdsa sadf fasd dfas sfad asdf fdsa",
+            "length": 68,
+            "unique_chars": 4,
+            "language": "en"
+          },
+          {
+            "id": "t1l1_002",
+            "content": "dad sad fad as ads fas dad sad fad as ads fas dad sad fad as ads fas",
+            "length": 69,
+            "unique_chars": 4,
+            "language": "en"
+          },
+          {
+            "id": "t1l1_003",
+            "content": "add sad dad fad sass adds adds fads dads adds sass fads dads adds",
+            "length": 67,
+            "unique_chars": 4,
+            "language": "en"
+          }
+        ]
+      },
+      "level_2": {
+        "difficulty_score": 1.1,
+        "estimated_wpm": 26,
+        "character_set": "asdfg",
+        "focus": "Add G key - left index finger extension",
+        "texts": [
+          {
+            "id": "t1l2_001",
+            "content": "gads fags saga gaff sass aged fade gage saga fads gags aged fade gage saga",
+            "length": 76,
+            "unique_chars": 5,
+            "language": "en"
+          },
+          {
+            "id": "t1l2_002",
+            "content": "gas sag gag ags gas dad gag sag gas dad gag ags gas sag gag ags gas",
+            "length": 67,
+            "unique_chars": 5,
+            "language": "en"
+          }
+        ]
+      },
+      "level_3": {
+        "difficulty_score": 1.2,
+        "estimated_wpm": 27,
+        "character_set": "asdfgh",
+        "focus": "Add H key - right index finger introduction",
+        "texts": [
+          {
+            "id": "t1l3_001",
+            "content": "hash dash gash fish dish hash aged sage hash fish dash gash dish aged sage hash",
+            "length": 81,
+            "unique_chars": 6,
+            "language": "en"
+          },
+          {
+            "id": "t1l3_002",
+            "content": "had has ash sha hag sag had ash sha hag has had ash sha hag sag had",
+            "length": 67,
+            "unique_chars": 6,
+            "language": "en"
+          }
+        ]
+      },
+      "level_4": {
+        "difficulty_score": 1.3,
+        "estimated_wpm": 28,
+        "character_set": "asdfghj",
+        "focus": "Add J key - right index finger coordination",
+        "texts": [
+          {
+            "id": "t1l4_001",
+            "content": "jags jade jaded flash fjash jaded flash jade jags jaded flash jade jags jaded",
+            "length": 78,
+            "unique_chars": 7,
+            "language": "en"
+          }
+        ]
+      },
+      "level_5": {
+        "difficulty_score": 1.4,
+        "estimated_wpm": 29,
+        "character_set": "asdfghjk",
+        "focus": "Add K key - right middle finger",
+        "texts": [
+          {
+            "id": "t1l5_001",
+            "content": "flask kasha jaded flask kasha jaded flask ash dash kasha jaded flask ash dash kasha",
+            "length": 85,
+            "unique_chars": 8,
+            "language": "en"
+          }
+        ]
+      },
+      "level_6": {
+        "difficulty_score": 1.5,
+        "estimated_wpm": 30,
+        "character_set": "asdfghjkl",
+        "focus": "Add L key - complete home row",
+        "texts": [
+          {
+            "id": "t1l6_001",
+            "content": "flask slash jaded glads flask shelf shads flask glade flash jaded shelf glads flask slash",
+            "length": 89,
+            "unique_chars": 9,
+            "language": "en"
+          },
+          {
+            "id": "t1l6_002",
+            "content": "lash glass flask slash gladklad flash glass lash flask slash glad flask glass lash",
+            "length": 83,
+            "unique_chars": 9,
+            "language": "en"
+          }
+        ]
+      },
+      "level_7": {
+        "difficulty_score": 1.7,
+        "estimated_wpm": 31,
+        "character_set": "asdfghjklq",
+        "focus": "Add Q key - left pinky reach",
+        "texts": [
+          {
+            "id": "t1l7_001",
+            "content": "quash flask quads slash quash flask quads slash quash flask glad quads slash quash flask",
+            "length": 88,
+            "unique_chars": 10,
+            "language": "en"
+          }
+        ]
+      },
+      "level_8": {
+        "difficulty_score": 1.8,
+        "estimated_wpm": 32,
+        "character_set": "asdfghjklqw",
+        "focus": "Add W key - left ring finger reach",
+        "texts": [
+          {
+            "id": "t1l8_001",
+            "content": "wash flask swash quash flash wash swash flask quash flash wash swash flask quash flash",
+            "length": 87,
+            "unique_chars": 11,
+            "language": "en"
+          }
+        ]
+      },
+      "level_9": {
+        "difficulty_score": 1.9,
+        "estimated_wpm": 33,
+        "character_set": "asdfghjklqwe",
+        "focus": "Add E key - left middle finger reach",
+        "texts": [
+          {
+            "id": "t1l9_001",
+            "content": "hedge flask sweet hedge flask wheel hedge sweet flask wheel hedge sweet flask wheel hedge",
+            "length": 88,
+            "unique_chars": 12,
+            "language": "en"
+          }
+        ]
+      },
+      "level_10": {
+        "difficulty_score": 2.0,
+        "estimated_wpm": 34,
+        "character_set": "asdfghjklqwer",
+        "focus": "Add R key - left index finger reach",
+        "texts": [
+          {
+            "id": "t1l10_001",
+            "content": "shrewd flask gargle shrewd flask wheel gargle shrewd flask wheel gargle shrewd flask wheel",
+            "length": 90,
+            "unique_chars": 13,
+            "language": "en"
+          }
+        ]
+      },
+      "level_15": {
+        "difficulty_score": 2.8,
+        "estimated_wpm": 38,
+        "character_set": "asdfghjklqwertyuiop",
+        "focus": "Complete top row integration",
+        "texts": [
+          {
+            "id": "t1l15_001",
+            "content": "quilted poetry requires thoughtful words quilted poetry requires thoughtful words quilted poetry thoughtful words requires quilted poetry thoughtful words requires quilted",
+            "length": 151,
+            "unique_chars": 19,
+            "language": "en"
+          },
+          {
+            "id": "t1l15_002",
+            "content": "typewriter players pursue their quarterly reports typewriter players pursue quarterly reports typewriter players pursue quarterly reports typewriter players",
+            "length": 141,
+            "unique_chars": 19,
+            "language": "en"
+          }
+        ]
+      },
+      "level_20": {
+        "difficulty_score": 3.5,
+        "estimated_wpm": 43,
+        "character_set": "abcdefghijklmnopqrstuvwxyz",
+        "focus": "Complete alphabet - all letters",
+        "texts": [
+          {
+            "id": "t1l20_001",
+            "content": "quick brown foxes jump over lazy dogs while typing experts practice their skills with determination and focus creating muscle memory through consistent repetition and dedication",
+            "length": 169,
+            "unique_chars": 26,
+            "language": "en"
+          },
+          {
+            "id": "t1l20_002",
+            "content": "professional typists develop excellent techniques by practicing fundamental exercises daily with proper posture breathing and finger placement while maintaining consistent rhythm",
+            "length": 169,
+            "unique_chars": 26,
+            "language": "en"
+          },
+          {
+            "id": "t1l20_003",
+            "content": "amazing jazz musicians frequently combine complex rhythms with beautiful melodies creating extraordinary performances that captivate audiences worldwide through skilled expression",
+            "length": 169,
+            "unique_chars": 26,
+            "language": "en"
+          }
+        ]
+      },
+      "level_25": {
+        "difficulty_score": 4.0,
+        "estimated_wpm": 48,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "focus": "Mixed case introduction",
+        "texts": [
+          {
+            "id": "t1l25_001",
+            "content": "Professional TypeWriters develop Advanced Skills through Consistent Practice Sessions. Modern Technology requires Excellent Typing Abilities for Maximum Productivity and Efficiency in Daily Work Tasks.",
+            "length": 186,
+            "unique_chars": 52,
+            "language": "en"
+          },
+          {
+            "id": "t1l25_002",
+            "content": "Software Engineers utilize Multiple Programming Languages including Python JavaScript TypeScript and Rust while Building Complex Applications that serve Millions of Users Daily.",
+            "length": 171,
+            "unique_chars": 52,
+            "language": "en"
+          }
+        ]
+      },
+      "level_30": {
+        "difficulty_score": 4.5,
+        "estimated_wpm": 52,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "focus": "Professional vocabulary with mixed case",
+        "texts": [
+          {
+            "id": "t1l30_001",
+            "content": "Advanced Programming Concepts require Understanding of Complex Algorithms and Data Structures. Software Engineers constantly Navigate between Different Programming Languages while Building Scalable Applications that serve Millions of Users worldwide through Cloud Infrastructure.",
+            "length": 252,
+            "unique_chars": 52,
+            "language": "en"
+          },
+          {
+            "id": "t1l30_002",
+            "content": "Machine Learning Engineers develop Sophisticated Models using TensorFlow PyTorch and Scikit Learn Libraries. These Professionals analyze Large Datasets to Extract Meaningful Patterns and Insights that Drive Business Decisions in Technology Companies.",
+            "length": 239,
+            "unique_chars": 52,
+            "language": "en"
+          }
+        ]
+      },
+      "level_35": {
+        "difficulty_score": 4.8,
+        "estimated_wpm": 55,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "focus": "Technical terminology and proper nouns",
+        "texts": [
+          {
+            "id": "t1l35_001",
+            "content": "DevOps Engineers implement Continuous Integration and Continuous Deployment Pipelines using Docker Kubernetes Jenkins and GitHub Actions. These Technologies enable Rapid Software Delivery while maintaining High Quality Standards and System Reliability across Multiple Environments.",
+            "length": 261,
+            "unique_chars": 52,
+            "language": "en"
+          },
+          {
+            "id": "t1l35_002",
+            "content": "Cybersecurity Specialists protect Organizations from Advanced Persistent Threats using Firewalls Intrusion Detection Systems and Behavioral Analytics. Modern Security Frameworks require Comprehensive Understanding of Encryption Network Protocols and Threat Intelligence.",
+            "length": 259,
+            "unique_chars": 52,
+            "language": "en"
+          }
+        ]
+      },
+      "level_40": {
+        "difficulty_score": 5.0,
+        "estimated_wpm": 58,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "focus": "Complex technical content preparation for punctuation",
+        "texts": [
+          {
+            "id": "t1l40_001",
+            "content": "Full Stack Developers master Frontend Technologies like React Angular Vue alongside Backend Frameworks including Node Express Django Flask while Understanding Database Systems such as PostgreSQL MongoDB Redis and implementing RESTful APIs GraphQL Microservices Architecture patterns for Scalable Web Applications.",
+            "length": 281,
+            "unique_chars": 52,
+            "language": "en"
+          },
+          {
+            "id": "t1l40_002",
+            "content": "Cloud Architects design Distributed Systems using Amazon Web Services Microsoft Azure Google Cloud Platform leveraging Serverless Computing Container Orchestration Auto Scaling Load Balancing Content Delivery Networks ensuring High Availability Fault Tolerance Performance Optimization.",
+            "length": 270,
+            "unique_chars": 52,
+            "language": "en"
+          },
+          {
+            "id": "t1l40_003",
+            "content": "Data Scientists analyze Complex Datasets using Python R SQL Jupyter Notebooks Apache Spark Hadoop implementing Machine Learning Algorithms Deep Neural Networks Natural Language Processing Computer Vision techniques to extract Business Intelligence from Unstructured Information Sources.",
+            "length": 266,
+            "unique_chars": 52,
+            "language": "en"
+          }
+        ]
+      }
+    }
+  }
+}

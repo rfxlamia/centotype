@@ -1,0 +1,25 @@
+[package]
+name = "centotype-content"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Text corpus loading, caching, and dynamic generation for Centotype"
+
+[dependencies]
+centotype-core.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+regex.workspace = true
+unicode-segmentation.workspace = true
+indexmap.workspace = true
+rayon.workspace = true
+once_cell.workspace = true
+memmap2.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true

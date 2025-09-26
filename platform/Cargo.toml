@@ -1,0 +1,23 @@
+[package]
+name = "centotype-platform"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Platform-specific integrations and terminal detection for Centotype"
+
+[dependencies]
+centotype-core.workspace = true
+crossterm.workspace = true
+serde.workspace = true
+once_cell.workspace = true
+tracing.workspace = true
+num_cpus = "1.0"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["wincon", "consoleapi", "processenv"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+nix = "0.27"

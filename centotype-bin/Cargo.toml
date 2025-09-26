@@ -1,0 +1,29 @@
+[package]
+name = "centotype"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "CLI-based typing trainer with 100 progressive difficulty levels"
+keywords.workspace = true
+categories.workspace = true
+
+[[bin]]
+name = "centotype"
+path = "src/main.rs"
+
+[dependencies]
+centotype-core.workspace = true
+centotype-engine.workspace = true
+centotype-content.workspace = true
+centotype-analytics.workspace = true
+centotype-cli.workspace = true
+centotype-persistence.workspace = true
+centotype-platform.workspace = true
+
+clap.workspace = true
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "macros"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true

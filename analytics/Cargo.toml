@@ -1,0 +1,18 @@
+[package]
+name = "centotype-analytics"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Performance analysis and error classification for Centotype"
+
+[dependencies]
+centotype-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+indexmap.workspace = true
+once_cell.workspace = true
+tracing.workspace = true

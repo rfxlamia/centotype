@@ -1,0 +1,283 @@
+{
+  "tier_2_complete": {
+    "tier_name": "Punctuation",
+    "description": "Progressive punctuation introduction from basic periods and commas to complex sentence structures",
+    "levels": [41, 60],
+    "learning_progression": [
+      "Basic sentence endings (period)",
+      "Comma usage in lists and clauses",
+      "Question and exclamation marks",
+      "Semicolons and colons",
+      "Quotation marks and dialogue",
+      "Complex punctuation combinations"
+    ],
+    "content": {
+      "level_41": {
+        "difficulty_score": 5.2,
+        "estimated_wpm": 55,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.",
+        "focus": "Period introduction - sentence structure",
+        "punctuation_density": 0.02,
+        "texts": [
+          {
+            "id": "t2l41_001",
+            "content": "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet. Professional typists use such sentences for practice. Consistent training improves both speed and accuracy. Regular practice builds muscle memory effectively.",
+            "length": 244,
+            "unique_chars": 53,
+            "language": "en",
+            "sentence_count": 5
+          },
+          {
+            "id": "t2l41_002",
+            "content": "Software development requires systematic thinking. Complex problems need careful analysis. Good programmers write clean readable code. Testing ensures applications work correctly. Documentation helps future maintenance efforts.",
+            "length": 214,
+            "unique_chars": 53,
+            "language": "en",
+            "sentence_count": 5
+          },
+          {
+            "id": "t2l41_003",
+            "content": "Modern technology transforms daily life significantly. Smartphones connect people worldwide instantly. Cloud computing enables remote collaboration. Artificial intelligence automates routine tasks. Digital literacy becomes increasingly important.",
+            "length": 226,
+            "unique_chars": 53,
+            "language": "en",
+            "sentence_count": 5
+          }
+        ]
+      },
+      "level_42": {
+        "difficulty_score": 5.4,
+        "estimated_wpm": 54,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,",
+        "focus": "Comma introduction - lists and pauses",
+        "punctuation_density": 0.03,
+        "texts": [
+          {
+            "id": "t2l42_001",
+            "content": "Programming languages include Python, JavaScript, TypeScript, Rust, and Go. Each language serves specific purposes, offers unique features, and targets different use cases. Developers choose tools based on project requirements, team expertise, and performance needs.",
+            "length": 261,
+            "unique_chars": 54,
+            "language": "en",
+            "comma_count": 8
+          },
+          {
+            "id": "t2l42_002",
+            "content": "Web development involves HTML, CSS, JavaScript, and various frameworks. Frontend technologies create user interfaces, handle interactions, and manage state. Backend systems process data, manage databases, and provide APIs for client applications.",
+            "length": 242,
+            "unique_chars": 54,
+            "language": "en",
+            "comma_count": 6
+          }
+        ]
+      },
+      "level_43": {
+        "difficulty_score": 5.6,
+        "estimated_wpm": 53,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!",
+        "focus": "Exclamation mark - emphasis and excitement",
+        "punctuation_density": 0.04,
+        "texts": [
+          {
+            "id": "t2l43_001",
+            "content": "Software development is incredibly rewarding! Creating elegant solutions requires creativity, logical thinking, and attention to detail. Debugging can be challenging, but finding solutions feels amazing! Clean code makes maintenance much easier.",
+            "length": 235,
+            "unique_chars": 55,
+            "language": "en",
+            "exclamation_count": 2
+          },
+          {
+            "id": "t2l43_002",
+            "content": "Technology advances at incredible speed! Machine learning transforms industries, automates processes, and enables new possibilities. Innovation drives progress! Continuous learning keeps professionals competitive, relevant, and successful.",
+            "length": 224,
+            "unique_chars": 55,
+            "language": "en",
+            "exclamation_count": 2
+          }
+        ]
+      },
+      "level_45": {
+        "difficulty_score": 5.8,
+        "estimated_wpm": 52,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?",
+        "focus": "Question marks - inquiries and dialogue",
+        "punctuation_density": 0.05,
+        "texts": [
+          {
+            "id": "t2l45_001",
+            "content": "What makes great software? Is it elegant design, robust functionality, or user experience? Developers constantly ask these questions. How do we balance performance with maintainability? Why do some applications succeed while others fail?",
+            "length": 231,
+            "unique_chars": 56,
+            "language": "en",
+            "question_count": 5
+          },
+          {
+            "id": "t2l45_002",
+            "content": "Which programming language should beginners learn? Python offers simplicity, JavaScript enables web development, while Rust provides safety. What factors matter most? Career goals, project types, and personal interests guide decisions!",
+            "length": 225,
+            "unique_chars": 56,
+            "language": "en",
+            "question_count": 2
+          }
+        ]
+      },
+      "level_47": {
+        "difficulty_score": 6.2,
+        "estimated_wpm": 50,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;",
+        "focus": "Semicolon introduction - complex sentences",
+        "punctuation_density": 0.06,
+        "texts": [
+          {
+            "id": "t2l47_001",
+            "content": "Modern development requires multiple skills; frontend expertise includes HTML, CSS, and JavaScript; backend knowledge covers databases, APIs, and server management. Teams collaborate effectively; code reviews improve quality; continuous integration ensures stability.",
+            "length": 255,
+            "unique_chars": 57,
+            "language": "en",
+            "semicolon_count": 5
+          },
+          {
+            "id": "t2l47_002",
+            "content": "Artificial intelligence transforms industries; machine learning algorithms process vast datasets; neural networks recognize patterns; automation increases efficiency. What challenges remain? How do we ensure ethical implementation; maintain human oversight; preserve employment opportunities?",
+            "length": 277,
+            "unique_chars": 57,
+            "language": "en",
+            "semicolon_count": 5
+          }
+        ]
+      },
+      "level_50": {
+        "difficulty_score": 6.5,
+        "estimated_wpm": 49,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:",
+        "focus": "Colon usage - explanations and lists",
+        "punctuation_density": 0.07,
+        "texts": [
+          {
+            "id": "t2l50_001",
+            "content": "Web development encompasses several technologies: HTML structures content, CSS styles appearance, JavaScript adds interactivity. Backend systems include: databases for storage, APIs for communication, servers for processing. Full-stack developers master both domains: frontend and backend skills.",
+            "length": 281,
+            "unique_chars": 58,
+            "language": "en",
+            "colon_count": 3
+          },
+          {
+            "id": "t2l50_002",
+            "content": "Programming paradigms offer different approaches: object-oriented design models real-world entities; functional programming emphasizes immutability; procedural methods follow sequential steps. Each paradigm has strengths: maintainability, performance, or simplicity depending on requirements.",
+            "length": 279,
+            "unique_chars": 58,
+            "language": "en",
+            "colon_count": 3
+          }
+        ]
+      },
+      "level_52": {
+        "difficulty_score": 6.8,
+        "estimated_wpm": 48,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"",
+        "focus": "Double quotation marks - direct quotes",
+        "punctuation_density": 0.08,
+        "texts": [
+          {
+            "id": "t2l52_001",
+            "content": "The architect explained: \"Design isn't just aesthetics; it's problem-solving.\" She emphasized that \"great software architecture requires understanding user needs, system constraints, and future scalability.\" The team learned: \"attention to detail separates good from exceptional.\"",
+            "length": 270,
+            "unique_chars": 59,
+            "language": "en",
+            "quote_count": 3
+          },
+          {
+            "id": "t2l52_002",
+            "content": "\"Code readability matters more than cleverness,\" the senior developer advised. \"Write code that your future self can understand.\" He continued: \"optimize for maintainability first, performance second.\" The principle remains: \"clarity beats complexity.\"",
+            "length": 244,
+            "unique_chars": 59,
+            "language": "en",
+            "quote_count": 4
+          }
+        ]
+      },
+      "level_55": {
+        "difficulty_score": 7.2,
+        "estimated_wpm": 46,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'",
+        "focus": "Single quotes and contractions",
+        "punctuation_density": 0.09,
+        "texts": [
+          {
+            "id": "t2l55_001",
+            "content": "\"What's the difference between good and great developers?\" she asked. \"It's not just technical skills; it's understanding business needs, user empathy, and team collaboration. Great developers don't just write code; they solve problems, mentor others, and drive innovation.\"",
+            "length": 268,
+            "unique_chars": 60,
+            "language": "en",
+            "single_quote_count": 4
+          },
+          {
+            "id": "t2l55_002",
+            "content": "The team leader said: \"We're building something that'll change how people work. It's not about perfect code; it's about creating value.\" The mission statement read: \"Empower users, don't overwhelm them; simplify complexity, don't hide it.\"",
+            "length": 238,
+            "unique_chars": 60,
+            "language": "en",
+            "single_quote_count": 6
+          }
+        ]
+      },
+      "level_57": {
+        "difficulty_score": 7.5,
+        "estimated_wpm": 45,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'(",
+        "focus": "Opening parentheses - additional information",
+        "punctuation_density": 0.10,
+        "texts": [
+          {
+            "id": "t2l57_001",
+            "content": "Modern frameworks (like React, Vue, and Angular enable rapid development. Database systems (PostgreSQL, MongoDB, Redis provide different storage solutions; each serves specific use cases. Cloud platforms (AWS, Azure, GCP offer scalable infrastructure: compute, storage, networking services.",
+            "length": 289,
+            "unique_chars": 61,
+            "language": "en",
+            "parentheses_count": 3
+          },
+          {
+            "id": "t2l57_002",
+            "content": "Programming languages (Python, JavaScript, Rust serve different purposes: web development, data science, systems programming. Learning path depends on goals (career focus, project needs, personal interests; consistent practice builds expertise over time through deliberate effort.",
+            "length": 274,
+            "unique_chars": 61,
+            "language": "en",
+            "parentheses_count": 2
+          }
+        ]
+      },
+      "level_60": {
+        "difficulty_score": 8.0,
+        "estimated_wpm": 43,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()",
+        "focus": "Complete punctuation set - complex sentences",
+        "punctuation_density": 0.12,
+        "texts": [
+          {
+            "id": "t2l60_001",
+            "content": "Advanced algorithms (like quicksort, mergesort, and heap operations) form computing's foundation. Time complexity notation O(n log n) describes performance characteristics; it helps developers choose appropriate solutions. \"Why does Big-O matter?\" students ask. The answer: scalability issues emerge when processing millions of records!",
+            "length": 325,
+            "unique_chars": 62,
+            "language": "en",
+            "complexity": "high"
+          },
+          {
+            "id": "t2l60_002",
+            "content": "Software engineering principles (DRY, SOLID, KISS) guide development practices. Code reviews ensure quality: \"Does this solve the real problem?\" Senior developers mentor juniors; they share wisdom gained through experience. The goal isn't perfect code; it's maintainable, scalable solutions that deliver value.",
+            "length": 302,
+            "unique_chars": 62,
+            "language": "en",
+            "complexity": "high"
+          },
+          {
+            "id": "t2l60_003",
+            "content": "\"What makes exceptional software?\" The answer involves multiple factors: elegant architecture, robust testing, clear documentation, and user-centered design. Teams that communicate effectively (through code reviews, pair programming, and regular meetings) consistently deliver better results than isolated individuals.",
+            "length": 303,
+            "unique_chars": 62,
+            "language": "en",
+            "complexity": "high"
+          }
+        ]
+      }
+    }
+  }
+}

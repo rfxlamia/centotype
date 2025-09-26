@@ -1,0 +1,163 @@
+{
+  "tier_4_sample": {
+    "tier_name": "Symbols",
+    "description": "Advanced symbol typing for programming and technical content leading to Level 100 mastery",
+    "levels": [81, 100],
+    "mastery_target": {
+      "level_100": {
+        "wpm_effective": 130,
+        "accuracy": 99.5,
+        "error_severity": "≤3",
+        "completion_time": "≤120 seconds",
+        "content_length": "3000+ characters",
+        "zero_backspace_threshold": "80% completion point"
+      }
+    },
+    "learning_progression": [
+      "Basic programming symbols ([, ], {, }, <, >)",
+      "Advanced operators (|, &, ^, ~, %, $, #, @)",
+      "Complex programming constructs and regex patterns",
+      "Mixed-language technical content",
+      "Master-level content with all character classes",
+      "Level 100: Ultimate typing mastery challenge"
+    ],
+    "content": {
+      "level_81": {
+        "difficulty_score": 11.5,
+        "estimated_wpm": 33,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]",
+        "focus": "Square bracket introduction - arrays and indexing",
+        "symbol_density": 0.13,
+        "texts": [
+          {
+            "id": "t4l81_001",
+            "content": "Array manipulation requires understanding indexing patterns: data[0] contains first_element, while data[length - 1] accesses last_element. Matrix operations follow similar conventions: matrix[row][column] = value where bounds checking prevents overflow. Modern languages use array[index] syntax consistently across implementations: Python lists[5], JavaScript arrays[10], and Rust vectors[15].",
+            "length": 381,
+            "unique_chars": 79,
+            "language": "en",
+            "programming_focus": true
+          }
+        ]
+      },
+      "level_83": {
+        "difficulty_score": 12.0,
+        "estimated_wpm": 32,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]{}",
+        "focus": "Curly braces - objects and code blocks",
+        "symbol_density": 0.14,
+        "texts": [
+          {
+            "id": "t4l83_001",
+            "content": "Object-oriented programming utilizes curly brace syntax extensively: class_definition { private_fields; public_methods(); constructor() { initialization_code; } }. JSON structures follow similar patterns: {\"key\": \"value\", \"nested\": {\"data\": [1, 2, 3]}, \"boolean\": true}. Database queries often use brace notation: {$match: {status: \"active\", created_date: {$gte: new_date}}}.",
+            "length": 398,
+            "unique_chars": 81,
+            "language": "en",
+            "programming_focus": true
+          }
+        ]
+      },
+      "level_85": {
+        "difficulty_score": 12.5,
+        "estimated_wpm": 31,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]{}\\<>",
+        "focus": "Angle brackets and backslashes - templates and escaping",
+        "symbol_density": 0.15,
+        "texts": [
+          {
+            "id": "t4l85_001",
+            "content": "Generic programming employs angle bracket notation: Vector<T> where T represents template_parameter. HTML markup uses similar syntax: <div class=\"container\"><p>Content</p></div> for document_structure. Regular expressions require careful escaping: \\d{3}-\\d{2}-\\d{4} matches social_security patterns, while \\w+@\\w+\\.\\w+ validates email_addresses. Template engines combine both: <template v-for=\"item in items\">{{item.name}}</template>.",
+            "length": 447,
+            "unique_chars": 84,
+            "language": "en",
+            "programming_focus": true
+          }
+        ]
+      },
+      "level_87": {
+        "difficulty_score": 13.0,
+        "estimated_wpm": 30,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]{}\\<>|&",
+        "focus": "Pipe and ampersand operators - logical operations",
+        "symbol_density": 0.16,
+        "texts": [
+          {
+            "id": "t4l87_001",
+            "content": "Boolean logic operations require precise operator usage: condition_a && condition_b evaluates both_expressions, while condition_c || condition_d uses short_circuit evaluation. Bitwise operations manipulate binary_data: value & mask isolates specific_bits, while flag | option combines bit_flags. Unix pipes chain_commands: grep \"pattern\" file.txt | sort | uniq | wc -l counts unique_matches efficiently.",
+            "length": 415,
+            "unique_chars": 86,
+            "language": "en",
+            "programming_focus": true
+          }
+        ]
+      },
+      "level_90": {
+        "difficulty_score": 14.0,
+        "estimated_wpm": 29,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]{}\\<>|&^~%$#@",
+        "focus": "Advanced symbol combinations - system programming",
+        "symbol_density": 0.18,
+        "texts": [
+          {
+            "id": "t4l90_001",
+            "content": "System programming demands mastery of complex operators: pointer_arithmetic uses *ptr = &variable for memory_access, while bit_manipulation employs XOR ^= operations. Hash_functions calculate checksums: #define HASH(x) ((x * 0x1A2B3C4D) >> 24) & 0xFF for data_integrity. Memory allocation follows patterns: malloc(sizeof(struct)) || error_handling for robust_systems. Assembly instructions: MOV EAX, [EBP+8]; XOR ECX, ECX demonstrate low_level programming.",
+            "length": 462,
+            "unique_chars": 90,
+            "language": "en",
+            "system_programming": true
+          }
+        ]
+      },
+      "level_95": {
+        "difficulty_score": 15.0,
+        "estimated_wpm": 28,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]{}\\<>|&^~%$#@_",
+        "focus": "Pre-mastery level - complex mixed content",
+        "symbol_density": 0.20,
+        "texts": [
+          {
+            "id": "t4l95_001",
+            "content": "Advanced cryptographic implementations require sophisticated bit_operations: encrypt_function(key[256], nonce[96], plaintext[*]) -> ciphertext where AES_256_GCM provides authenticated_encryption. Compiler_optimizations utilize inline_assembly: __asm__(\"movq %0, %%rax; addq $1, %%rax\" : \"=r\"(result) : \"r\"(input)); for performance_critical code_paths. Regular expressions: /^(?:[A-Z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[A-Z0-9!#$%&'*+\\/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?\\.)+[A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?)$/ validate email_addresses comprehensively.",
+            "length": 682,
+            "unique_chars": 91,
+            "language": "en",
+            "master_preparation": true
+          }
+        ]
+      },
+      "level_100": {
+        "difficulty_score": 16.0,
+        "estimated_wpm": 30,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=[]{}\\<>|&^~%$#@_",
+        "focus": "MASTERY LEVEL - Ultimate typing challenge with mixed languages",
+        "symbol_density": 0.22,
+        "mastery_criteria": {
+          "target_wpm": 130,
+          "min_accuracy": 99.5,
+          "max_error_severity": 3,
+          "time_limit": 120,
+          "content_length": [3000, 3500],
+          "language_switching": true,
+          "zero_backspace_zone": 0.8
+        },
+        "texts": [
+          {
+            "id": "t4l100_001",
+            "content": "Ultimate mastery encompasses all programming paradigms: functional composition map(f) . filter(p) . reduce(g), object-oriented inheritance class Child extends Parent { constructor(args) { super(args); this._private = Symbol('hidden'); } }, and low-level memory management *ptr++ = (*src++ & 0xFF) | (flag << 8). Advanced regex patterns /^(?:[A-Z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[A-Z0-9!#$%&'*+\\/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?\\.)+)/ validate complex_inputs while concurrent processing spawn(move || { for i in 0..=1000 { tx.send(expensive_computation(i * 0x1A2B + 0x3C4D)).unwrap(); } }) maximizes throughput. Sistem kriptografi menggunakan algoritma AES-256-GCM: encrypt(&key[..32], &nonce[..12], &plaintext[..]) -> Result<Vec<u8>, CryptoError> memastikan keamanan data dengan overhead minimal ≤5% untuk operasi real-time. Database transactions BEGIN; INSERT INTO users (id, email, created_at) VALUES (uuid_generate_v4(), $1, NOW()); COMMIT; ensure ACID compliance while maintaining performance ≥10000 TPS under concurrent load. Neural network architectures: transformer_layer(attention(Q, K, V) + feedforward(layer_norm(x))) process sequential data where Q = xW_q, K = xW_k, V = xW_v represent learned projections optimizing cross-entropy loss ∇L = Σ(y_true * log(y_pred)) across mini-batches. Advanced memory optimization: #define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1)) ensures cache-friendly data structures while __builtin_prefetch(ptr, 0, 3) hints processor caching strategies. Kinerja sistem terdistribusi memerlukan load balancing: consistent_hashing(key) % ring_size distributes requests while circuit_breaker pattern melindungi upstream services dari cascade failures. Modern deployment pipelines: docker build -t app:${GIT_SHA} . && kubectl apply -f k8s/ --namespace=production enable continuous delivery with zero-downtime updates through blue-green strategies. The ultimate typing mastery requires sustained performance: 130+ WPM effective speed, 99.5%+ accuracy, minimal error severity ≤3 points, zero corrections in final 20% of content, demonstrating complete muscle memory automation across all character classes, symbol densities, language transitions, and technical complexity levels while maintaining consistent rhythm throughout 120-second evaluation periods under cognitive load conditions.",
+            "length": 2847,
+            "unique_chars": 91,
+            "language": "mixed",
+            "mastery_validation": true,
+            "complexity_breakdown": {
+              "programming_syntax": 35,
+              "mathematical_notation": 15,
+              "regex_patterns": 10,
+              "mixed_languages": 15,
+              "technical_symbols": 20,
+              "natural_language": 5
+            }
+          }
+        ]
+      }
+    }
+  }
+}

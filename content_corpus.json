@@ -1,0 +1,476 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "total_levels": 100,
+    "tiers": 4,
+    "languages": ["en", "id"],
+    "generated_at": "2025-09-27T00:00:00Z",
+    "difficulty_algorithm": "character_frequency_weighted",
+    "content_validation": "scientifically_grounded"
+  },
+  "tier_definitions": {
+    "tier_1": {
+      "name": "Letters",
+      "levels": [1, 40],
+      "description": "Basic letter combinations and common words",
+      "character_sets": ["a-z", "A-Z"],
+      "progression": "home_row_to_all_letters"
+    },
+    "tier_2": {
+      "name": "Punctuation",
+      "levels": [41, 60],
+      "description": "Progressive punctuation introduction",
+      "character_sets": ["a-z", "A-Z", ".,!?;:\"'()"],
+      "progression": "basic_to_complex_punctuation"
+    },
+    "tier_3": {
+      "name": "Numbers",
+      "levels": [61, 80],
+      "description": "Number typing and mathematical expressions",
+      "character_sets": ["a-z", "A-Z", ".,!?;:\"'()", "0-9", "+-*/="],
+      "progression": "digits_to_complex_expressions"
+    },
+    "tier_4": {
+      "name": "Symbols",
+      "levels": [81, 100],
+      "description": "Programming symbols and advanced content",
+      "character_sets": ["a-z", "A-Z", ".,!?;:\"'()", "0-9", "+-*/=", "<>|&^~%$#@[]{}\\/_"],
+      "progression": "basic_symbols_to_master_level"
+    }
+  },
+  "difficulty_metrics": {
+    "character_frequency_weights": {
+      "common_letters": 1.0,
+      "uncommon_letters": 1.5,
+      "basic_punctuation": 1.8,
+      "complex_punctuation": 2.2,
+      "digits": 1.4,
+      "math_operators": 1.9,
+      "programming_symbols": 2.8,
+      "rare_symbols": 3.5
+    },
+    "complexity_factors": {
+      "bigram_rarity": 0.3,
+      "case_switching": 0.4,
+      "finger_distance": 0.5,
+      "symbol_density": 0.8,
+      "language_switching": 1.0
+    }
+  },
+  "content": {
+    "tier_1": {
+      "level_1": {
+        "difficulty_score": 1.0,
+        "estimated_wpm": 25,
+        "character_set": "asdf",
+        "length_range": [40, 60],
+        "texts": [
+          {
+            "id": "t1l1_001",
+            "language": "en",
+            "content": "asdf fdsa sadf fasd dfas sfad asdf fdsa sadf fasd",
+            "metadata": {
+              "unique_chars": 4,
+              "bigram_complexity": 1.2,
+              "finger_usage": ["left_pinky", "left_ring", "left_middle", "left_index"]
+            }
+          },
+          {
+            "id": "t1l1_002",
+            "language": "en",
+            "content": "dad sad fad as ads fas dad sad fad as ads fas dad",
+            "metadata": {
+              "unique_chars": 4,
+              "bigram_complexity": 1.1,
+              "finger_usage": ["left_pinky", "left_ring", "left_middle", "left_index"]
+            }
+          }
+        ]
+      },
+      "level_2": {
+        "difficulty_score": 1.1,
+        "estimated_wpm": 26,
+        "character_set": "asdfg",
+        "length_range": [45, 65],
+        "texts": [
+          {
+            "id": "t1l2_001",
+            "language": "en",
+            "content": "gags fads saga gaff sass aged fade gage saga fads gags aged",
+            "metadata": {
+              "unique_chars": 5,
+              "bigram_complexity": 1.3,
+              "finger_usage": ["left_pinky", "left_ring", "left_middle", "left_index", "left_index"]
+            }
+          }
+        ]
+      },
+      "level_3": {
+        "difficulty_score": 1.2,
+        "estimated_wpm": 27,
+        "character_set": "asdfgh",
+        "length_range": [50, 70],
+        "texts": [
+          {
+            "id": "t1l3_001",
+            "language": "en",
+            "content": "hash dash gash fish dish hash aged sage hash fish dash gash dish aged",
+            "metadata": {
+              "unique_chars": 6,
+              "bigram_complexity": 1.4,
+              "finger_usage": ["left_pinky", "left_ring", "left_middle", "left_index", "left_index", "right_index"]
+            }
+          }
+        ]
+      },
+      "level_10": {
+        "difficulty_score": 2.0,
+        "estimated_wpm": 35,
+        "character_set": "asdfghjkl",
+        "length_range": [80, 120],
+        "texts": [
+          {
+            "id": "t1l10_001",
+            "language": "en",
+            "content": "flask slash jaded glads flask shelf shads flask glade flash jaded shelf glads flask slash jaded shelf glade flash",
+            "metadata": {
+              "unique_chars": 9,
+              "bigram_complexity": 2.1,
+              "finger_usage": ["left_hand", "right_hand"]
+            }
+          }
+        ]
+      },
+      "level_20": {
+        "difficulty_score": 3.5,
+        "estimated_wpm": 45,
+        "character_set": "abcdefghijklmnopqrstuvwxyz",
+        "length_range": [120, 180],
+        "texts": [
+          {
+            "id": "t1l20_001",
+            "language": "en",
+            "content": "quick brown foxes jump over lazy dogs while typing experts practice their skills with determination and focus creating muscle memory through repetition",
+            "metadata": {
+              "unique_chars": 26,
+              "bigram_complexity": 3.2,
+              "finger_usage": ["all_fingers"],
+              "common_words": true
+            }
+          }
+        ]
+      },
+      "level_30": {
+        "difficulty_score": 4.2,
+        "estimated_wpm": 55,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "length_range": [150, 220],
+        "texts": [
+          {
+            "id": "t1l30_001",
+            "language": "en",
+            "content": "Professional TypeWriter Masters develop their Skills through Consistent Practice and Dedication. Advanced Users often Achieve remarkable Speed while maintaining Perfect Accuracy throughout Extended Sessions.",
+            "metadata": {
+              "unique_chars": 52,
+              "bigram_complexity": 4.1,
+              "finger_usage": ["all_fingers"],
+              "case_switching": true,
+              "proper_nouns": true
+            }
+          }
+        ]
+      },
+      "level_40": {
+        "difficulty_score": 5.0,
+        "estimated_wpm": 65,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "length_range": [180, 280],
+        "texts": [
+          {
+            "id": "t1l40_001",
+            "language": "en",
+            "content": "Advanced Programming Concepts require Understanding of Complex Algorithms and Data Structures. Software Engineers constantly Navigate between Different Programming Languages while Building Scalable Applications that serve Millions of Users worldwide. The Technology Industry demands Continuous Learning and Adaptation to new Frameworks.",
+            "metadata": {
+              "unique_chars": 52,
+              "bigram_complexity": 4.8,
+              "finger_usage": ["all_fingers"],
+              "case_switching": true,
+              "technical_vocabulary": true
+            }
+          }
+        ]
+      }
+    },
+    "tier_2": {
+      "level_41": {
+        "difficulty_score": 5.2,
+        "estimated_wpm": 60,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.",
+        "length_range": [160, 240],
+        "texts": [
+          {
+            "id": "t2l41_001",
+            "language": "en",
+            "content": "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet. Professional typists use such sentences for practice. Consistent training improves both speed and accuracy.",
+            "metadata": {
+              "unique_chars": 53,
+              "bigram_complexity": 4.9,
+              "punctuation_density": 0.02,
+              "sentence_structure": "simple"
+            }
+          }
+        ]
+      },
+      "level_45": {
+        "difficulty_score": 5.8,
+        "estimated_wpm": 58,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?",
+        "length_range": [180, 260],
+        "texts": [
+          {
+            "id": "t2l45_001",
+            "language": "en",
+            "content": "Software development is both art and science! Creating elegant solutions requires creativity, logical thinking, and attention to detail. Do programmers enjoy debugging? Most find it challenging yet rewarding. Clean code speaks for itself.",
+            "metadata": {
+              "unique_chars": 56,
+              "bigram_complexity": 5.4,
+              "punctuation_density": 0.04,
+              "sentence_structure": "mixed"
+            }
+          }
+        ]
+      },
+      "level_50": {
+        "difficulty_score": 6.5,
+        "estimated_wpm": 55,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:",
+        "length_range": [200, 300],
+        "texts": [
+          {
+            "id": "t2l50_001",
+            "language": "en",
+            "content": "Modern web development encompasses many technologies: HTML, CSS, JavaScript, and various frameworks. Full-stack developers must understand both frontend and backend systems; they work with databases, APIs, and user interfaces. What makes a great developer? Continuous learning, problem-solving skills, and collaboration!",
+            "metadata": {
+              "unique_chars": 58,
+              "bigram_complexity": 6.1,
+              "punctuation_density": 0.06,
+              "sentence_structure": "complex"
+            }
+          }
+        ]
+      },
+      "level_55": {
+        "difficulty_score": 7.2,
+        "estimated_wpm": 52,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'",
+        "length_range": [220, 320],
+        "texts": [
+          {
+            "id": "t2l55_001",
+            "language": "en",
+            "content": "The architect said, \"Design isn't just about aesthetics; it's about solving problems elegantly.\" She emphasized that great software architecture requires understanding user needs, system constraints, and future scalability. \"What separates good from great?\" she asked. The answer: attention to detail and user empathy.",
+            "metadata": {
+              "unique_chars": 60,
+              "bigram_complexity": 6.8,
+              "punctuation_density": 0.08,
+              "quoted_speech": true
+            }
+          }
+        ]
+      },
+      "level_60": {
+        "difficulty_score": 8.0,
+        "estimated_wpm": 50,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()",
+        "length_range": [250, 350],
+        "texts": [
+          {
+            "id": "t2l60_001",
+            "language": "en",
+            "content": "Advanced algorithms (like quicksort, mergesort, and heap operations) form the foundation of efficient computing. The time complexity notation O(n log n) describes performance characteristics; it helps developers choose appropriate solutions. \"Why does Big-O matter?\" students often ask. The answer lies in scalability: what works for 100 records might fail with 1,000,000!",
+            "metadata": {
+              "unique_chars": 62,
+              "bigram_complexity": 7.5,
+              "punctuation_density": 0.1,
+              "technical_parentheses": true
+            }
+          }
+        ]
+      }
+    },
+    "tier_3": {
+      "level_61": {
+        "difficulty_score": 8.2,
+        "estimated_wpm": 48,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789",
+        "length_range": [240, 340],
+        "texts": [
+          {
+            "id": "t3l61_001",
+            "language": "en",
+            "content": "Database optimization often involves analyzing query performance metrics. Table scans affecting 1000000 rows perform differently than indexed lookups on 100 records. The difference between O(1) and O(n) complexity becomes apparent when dealing with datasets containing 50000 or more entries.",
+            "metadata": {
+              "unique_chars": 72,
+              "bigram_complexity": 7.8,
+              "number_density": 0.03,
+              "technical_numbers": true
+            }
+          }
+        ]
+      },
+      "level_65": {
+        "difficulty_score": 8.8,
+        "estimated_wpm": 46,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/",
+        "length_range": [260, 360],
+        "texts": [
+          {
+            "id": "t3l65_001",
+            "language": "en",
+            "content": "Mathematical expressions in programming require precision: calculating 3.14159 * radius * radius gives area, while 2 * 3.14159 * radius computes circumference. Performance benchmarks show that 1000 + 2000 - 500 / 10 * 3 operations per second indicate system efficiency. Complex formulas like (a + b) * (c - d) / (e + f) test computational accuracy.",
+            "metadata": {
+              "unique_chars": 76,
+              "bigram_complexity": 8.4,
+              "number_density": 0.05,
+              "math_expressions": true
+            }
+          }
+        ]
+      },
+      "level_70": {
+        "difficulty_score": 9.5,
+        "estimated_wpm": 44,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "length_range": [280, 380],
+        "texts": [
+          {
+            "id": "t3l70_001",
+            "language": "en",
+            "content": "Financial calculations require absolute precision: annual_interest = principal * rate / 100, where principal = 250000 and rate = 4.25. Monthly payments follow formula: payment = principal * (rate * (1 + rate)^months) / ((1 + rate)^months - 1). For a 30-year mortgage at 3.75%, this equals approximately 1157.79 per month.",
+            "metadata": {
+              "unique_chars": 77,
+              "bigram_complexity": 9.1,
+              "number_density": 0.07,
+              "financial_formulas": true
+            }
+          }
+        ]
+      },
+      "level_75": {
+        "difficulty_score": 10.2,
+        "estimated_wpm": 42,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "length_range": [300, 400],
+        "texts": [
+          {
+            "id": "t3l75_001",
+            "language": "en",
+            "content": "Scientific notation handles large numbers efficiently: 6.022 * 10^23 represents Avogadro's number, while 9.109 * 10^-31 describes electron mass. Computing 2^32 = 4294967296 reveals integer limits; 2^64 = 18446744073709551616 shows 64-bit boundaries. Temperature conversions use formulas: celsius = (fahrenheit - 32) * 5/9, where 212°F = 100°C and 32°F = 0°C.",
+            "metadata": {
+              "unique_chars": 77,
+              "bigram_complexity": 9.8,
+              "number_density": 0.09,
+              "scientific_notation": true
+            }
+          }
+        ]
+      },
+      "level_80": {
+        "difficulty_score": 11.0,
+        "estimated_wpm": 40,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=",
+        "length_range": [320, 420],
+        "texts": [
+          {
+            "id": "t3l80_001",
+            "language": "en",
+            "content": "Advanced algorithms analyze complexity through mathematical models: quicksort averages O(n log n) = n * log2(n), where n = 1000000 gives approximately 19931569 operations. Fibonacci sequence F(n) = F(n-1) + F(n-2) grows exponentially; F(40) = 102334155 requires significant computation. Matrix multiplication of 500x500 matrices involves 125000000 operations, demonstrating why efficiency matters at scale.",
+            "metadata": {
+              "unique_chars": 77,
+              "bigram_complexity": 10.5,
+              "number_density": 0.11,
+              "algorithmic_analysis": true
+            }
+          }
+        ]
+      }
+    },
+    "tier_4_sample": {
+      "level_85": {
+        "difficulty_score": 12.5,
+        "estimated_wpm": 38,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=<>[]{}\\|&^~%$#@_",
+        "length_range": [350, 450],
+        "texts": [
+          {
+            "id": "t4l85_001",
+            "language": "en",
+            "content": "Modern programming languages utilize complex syntax: array[index] = {key: value, nested: {data: [1, 2, 3]}}, while conditional logic follows patterns like if (x > 0 && y < 100) { result = Math.pow(x, 2) + Math.sqrt(y); }. Regular expressions \\d{3}-\\d{2}-\\d{4} match patterns, and bitwise operations like 0xFF & 0x0F | 0xA0 manipulate binary data efficiently.",
+            "metadata": {
+              "unique_chars": 91,
+              "bigram_complexity": 12.1,
+              "symbol_density": 0.15,
+              "programming_syntax": true
+            }
+          }
+        ]
+      },
+      "level_90": {
+        "difficulty_score": 14.2,
+        "estimated_wpm": 35,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=<>[]{}\\|&^~%$#@_",
+        "length_range": [400, 500],
+        "texts": [
+          {
+            "id": "t4l90_001",
+            "language": "en",
+            "content": "Advanced system programming requires mastering complex pointer operations: *ptr = &variable, while memory allocation uses malloc(sizeof(struct)); dereferencing follows (*ptr)->field = 0x1A2B3C4D patterns. Assembly instructions MOV EAX, [EBP+8] and XOR ECX, ECX demonstrate low-level operations. Network programming utilizes socket configurations: bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) || connect(...) establish connections.",
+            "metadata": {
+              "unique_chars": 91,
+              "bigram_complexity": 13.8,
+              "symbol_density": 0.18,
+              "system_programming": true
+            }
+          }
+        ]
+      },
+      "level_100": {
+        "difficulty_score": 16.0,
+        "estimated_wpm": 30,
+        "character_set": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,!?;:\"'()0123456789+-*/=<>[]{}\\|&^~%$#@_",
+        "length_range": [450, 550],
+        "texts": [
+          {
+            "id": "t4l100_001",
+            "language": "mixed",
+            "content": "Ultimate mastery combines all elements: complex regex /^(?:[A-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[A-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?\\.))+/ validates emails while concurrent processing spawn(move || { for i in 0..=1000 { tx.send(expensive_computation(i)).unwrap(); } }) maximizes efficiency. Kriptografi melalui algoritma AES-256-GCM memastikan keamanan: encrypt(&key[..], &nonce[..], &plaintext[..]) menghasilkan ciphertext yang aman.",
+            "metadata": {
+              "unique_chars": 91,
+              "bigram_complexity": 15.5,
+              "symbol_density": 0.22,
+              "language_switching": true,
+              "master_level": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  "validation_rules": {
+    "difficulty_progression": {
+      "max_jump": 0.5,
+      "min_increment": 0.1,
+      "smoothness_factor": 0.85
+    },
+    "content_quality": {
+      "min_unique_chars": 4,
+      "max_repetition_ratio": 0.3,
+      "readability_threshold": 6.0
+    },
+    "performance_targets": {
+      "memory_per_level": "512KB",
+      "load_time_ms": 50,
+      "validation_time_ms": 10
+    }
+  }
+}

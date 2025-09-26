@@ -1,0 +1,22 @@
+[package]
+name = "centotype-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Command-line interface and interactive navigation for Centotype"
+
+[dependencies]
+centotype-core.workspace = true
+centotype-engine.workspace = true
+centotype-content.workspace = true
+centotype-analytics.workspace = true
+centotype-persistence.workspace = true
+centotype-platform.workspace = true
+clap.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+serde.workspace = true
+chrono.workspace = true
+tracing.workspace = true

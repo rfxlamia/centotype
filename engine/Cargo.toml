@@ -1,0 +1,27 @@
+[package]
+name = "centotype-engine"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Event loop, input handling, and render engine for Centotype"
+
+[dependencies]
+centotype-core.workspace = true
+centotype-platform.workspace = true
+crossterm = { workspace = true, features = ["event-stream"] }
+ratatui.workspace = true
+tokio = { workspace = true, features = ["rt", "time", "macros", "sync"] }
+parking_lot.workspace = true
+once_cell.workspace = true
+tracing.workspace = true
+serde.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+regex.workspace = true
+unicode-segmentation.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+

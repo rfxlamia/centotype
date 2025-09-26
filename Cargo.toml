@@ -1,0 +1,89 @@
+[workspace]
+members = [
+    "core",
+    "engine",
+    "content",
+    "analytics",
+    "cli",
+    "persistence",
+    "platform",
+    "centotype-bin"
+]
+resolver = "2"
+
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75.0"
+authors = ["Centotype Team <contact@centotype.dev>"]
+license = "MIT"
+repository = "https://github.com/centotype/centotype"
+homepage = "https://centotype.dev"
+description = "CLI-based typing trainer with 100 progressive difficulty levels"
+keywords = ["typing", "cli", "trainer", "practice", "wpm"]
+categories = ["command-line-utilities", "games", "education"]
+
+[workspace.dependencies]
+# Core dependencies
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["rt", "time", "macros"] }
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Terminal/CLI dependencies
+crossterm = "0.27"
+clap = { version = "4.0", features = ["derive", "env"] }
+ratatui = "0.24"
+
+# Performance and async
+rayon = "1.8"
+parking_lot = "0.12"
+once_cell = "1.19"
+
+# Utilities
+indexmap = "2.0"
+regex = "1.10"
+unicode-segmentation = "1.10"
+unicode-width = "0.1"
+
+# Configuration and persistence
+toml = "0.8"
+dirs = "5.0"
+memmap2 = "0.9"
+
+# Testing and benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.4"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Internal workspace crates
+centotype-core = { path = "core" }
+centotype-engine = { path = "engine" }
+centotype-content = { path = "content" }
+centotype-analytics = { path = "analytics" }
+centotype-cli = { path = "cli" }
+centotype-persistence = { path = "persistence" }
+centotype-platform = { path = "platform" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+debug = true
+
+# Performance targets validation profile
+[profile.perf-test]
+inherits = "release"
+debug = true
+strip = false
+

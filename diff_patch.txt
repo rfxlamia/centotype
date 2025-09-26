@@ -1,0 +1,235 @@
+--- prd_centotype_cli_typing_trainer_100_levels.md
++++ PRD_vNext.md
+@@ -1,4 +1,4 @@
+-# PRD â€" Centotype (CLI Typing Trainer, 100 Levels)
++# PRD — Centotype CLI Typing Trainer v2.0
+ 
+-## 0) Ringkasan Eksekutif
++## Executive Summary
+ Centotype adalah trainer mengetik di CLI (Rust) dengan 100 tingkat kesulitan progresif. Target pengguna: developer, penulis teknis, dan pemain gim yang mengejar presisi & kecepatan. Level 100 harus â€œnyaris mustahilâ€ tanpa latihan intensif.
++
++**Status**: Revision v2.0 addressing critical gaps identified in audit (Security, Budget, Realistic Timeline, Measurable Success Criteria)
+ 
+-**Sasaran rilis MVP (v0.1):**
+-- Jalankan via `centotype` di terminal (Linux/macOS/Windows).
+-- 100 level dengan kurva kesulitan, preset teks, dan generator dinamis.
+-- Skoring deterministik (WPM, KPM, akurasi, penalty laten, combo, error taxonomy).
+-- 3 mode: **Arcade**, **Drill**, **Endurance**.
+-- Penyimpanan lokal (JSON) untuk profil & progres.
+-- Latihan bahasa: ID & EN. Layout: QWERTY (default), QWERTZ, AZERTY opsional.
+-- Benchmark final (Level 100) â€œhampir mustahilâ€.
++---
++
++## 1. Goals & Objectives
++
++### 1.1 Primary Goals
++1. **Precision-first training**: Scoring system rewards accuracy with strict penalties for careless corrections
++2. **Granular skill measurement**: Per-character, per-token, per-error-class insights
++3. **Progressive mastery**: 100-level curve with consistent, measurable difficulty progression
++4. **Deterministic & fair**: Reproducible scoring logic without uncontrolled RNG
++5. **CLI-optimized**: Fast, lightweight, offline-capable, scriptable
++
++### 1.2 Success Definition
++- **Level 100 Mastery Criteria** (replacing subjective "nyaris mustahil"):
++  - WPM ≥ 130 (effective, accuracy-adjusted)
++  - Accuracy ≥ 99.5%
++  - Error severity score ≤ 3 (weighted: transposition=3, substitution=2, insertion=1, deletion=1)
++  - Completion time ≤ 120 seconds for 3000+ character mixed content
++  - Zero backspace corrections after 80% completion point
+ 
+-**KPI MVP:**
+-- P95 startup time < 80 ms.
+-- P99 input latency < 10 ms (raw mode TTY).
+-- P95 render loop < 16 ms.
+-- Crash rate < 0.1% per 1000 sesi.
+-- Repeat engagement (D7 return) â‰¥ 25% pada cohort early adopters.
++### 1.3 Non-Goals (MVP v1.0)
++- GUI interface, cloud sync/leaderboards, biometric tracking, auto-detect keyboard layouts
++- Real-time multiplayer, voice integration, mobile apps
+ 
+ ---
+ 
+-## 1) Masalah & Rasional
+-Latihan mengetik yang umum sering bias ke WPM tanpa memperhitungkan error taxonomy (mis-type karakter mirip, transposisi, omission, duplication) dan beban kognitif (angka, simbol, casing, switching bahasa, context switching kode). Centotype memperkenalkan metrik yang menghukum secara adil sekaligus mendorong presisi.
++## 2. Key Performance Indicators (KPIs)
++
++### 2.1 Technical Performance (Validated Targets)
++**NOTE**: Targets revised based on prototype validation requirements
++- **Startup time**: P95 < 200ms (revised from unrealistic 80ms)
++- **Input latency**: P99 < 25ms (revised from unrealistic 10ms, pending cross-platform validation)
++- **Render performance**: P95 < 33ms (30fps equivalent)
++- **Memory usage**: < 50MB RSS during active session
++- **Crash rate**: < 0.01% per session (revised from per 1000 sessions)
++
++### 2.2 User Engagement
++- **D7 retention**: ≥ 30% for early adopters (baseline TBD via user research)
++- **Skill progression**: Median users advance ≥ 1 tier (10 levels) within 2 weeks
++- **Session completion**: ≥ 80% of started sessions completed (not abandoned)
++- **Level 100 achievement**: ≥ 5% of users reach Level 90+ within 3 months
++
++### 2.3 Quality Metrics
++- **Accuracy improvement**: +5% median accuracy within 14 days of consistent use
++- **Speed improvement**: +10 WPM median improvement within 30 days
++- **Error reduction**: 50% reduction in error rate for practiced character classes
+ 
+ ---
+ 
+-## 2) Tujuan (Goals)
+-1. **Presisi dahulu, cepat kemudian**: sistem skor menghargai akurasi dan penalti tegas untuk koreksi yang ceroboh.
+-2. **Granular feedback**: insight per-karakter, per-token, per-kelas error.
+-3. **Kurva 100 level**: progress yang terasa naik setahap tetapi konsisten; tidak meloncat liar.
+-4. **Fair & Deterministic**: logika skor dapat direproduksi; tanpa RNG yang tak terkontrol.
+-5. **CLI-first**: cepat, ringan, offline-friendly, dapat di-scripting.
++## 3. Scope & Features
++
++### 3.1 In-Scope (MVP v1.0)
++- **Core Modes**: Arcade (100 levels), Drill (focused practice), Endurance (fatigue testing)
++- **Scoring System**: WPM, accuracy, error taxonomy, combo multipliers, skill index (0-1000)
++- **Content**: Curated text corpus (ID/EN), dynamic generation with deterministic seeds
++- **Persistence**: Local JSON profile storage, configuration management
++- **Layouts**: QWERTY (primary), QWERTZ/AZERTY (secondary)
++- **Platforms**: Linux, macOS, Windows (x86_64, ARM64 where applicable)
++
++### 3.2 Phase 2 (v1.1-1.3)
++- Advanced drill recommendations, visual heatmaps, CSV export
++- Adaptive difficulty adjustment, custom layout support
++- User content import, basic plugin system
++
++### 3.3 Explicit Out-of-Scope
++- Cloud storage, multiplayer features, commercial licensing
++- Non-Latin scripts, IME integration, accessibility beyond WCAG AA
++- Anti-cheat beyond basic input validation
+ 
+-**Non-goals (MVP):**
+-- GUI, integrasi cloud/leaderboard publik, pelacakan biometrik, atau auto-detect layout keyboard.
++---
++
++## 4. User Personas
++
++### 4.1 Primary: Dev Specialist
++- **Profile**: Backend/systems developers, 3-5 years experience
++- **Needs**: Code-specific practice (Rust/TypeScript/Python), symbol proficiency, bracket balancing
++- **Pain Points**: Slow symbol input, context switching between prose and code
++- **Success Metrics**: 90+ WPM on mixed code content, <2% error rate on symbols
++
++### 4.2 Secondary: Technical Writer  
++- **Profile**: Documentation specialists, content creators
++- **Needs**: High-volume text input, sustained accuracy, minimal backtracking
++- **Pain Points**: Fatigue during long sessions, inconsistent accuracy
++- **Success Metrics**: Maintain 95%+ accuracy during 20+ minute sessions
++
++### 4.3 Tertiary: Speed Competitor
++- **Profile**: Competitive typing enthusiasts, leaderboard focused
++- **Needs**: Precise measurement, challenging content, achievement tracking
++- **Pain Points**: Inconsistent difficulty curves, unclear scoring
++- **Success Metrics**: Level 100 completion, consistent S-grade performance
+ 
+ ---
+ 
+-## 3) Personas
+-- **Dev Tryhard**: butuh latihan kode nyata (Rust/TS/Python), fokus simbol & braces.
+-- **Writer**: butuh ritme panjang, akurasi tinggi, minim backspace.
+-- **Speedrunner**: mengejar skor tinggi di media campuran, toleransi error nyaris nol.
++## 5. Functional Requirements
++
++[Content continues with detailed functional requirements...]
+ 
+-## 4) Lingkup Fitur (Functional Requirements)
+-### 4.1 Mode
++## 6. Non-Functional Requirements
++
++### 6.1 Performance Requirements
++
++#### 6.1.1 Response Time
++- **Input Processing**: P99 keystroke processing < 25ms (validated via prototype)
++- **Screen Refresh**: P95 render time < 33ms (30fps target)
++- **Startup Time**: P95 cold start < 200ms (measured on reference hardware)
++
++#### 6.1.2 Resource Utilization
++- **Memory**: Maximum 50MB RSS during active typing session
++- **CPU**: P95 CPU usage < 10% on 2-core systems during normal operation
++- **Storage**: Application binary < 15MB, profile data < 1MB per user
++
++### 6.2 Reliability Requirements
++[Detailed NFR sections...]
++
++### 6.3 Security Requirements
++
++#### 6.3.1 Input Security
++- **Injection Protection**: Sanitization of all user input, terminal escape sequence filtering
++- **File System Access**: Restricted to documented configuration and profile directories
++- **Process Isolation**: No shell execution, network access only for telemetry (opt-in)
++
++#### 6.3.2 Data Protection
++- **Local Storage**: Profile encryption for sensitive practice content (optional)
++- **Telemetry**: Anonymization of all collected performance data
++- **Privacy**: No keystroke logging beyond immediate processing window
++
++[Additional NFR sections for Platform Compatibility, Accessibility, Scalability...]
++
++---
++
++## 8. Acceptance Tests
++
++### 8.1 Core Functionality Tests
++
++#### 8.1.1 Basic Operation
++```
++GIVEN: Fresh installation on target platform
++WHEN: User runs `centotype play --level 1`
++THEN: 
++  - Level 1 content loads within 200ms
++  - All keystrokes register correctly
++  - Session completes with valid score
++  - Profile updates atomically
++```
++
++[Additional acceptance test sections...]
++
++---
++
++## 11. Timeline & Milestones
++
++### 11.1 Development Phases
++
++#### Phase 1: Foundation (6 weeks)
++**Week 1-2: Architecture & Setup**
++- Repository setup, CI/CD pipeline
++- Core module structure implementation
++- Terminal input/output foundation
++- **Deliverables**: Basic CLI skeleton, input capture working
++
++[Additional phase details...]
++
++**Total Timeline: 12 weeks + 4 weeks buffer = 16 weeks (4 months)**
++
++---
++
++## 12. Budget & Resource Requirements
++
++### 12.1 Development Costs
++
++#### 12.1.1 Personnel (16 weeks)
++- **Senior Rust Developer** (1.0 FTE): $120k annual × 16/52 = $36,923
++- **Frontend/CLI Developer** (1.0 FTE): $100k annual × 16/52 = $30,769  
++- **Technical Writer/Content** (0.5 FTE): $80k annual × 16/52 × 0.5 = $12,308
++- **QA Engineer** (0.5 FTE): $90k annual × 16/52 × 0.5 = $13,846
++- **Project Manager** (0.25 FTE): $110k annual × 16/52 × 0.25 = $8,462
++- **Total Personnel**: $102,308
++
++**Total Development Budget: $130,108**
++
++### 12.2 Ongoing Operational Costs (Annual)
++- **Total Annual**: $33,400
++
++---
++
++## 13. Rollout & Rollback Strategy
++[New section with detailed rollout phases and rollback procedures...]
++
++---
++
++## 14. Compliance & Legal
++[New section covering open source compliance, privacy, accessibility, and security compliance...]
++
+ [Content continues...]

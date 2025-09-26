@@ -1,0 +1,25 @@
+[package]
+name = "centotype-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core state management and scoring engine for Centotype"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+indexmap.workspace = true
+unicode-segmentation.workspace = true
+once_cell.workspace = true
+parking_lot.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+proptest.workspace = true
+
