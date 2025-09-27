@@ -3,7 +3,6 @@ use crate::types::*;
 use indexmap::IndexMap;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use tracing::{debug, info};
 
 /// Level manager for 100 progressive difficulty levels
 pub struct Level {
@@ -43,7 +42,7 @@ impl Level {
     pub fn get_next_level(&mut self, progress: &UserProgress) -> Result<LevelId> {
         // Start with Level 1 if no progress
         if progress.best_results.is_empty() {
-            return Ok(LevelId::new(1)?);
+            return LevelId::new(1);
         }
 
         // Find the highest completed level with good performance
@@ -67,7 +66,7 @@ impl Level {
         }
 
         // Ensure we don't exceed level 100
-        Ok(LevelId::new(next_level.min(100))?)
+        LevelId::new(next_level.min(100))
     }
 
     /// Check if Level 100 mastery criteria is met
@@ -151,7 +150,8 @@ impl Level {
             // Unlock next tier if current tier is mostly completed
             if tier_num > 1 {
                 let prev_tier = Tier(tier_num - 1);
-                let prev_completed = tier_stats.get(&prev_tier)
+                let prev_completed = tier_stats
+                    .get(&prev_tier)
                     .map(|stat| stat.completed_levels)
                     .unwrap_or(0);
 
@@ -233,17 +233,17 @@ impl Level {
     fn get_tier_target_wpm(&self, tier: Tier) -> f64 {
         // Progressive WPM targets by tier
         match tier.0 {
-            1 => 20.0,  // Tier 1: 20 WPM
-            2 => 30.0,  // Tier 2: 30 WPM
-            3 => 40.0,  // Tier 3: 40 WPM
-            4 => 50.0,  // Tier 4: 50 WPM
-            5 => 60.0,  // Tier 5: 60 WPM
-            6 => 70.0,  // Tier 6: 70 WPM
-            7 => 80.0,  // Tier 7: 80 WPM
-            8 => 90.0,  // Tier 8: 90 WPM
-            9 => 110.0, // Tier 9: 110 WPM
+            1 => 20.0,   // Tier 1: 20 WPM
+            2 => 30.0,   // Tier 2: 30 WPM
+            3 => 40.0,   // Tier 3: 40 WPM
+            4 => 50.0,   // Tier 4: 50 WPM
+            5 => 60.0,   // Tier 5: 60 WPM
+            6 => 70.0,   // Tier 6: 70 WPM
+            7 => 80.0,   // Tier 7: 80 WPM
+            8 => 90.0,   // Tier 8: 90 WPM
+            9 => 110.0,  // Tier 9: 110 WPM
             10 => 130.0, // Tier 10: 130 WPM (Level 100 mastery)
-            _ => 20.0,  // Default
+            _ => 20.0,   // Default
         }
     }
 
@@ -393,10 +393,13 @@ fn create_tier_1_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(1),
         name: format!("Basic Letters {}", level_in_tier),
-        description: format!("Learn home row and basic letter combinations - Level {}", level_in_tier),
+        description: format!(
+            "Learn home row and basic letter combinations - Level {}",
+            level_in_tier
+        ),
         character_focus: CharacterFocus::Letters {
             lowercase: true,
-            uppercase: level_in_tier > 5
+            uppercase: level_in_tier > 5,
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 3.0 + (level_in_tier as f64 * 0.3),
@@ -415,10 +418,13 @@ fn create_tier_2_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(2),
         name: format!("Letter Mastery {}", level_in_tier),
-        description: format!("Master all letters with mixed case - Level {}", level_in_tier),
+        description: format!(
+            "Master all letters with mixed case - Level {}",
+            level_in_tier
+        ),
         character_focus: CharacterFocus::Letters {
             lowercase: true,
-            uppercase: true
+            uppercase: true,
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 4.0 + (level_in_tier as f64 * 0.4),
@@ -437,14 +443,17 @@ fn create_tier_3_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(3),
         name: format!("Numbers Introduction {}", level_in_tier),
-        description: format!("Learn number typing and basic combinations - Level {}", level_in_tier),
+        description: format!(
+            "Learn number typing and basic combinations - Level {}",
+            level_in_tier
+        ),
         character_focus: CharacterFocus::Mixed {
             ratios: CharacterRatios {
                 letters: 0.7,
                 numbers: 0.2 + (level_in_tier as f64 * 0.01),
                 punctuation: 0.1,
                 symbols: 0.0,
-            }
+            },
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 4.5 + (level_in_tier as f64 * 0.3),
@@ -470,7 +479,7 @@ fn create_tier_4_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
                 numbers: 0.2,
                 punctuation: 0.15 + (level_in_tier as f64 * 0.01),
                 symbols: 0.05,
-            }
+            },
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 5.0 + (level_in_tier as f64 * 0.3),
@@ -489,8 +498,13 @@ fn create_tier_5_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(5),
         name: format!("Advanced Punctuation {}", level_in_tier),
-        description: format!("Complex punctuation and formatting - Level {}", level_in_tier),
-        character_focus: CharacterFocus::Punctuation(vec!['.', ',', ';', ':', '!', '?', '"', '\'', '(', ')', '[', ']']),
+        description: format!(
+            "Complex punctuation and formatting - Level {}",
+            level_in_tier
+        ),
+        character_focus: CharacterFocus::Punctuation(vec![
+            '.', ',', ';', ':', '!', '?', '"', '\'', '(', ')', '[', ']',
+        ]),
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 5.5 + (level_in_tier as f64 * 0.3),
             rare_word_ratio: 0.3,
@@ -509,7 +523,9 @@ fn create_tier_6_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         tier: Tier(6),
         name: format!("Symbol Introduction {}", level_in_tier),
         description: format!("Learn basic programming symbols - Level {}", level_in_tier),
-        character_focus: CharacterFocus::Symbols(vec!['@', '#', '$', '%', '^', '&', '*', '+', '=', '-', '_']),
+        character_focus: CharacterFocus::Symbols(vec![
+            '@', '#', '$', '%', '^', '&', '*', '+', '=', '-', '_',
+        ]),
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 6.0 + (level_in_tier as f64 * 0.3),
             rare_word_ratio: 0.35,
@@ -527,8 +543,13 @@ fn create_tier_7_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(7),
         name: format!("Advanced Symbols {}", level_in_tier),
-        description: format!("Master complex symbol combinations - Level {}", level_in_tier),
-        character_focus: CharacterFocus::Symbols(vec!['<', '>', '/', '\\', '|', '`', '~', '{', '}', '[', ']']),
+        description: format!(
+            "Master complex symbol combinations - Level {}",
+            level_in_tier
+        ),
+        character_focus: CharacterFocus::Symbols(vec![
+            '<', '>', '/', '\\', '|', '`', '~', '{', '}', '[', ']',
+        ]),
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 6.5 + (level_in_tier as f64 * 0.3),
             rare_word_ratio: 0.4,
@@ -546,14 +567,17 @@ fn create_tier_8_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(8),
         name: format!("Code Patterns {}", level_in_tier),
-        description: format!("Programming language patterns and syntax - Level {}", level_in_tier),
+        description: format!(
+            "Programming language patterns and syntax - Level {}",
+            level_in_tier
+        ),
         character_focus: CharacterFocus::Mixed {
             ratios: CharacterRatios {
                 letters: 0.4,
                 numbers: 0.25,
                 punctuation: 0.15,
                 symbols: 0.2,
-            }
+            },
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 7.0 + (level_in_tier as f64 * 0.3),
@@ -572,14 +596,17 @@ fn create_tier_9_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
         id,
         tier: Tier(9),
         name: format!("Expert Combinations {}", level_in_tier),
-        description: format!("Complex multi-character sequences - Level {}", level_in_tier),
+        description: format!(
+            "Complex multi-character sequences - Level {}",
+            level_in_tier
+        ),
         character_focus: CharacterFocus::Mixed {
             ratios: CharacterRatios {
                 letters: 0.35,
                 numbers: 0.3,
                 punctuation: 0.15,
                 symbols: 0.2,
-            }
+            },
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 8.0 + (level_in_tier as f64 * 0.3),
@@ -615,7 +642,7 @@ fn create_tier_10_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
                 numbers: 0.3,
                 punctuation: 0.2,
                 symbols: 0.2,
-            }
+            },
         },
         difficulty_modifiers: DifficultyModifiers {
             word_length_avg: 9.0 + (level_in_tier as f64 * 0.4),

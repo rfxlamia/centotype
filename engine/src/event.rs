@@ -76,7 +76,9 @@ impl Event {
 
                     // Track processing latency
                     let processing_time = process_start.elapsed();
-                    self.performance_tracker.lock().record_event_processing(processing_time);
+                    self.performance_tracker
+                        .lock()
+                        .record_event_processing(processing_time);
 
                     // Request render update
                     if render_tx.send(RenderCommand::Update).is_err() {
@@ -147,19 +149,21 @@ impl Event {
 
                 match timeout(Duration::from_millis(10), async move {
                     match crossterm::event::poll(Duration::from_millis(1)) {
-                        Ok(true) => {
-                            match crossterm::event::read() {
-                                Ok(event) => Ok(Some(event)),
-                                Err(e) => Err(CentotypeError::Input(format!("Read error: {}", e))),
-                            }
-                        }
+                        Ok(true) => match crossterm::event::read() {
+                            Ok(event) => Ok(Some(event)),
+                            Err(e) => Err(CentotypeError::Input(format!("Read error: {}", e))),
+                        },
                         Ok(false) => Ok(None),
                         Err(e) => Err(CentotypeError::Input(format!("Poll error: {}", e))),
                     }
-                }).await {
+                })
+                .await
+                {
                     Ok(Ok(Some(crossterm_event))) => {
                         let input_latency = input_start.elapsed();
-                        performance_tracker.lock().record_input_latency(input_latency);
+                        performance_tracker
+                            .lock()
+                            .record_input_latency(input_latency);
 
                         // Convert crossterm event to engine event
                         if let Some(engine_event) = Self::convert_crossterm_event(crossterm_event) {

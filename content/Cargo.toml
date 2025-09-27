@@ -19,6 +19,16 @@ rayon.workspace = true
 once_cell.workspace = true
 memmap2.workspace = true
 tracing.workspace = true
+# Content generation dependencies
+moka = { version = "0.12", features = ["future"] }
+rand = "0.8"
+rand_chacha = "0.3"
+unicode-normalization = "0.1"
+# Async support for content loading
+tokio = { workspace = true, features = ["sync"] }
+# Error handling
+thiserror.workspace = true
+anyhow.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

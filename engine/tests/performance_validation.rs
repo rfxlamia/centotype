@@ -2,9 +2,9 @@
 // These tests validate that the application meets performance requirements
 
 use centotype_engine::*;
-use std::time::{Duration, Instant};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 const P99_INPUT_LATENCY_THRESHOLD: Duration = Duration::from_millis(25);
 const P95_STARTUP_THRESHOLD: Duration = Duration::from_millis(200);
@@ -67,7 +67,9 @@ fn test_render_performance_p95() {
 
     // Load test text to render
     let test_text = "The quick brown fox jumps over the lazy dog. ".repeat(20);
-    engine.load_text(&test_text).expect("Failed to load test text");
+    engine
+        .load_text(&test_text)
+        .expect("Failed to load test text");
 
     println!("Running {} render performance measurements...", ITERATIONS);
 
@@ -153,7 +155,10 @@ fn test_sustained_performance() {
     let start_time = Instant::now();
     let mut samples = Vec::new();
 
-    println!("Running sustained performance test for {:?}...", TEST_DURATION);
+    println!(
+        "Running sustained performance test for {:?}...",
+        TEST_DURATION
+    );
 
     while start_time.elapsed() < TEST_DURATION {
         let sample_start = Instant::now();
@@ -195,7 +200,10 @@ fn test_concurrent_performance() {
     let latency_accumulator = Arc::new(AtomicU64::new(0));
     let mut handles = Vec::new();
 
-    println!("Running concurrent performance test with {} threads...", NUM_THREADS);
+    println!(
+        "Running concurrent performance test with {} threads...",
+        NUM_THREADS
+    );
 
     for thread_id in 0..NUM_THREADS {
         let latency_acc = Arc::clone(&latency_accumulator);
@@ -209,15 +217,17 @@ fn test_concurrent_performance() {
             for i in 0..OPERATIONS_PER_THREAD {
                 let start = Instant::now();
 
-                let _result = engine.handle_input(TestInput::Char(
-                    char::from(b'a' + (i % 26) as u8)
-                ));
+                let _result =
+                    engine.handle_input(TestInput::Char(char::from(b'a' + (i % 26) as u8)));
 
                 let latency = start.elapsed();
                 max_latency = max_latency.max(latency);
 
                 if i % 50 == 0 {
-                    println!("Thread {} progress: {}/{}", thread_id, i, OPERATIONS_PER_THREAD);
+                    println!(
+                        "Thread {} progress: {}/{}",
+                        thread_id, i, OPERATIONS_PER_THREAD
+                    );
                 }
             }
 

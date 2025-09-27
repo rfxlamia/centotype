@@ -17,10 +17,20 @@ impl InputOptimizations {
         })
     }
 
-    pub fn configure_input_system(&self) -> Result<()> { Ok(()) }
+    pub fn configure_input_system(&self) -> Result<()> {
+        Ok(())
+    }
 }
 
 pub struct PlatformInput;
+impl Default for PlatformInput {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PlatformInput {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }

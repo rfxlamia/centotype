@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Architecture","OSType"],"struct":["PlatformDetector","PlatformInfo"]};

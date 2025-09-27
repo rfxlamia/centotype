@@ -17,7 +17,9 @@ impl PlatformPerformance {
         })
     }
 
-    pub fn configure_performance(&self) -> Result<()> { Ok(()) }
+    pub fn configure_performance(&self) -> Result<()> {
+        Ok(())
+    }
 
     pub fn get_current_metrics(&self) -> SystemMetrics {
         SystemMetrics {

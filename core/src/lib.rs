@@ -22,21 +22,21 @@
 //! - `LevelManager`: Level progression and unlock logic
 //! - `ErrorClassifier`: Damerau-Levenshtein error detection
 
-pub mod types;
-pub mod session;
-pub mod scoring;
-pub mod level;
 pub mod error;
+pub mod level;
+pub mod scoring;
+pub mod session;
+pub mod types;
 
 // Re-export main types for convenience
-pub use types::*;
-pub use session::SessionManager;
-pub use scoring::Scoring as ScoringEngine;
-pub use level::Level as LevelManager;
 pub use error::Error as ErrorClassifier;
+pub use level::Level as LevelManager;
+pub use scoring::Scoring as ScoringEngine;
+pub use session::SessionManager;
+pub use types::*;
 
-use std::sync::Arc;
 use parking_lot::RwLock;
+use std::sync::Arc;
 
 /// Core engine that coordinates all components
 pub struct CentotypeCore {
@@ -106,7 +106,9 @@ impl CentotypeCore {
         let session_id = uuid::Uuid::new_v4();
         Ok(SessionResult {
             session_id,
-            mode: TrainingMode::Arcade { level: LevelId::new(1).unwrap() },
+            mode: TrainingMode::Arcade {
+                level: LevelId::new(1).unwrap(),
+            },
             completed_at: chrono::Utc::now(),
             duration_seconds: 60.0,
             metrics: FinalMetrics {

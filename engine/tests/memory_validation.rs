@@ -45,7 +45,12 @@ fn get_memory_usage() -> Result<u64, Box<dyn std::error::Error>> {
     use std::process::Command;
 
     let output = Command::new("tasklist")
-        .args(&["/FI", &format!("PID eq {}", std::process::id()), "/FO", "CSV"])
+        .args(&[
+            "/FI",
+            &format!("PID eq {}", std::process::id()),
+            "/FO",
+            "CSV",
+        ])
         .output()?;
 
     let output_str = String::from_utf8(output.stdout)?;
@@ -72,27 +77,26 @@ fn get_memory_usage() -> Result<u64, Box<dyn std::error::Error>> {
 fn test_memory_usage_baseline() {
     println!("Testing baseline memory usage...");
 
-    let initial_memory = get_memory_usage()
-        .expect("Failed to get initial memory usage");
+    let initial_memory = get_memory_usage().expect("Failed to get initial memory usage");
 
     println!("Initial memory usage: {} MB", initial_memory / 1024 / 1024);
 
     // Create engine but don't start it yet
     let engine = TypingEngine::new();
 
-    let after_creation = get_memory_usage()
-        .expect("Failed to get memory usage after creation");
+    let after_creation = get_memory_usage().expect("Failed to get memory usage after creation");
 
     println!("Memory after creation: {} MB", after_creation / 1024 / 1024);
 
     // Initialize the engine
-    let _initialized = engine.initialize()
-        .expect("Failed to initialize engine");
+    let _initialized = engine.initialize().expect("Failed to initialize engine");
 
-    let after_init = get_memory_usage()
-        .expect("Failed to get memory usage after initialization");
+    let after_init = get_memory_usage().expect("Failed to get memory usage after initialization");
 
-    println!("Memory after initialization: {} MB", after_init / 1024 / 1024);
+    println!(
+        "Memory after initialization: {} MB",
+        after_init / 1024 / 1024
+    );
 
     assert!(
         after_init <= MAX_MEMORY_RSS_BYTES,
@@ -153,7 +157,10 @@ fn test_memory_usage_under_load() {
         std::thread::sleep(MEMORY_CHECK_INTERVAL);
     }
 
-    println!("Maximum memory usage during test: {} MB", max_memory / 1024 / 1024);
+    println!(
+        "Maximum memory usage during test: {} MB",
+        max_memory / 1024 / 1024
+    );
     println!("Total memory samples: {}", memory_samples.len());
 
     // Calculate average memory usage
@@ -167,13 +174,15 @@ fn test_memory_leak_detection() {
     const ITERATIONS: usize = 1000;
     const SAMPLE_FREQUENCY: usize = 100;
 
-    println!("Running memory leak detection for {} iterations...", ITERATIONS);
+    println!(
+        "Running memory leak detection for {} iterations...",
+        ITERATIONS
+    );
 
     let mut engine = TypingEngine::new_test_mode();
     engine.start().expect("Failed to start engine");
 
-    let initial_memory = get_memory_usage()
-        .expect("Failed to get initial memory");
+    let initial_memory = get_memory_usage().expect("Failed to get initial memory");
 
     let mut memory_samples = Vec::new();
 
@@ -192,17 +201,12 @@ fn test_memory_leak_detection() {
         if i % SAMPLE_FREQUENCY == 0 {
             if let Ok(current_memory) = get_memory_usage() {
                 memory_samples.push((i, current_memory));
-                println!(
-                    "Iteration {}: {} MB",
-                    i,
-                    current_memory / 1024 / 1024
-                );
+                println!("Iteration {}: {} MB", i, current_memory / 1024 / 1024);
             }
         }
     }
 
-    let final_memory = get_memory_usage()
-        .expect("Failed to get final memory");
+    let final_memory = get_memory_usage().expect("Failed to get final memory");
 
     println!("Initial memory: {} MB", initial_memory / 1024 / 1024);
     println!("Final memory: {} MB", final_memory / 1024 / 1024);
@@ -223,13 +227,11 @@ fn test_memory_leak_detection() {
         let first_half = &memory_samples[..memory_samples.len() / 2];
         let second_half = &memory_samples[memory_samples.len() / 2..];
 
-        let first_avg = first_half.iter()
-            .map(|(_, mem)| *mem)
-            .sum::<u64>() / first_half.len() as u64;
+        let first_avg =
+            first_half.iter().map(|(_, mem)| *mem).sum::<u64>() / first_half.len() as u64;
 
-        let second_avg = second_half.iter()
-            .map(|(_, mem)| *mem)
-            .sum::<u64>() / second_half.len() as u64;
+        let second_avg =
+            second_half.iter().map(|(_, mem)| *mem).sum::<u64>() / second_half.len() as u64;
 
         println!("First half average: {} MB", first_avg / 1024 / 1024);
         println!("Second half average: {} MB", second_avg / 1024 / 1024);

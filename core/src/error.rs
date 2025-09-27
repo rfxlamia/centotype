@@ -74,10 +74,10 @@ impl Error {
     /// Get error patterns for learning insights
     pub fn get_error_patterns(&self, session_results: &[SessionResult]) -> ErrorPatterns {
         let mut character_errors = HashMap::new();
-        let mut bigram_errors = HashMap::new();
-        let mut position_errors = Vec::new();
+        let bigram_errors = HashMap::new();
+        let position_errors = Vec::new();
 
-        for result in session_results {
+        for _result in session_results {
             // Accumulate character-level errors
             for ch in 'a'..='z' {
                 character_errors.entry(ch).or_insert(0);
@@ -110,10 +110,8 @@ impl Error {
         let target_graphemes: Vec<&str> = target.graphemes(true).collect();
         let typed_graphemes: Vec<&str> = typed.graphemes(true).collect();
 
-        let (distance_matrix, operations) = self.compute_damerau_levenshtein_with_operations(
-            &target_graphemes,
-            &typed_graphemes,
-        );
+        let (distance_matrix, operations) =
+            self.compute_damerau_levenshtein_with_operations(&target_graphemes, &typed_graphemes);
 
         let total_distance = distance_matrix[target_graphemes.len()][typed_graphemes.len()];
 
@@ -123,7 +121,11 @@ impl Error {
         // Analyze operations to classify error types
         for operation in &operations {
             match operation {
-                EditOperation::Substitution { position, expected, actual } => {
+                EditOperation::Substitution {
+                    position,
+                    expected,
+                    actual,
+                } => {
                     stats.substitution += 1;
                     error_positions.push(ErrorPosition {
                         position: *position,
@@ -132,7 +134,10 @@ impl Error {
                         actual_char: Some(*actual),
                     });
                 }
-                EditOperation::Insertion { position, char_inserted } => {
+                EditOperation::Insertion {
+                    position,
+                    char_inserted,
+                } => {
                     stats.insertion += 1;
                     error_positions.push(ErrorPosition {
                         position: *position,
@@ -141,7 +146,10 @@ impl Error {
                         actual_char: Some(*char_inserted),
                     });
                 }
-                EditOperation::Deletion { position, char_deleted } => {
+                EditOperation::Deletion {
+                    position,
+                    char_deleted,
+                } => {
                     stats.deletion += 1;
                     error_positions.push(ErrorPosition {
                         position: *position,
@@ -150,7 +158,11 @@ impl Error {
                         actual_char: None,
                     });
                 }
-                EditOperation::Transposition { position, char1, char2 } => {
+                EditOperation::Transposition {
+                    position,
+                    char1,
+                    char2,
+                } => {
                     stats.transposition += 1;
                     error_positions.push(ErrorPosition {
                         position: *position,
@@ -204,14 +216,15 @@ impl Error {
 
                 matrix[i][j] = min(
                     min(
-                        matrix[i - 1][j] + 1,     // deletion
-                        matrix[i][j - 1] + 1,     // insertion
+                        matrix[i - 1][j] + 1, // deletion
+                        matrix[i][j - 1] + 1, // insertion
                     ),
-                    matrix[i - 1][j - 1] + cost,  // substitution
+                    matrix[i - 1][j - 1] + cost, // substitution
                 );
 
                 // Transposition
-                if i > 1 && j > 1
+                if i > 1
+                    && j > 1
                     && source[i - 1] == target[j - 2]
                     && source[i - 2] == target[j - 1]
                 {
@@ -245,9 +258,7 @@ impl Error {
                 });
                 i -= 1;
                 j -= 1;
-            } else if i > 0 && j > 0
-                && matrix[i][j] == matrix[i - 1][j - 1] + 1
-            {
+            } else if i > 0 && j > 0 && matrix[i][j] == matrix[i - 1][j - 1] + 1 {
                 // Substitution
                 operations.push(EditOperation::Substitution {
                     position: i - 1,
@@ -256,7 +267,8 @@ impl Error {
                 });
                 i -= 1;
                 j -= 1;
-            } else if i > 1 && j > 1
+            } else if i > 1
+                && j > 1
                 && source[i - 1] == target[j - 2]
                 && source[i - 2] == target[j - 1]
                 && matrix[i][j] == matrix[i - 2][j - 2] + 1
@@ -293,7 +305,7 @@ impl Error {
         operations
     }
 
-    fn identify_common_mistakes(&self, session_results: &[SessionResult]) -> Vec<CommonMistake> {
+    fn identify_common_mistakes(&self, _session_results: &[SessionResult]) -> Vec<CommonMistake> {
         // This is a simplified implementation
         // In practice, you'd analyze patterns across many sessions
         let mut mistakes = Vec::new();
@@ -354,7 +366,9 @@ pub enum ErrorType {
 #[derive(Debug, Clone)]
 enum EditOperation {
     Match {
+        #[allow(dead_code)]
         position: usize,
+        #[allow(dead_code)]
         character: char,
     },
     Substitution {
@@ -397,9 +411,9 @@ pub struct PositionError {
 /// Common typing mistake pattern
 #[derive(Debug, Clone)]
 pub struct CommonMistake {
-    pub pattern: String,           // Correct pattern
-    pub mistake: String,           // Common mistake
-    pub frequency: u32,            // How often this mistake occurs
+    pub pattern: String,            // Correct pattern
+    pub mistake: String,            // Common mistake
+    pub frequency: u32,             // How often this mistake occurs
     pub suggested_practice: String, // Practice recommendation
 }
 
@@ -458,7 +472,10 @@ mod tests {
 
         let analysis = classifier.analyze_errors("hello", "hallo");
         assert_eq!(analysis.error_positions.len(), 1);
-        assert_eq!(analysis.error_positions[0].error_type, ErrorType::Substitution);
+        assert_eq!(
+            analysis.error_positions[0].error_type,
+            ErrorType::Substitution
+        );
         assert_eq!(analysis.error_positions[0].expected_char, Some('e'));
         assert_eq!(analysis.error_positions[0].actual_char, Some('a'));
     }

@@ -3,14 +3,20 @@
 //! Performance analysis and statistical tracking for typing sessions.
 
 pub mod analysis;
+pub mod export;
 pub mod metrics;
 pub mod trends;
-pub mod export;
 
 use centotype_core::types::*;
 
 pub struct AnalyticsEngine {
     // Analytics implementation
+}
+
+impl Default for AnalyticsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AnalyticsEngine {

@@ -1,6 +1,11 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TerminalType {
-    XTerm, GnomeTerminal, ITerm2, WindowsTerminal, CMD, Unknown,
+    XTerm,
+    GnomeTerminal,
+    ITerm2,
+    WindowsTerminal,
+    CMD,
+    Unknown,
 }
 
 #[derive(Debug, Clone)]
@@ -13,11 +18,23 @@ pub struct TerminalCapabilities {
 }
 
 impl TerminalCapabilities {
-    pub fn has_limitations(&self) -> bool { false }
-    pub fn configure_terminal(&self) -> centotype_core::types::Result<()> { Ok(()) }
+    pub fn has_limitations(&self) -> bool {
+        false
+    }
+    pub fn configure_terminal(&self) -> centotype_core::types::Result<()> {
+        Ok(())
+    }
 }
 
 pub struct TerminalManager;
+impl Default for TerminalManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TerminalManager {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }

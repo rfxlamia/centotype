@@ -12,46 +12,45 @@ fn test_malicious_escape_sequences() {
 
     let malicious_inputs = vec![
         // ANSI escape sequences
-        "\x1b[2J",           // Clear screen
-        "\x1b[H",            // Cursor home
-        "\x1b[31m",          // Red color
-        "\x1b[1;1H",         // Cursor position
-        "\x1b[?1049h",       // Alternative screen buffer
-        "\x1b]0;Evil\x07",   // Set window title
-
+        "\x1b[2J",         // Clear screen
+        "\x1b[H",          // Cursor home
+        "\x1b[31m",        // Red color
+        "\x1b[1;1H",       // Cursor position
+        "\x1b[?1049h",     // Alternative screen buffer
+        "\x1b]0;Evil\x07", // Set window title
         // Control characters
-        "\x00",              // NULL
-        "\x01",              // SOH
-        "\x02",              // STX
-        "\x03",              // ETX (Ctrl+C)
-        "\x04",              // EOT (Ctrl+D)
-        "\x08",              // Backspace
-        "\x0A",              // Line feed
-        "\x0D",              // Carriage return
-        "\x1B",              // Escape
-        "\x7F",              // DEL
-
+        "\x00", // NULL
+        "\x01", // SOH
+        "\x02", // STX
+        "\x03", // ETX (Ctrl+C)
+        "\x04", // EOT (Ctrl+D)
+        "\x08", // Backspace
+        "\x0A", // Line feed
+        "\x0D", // Carriage return
+        "\x1B", // Escape
+        "\x7F", // DEL
         // Terminal-specific escape sequences
-        "\x1b[6n",           // Device status report
-        "\x1b[c",            // Device attributes
-        "\x1b[>c",           // Secondary device attributes
-        "\x1b]4;1;?\x07",    // Query color
-        "\x1b]10;?\x07",     // Query foreground color
-        "\x1b]11;?\x07",     // Query background color
-
+        "\x1b[6n",        // Device status report
+        "\x1b[c",         // Device attributes
+        "\x1b[>c",        // Secondary device attributes
+        "\x1b]4;1;?\x07", // Query color
+        "\x1b]10;?\x07",  // Query foreground color
+        "\x1b]11;?\x07",  // Query background color
         // Dangerous sequences that could execute commands
-        "\x1b]52;c;$(whoami)\x07",  // Clipboard manipulation
-        "\x1b]1337;",               // iTerm2 proprietary
-        "\x1b_Gf=32;",              // Kitty graphics protocol
-
+        "\x1b]52;c;$(whoami)\x07", // Clipboard manipulation
+        "\x1b]1337;",              // iTerm2 proprietary
+        "\x1b_Gf=32;",             // Kitty graphics protocol
         // Unicode shenanigans
-        "\u{200B}",          // Zero-width space
-        "\u{FEFF}",          // Byte order mark
-        "\u{202E}",          // Right-to-left override
-        "\u{2066}",          // Left-to-right isolate
+        "\u{200B}", // Zero-width space
+        "\u{FEFF}", // Byte order mark
+        "\u{202E}", // Right-to-left override
+        "\u{2066}", // Left-to-right isolate
     ];
 
-    println!("Testing {} malicious input sequences...", malicious_inputs.len());
+    println!(
+        "Testing {} malicious input sequences...",
+        malicious_inputs.len()
+    );
 
     for (i, input) in malicious_inputs.iter().enumerate() {
         println!("Testing input {}: {:?}", i + 1, input);
@@ -106,13 +105,7 @@ fn test_input_buffer_overflow() {
     engine.start().expect("Failed to start engine");
 
     // Test various sizes of input to check for buffer overflows
-    let sizes = vec![
-        100,
-        1_000,
-        10_000,
-        100_000,
-        1_000_000,
-    ];
+    let sizes = vec![100, 1_000, 10_000, 100_000, 1_000_000];
 
     for size in sizes {
         println!("Testing input buffer with {} characters...", size);
@@ -136,7 +129,10 @@ fn test_input_buffer_overflow() {
 
                 // Verify engine is still responsive
                 let test_result = engine.handle_input(TestInput::Char('x'));
-                assert!(test_result.is_ok(), "Engine became unresponsive after large input");
+                assert!(
+                    test_result.is_ok(),
+                    "Engine became unresponsive after large input"
+                );
             }
             Err(e) => {
                 println!("Large input rejected (size {}): {}", size, e);
@@ -157,25 +153,21 @@ fn test_unicode_edge_cases() {
         "e\u{0301}",         // e with acute accent
         "n\u{0303}",         // n with tilde
         "a\u{0300}\u{0301}", // a with multiple combining marks
-
         // Emoji and extended characters
-        "🦀",                // Rust crab emoji
-        "👨‍💻",              // Man technologist (multi-codepoint)
-        "🏳️‍🌈",            // Rainbow flag (flag + ZWJ + rainbow)
-
+        "🦀", // Rust crab emoji
+        "👨‍💻", // Man technologist (multi-codepoint)
+        "🏳️‍🌈", // Rainbow flag (flag + ZWJ + rainbow)
         // Directional and formatting characters
-        "\u{061C}",          // Arabic letter mark
-        "\u{200D}",          // Zero-width joiner
-        "\u{200C}",          // Zero-width non-joiner
-
+        "\u{061C}", // Arabic letter mark
+        "\u{200D}", // Zero-width joiner
+        "\u{200C}", // Zero-width non-joiner
         // Surrogate pairs and edge cases
-        "\u{10000}",         // Linear B syllable
-        "\u{1F4A9}",         // Pile of poo emoji
-        "\u{E000}",          // Private use area
-
+        "\u{10000}", // Linear B syllable
+        "\u{1F4A9}", // Pile of poo emoji
+        "\u{E000}",  // Private use area
         // Normalization edge cases
-        "Ä",                 // A with diaeresis (single codepoint)
-        "A\u{0308}",         // A + combining diaeresis (two codepoints)
+        "Ä",         // A with diaeresis (single codepoint)
+        "A\u{0308}", // A + combining diaeresis (two codepoints)
     ];
 
     println!("Testing {} Unicode edge cases...", unicode_tests.len());
@@ -220,15 +212,17 @@ fn test_concurrent_input_safety() {
 
     let mut handles = Vec::new();
 
-    println!("Testing concurrent input safety with {} threads...", NUM_THREADS);
+    println!(
+        "Testing concurrent input safety with {} threads...",
+        NUM_THREADS
+    );
 
     for thread_id in 0..NUM_THREADS {
         let engine_clone = Arc::clone(&engine);
 
         let handle = thread::spawn(move || {
             let malicious_chars = vec![
-                '\x1b', '\x00', '\x03', '\x04', '\x08', '\x7F',
-                '🦀', '\u{202E}', '\u{200B}',
+                '\x1b', '\x00', '\x03', '\x04', '\x08', '\x7F', '🦀', '\u{202E}', '\u{200B}',
             ];
 
             for i in 0..INPUTS_PER_THREAD {
@@ -248,7 +242,9 @@ fn test_concurrent_input_safety() {
 
     // Wait for all threads to complete
     for handle in handles {
-        handle.join().expect("Thread panicked during concurrent input test");
+        handle
+            .join()
+            .expect("Thread panicked during concurrent input test");
     }
 
     // Verify engine is still in a consistent state
@@ -269,11 +265,11 @@ fn test_input_timing_attacks() {
 
     // Test that input processing time doesn't reveal sensitive information
     let inputs = vec![
-        "password123",        // Common password
-        "admin",             // Common username
-        "\x1b[2J",           // Escape sequence
-        "normal text",       // Normal input
-        "🦀🦀🦀",          // Unicode
+        "password123", // Common password
+        "admin",       // Common username
+        "\x1b[2J",     // Escape sequence
+        "normal text", // Normal input
+        "🦀🦀🦀",      // Unicode
     ];
 
     let mut timing_results = Vec::new();
@@ -310,5 +306,8 @@ fn test_input_timing_attacks() {
         timing_ratio
     );
 
-    println!("Input timing consistency verified (max ratio: {:.2}x)", timing_ratio);
+    println!(
+        "Input timing consistency verified (max ratio: {:.2}x)",
+        timing_ratio
+    );
 }

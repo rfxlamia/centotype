@@ -4,8 +4,8 @@
 
 pub mod commands;
 pub mod interface;
-pub mod navigation;
 pub mod menus;
+pub mod navigation;
 
 use centotype_core::types::*;
 use clap::{Parser, Subcommand};
@@ -49,6 +49,12 @@ pub enum Commands {
 
 pub struct CliManager {
     // CLI implementation
+}
+
+impl Default for CliManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CliManager {

@@ -4,16 +4,16 @@
 
 pub mod event;
 pub mod input;
+pub mod performance;
 pub mod render;
 pub mod tty;
-pub mod performance;
 
 // Re-export main types
 pub use event::Event as EngineEvent;
 pub use input::Input as InputProcessor;
+pub use performance::Performance as PerformanceMonitor;
 pub use render::Render as Renderer;
 pub use tty::Tty as TtyManager;
-pub use performance::Performance as PerformanceMonitor;
 
 use centotype_core::{types::*, CentotypeCore};
 use centotype_platform::PlatformManager;
@@ -31,7 +31,11 @@ impl CentotypeEngine {
     }
 
     /// Start the main engine loop - stub implementation
-    pub async fn run(&mut self, _mode: TrainingMode, _target_text: String) -> Result<SessionResult> {
+    pub async fn run(
+        &mut self,
+        _mode: TrainingMode,
+        _target_text: String,
+    ) -> Result<SessionResult> {
         // Stub implementation
         self.core.complete_session()
     }

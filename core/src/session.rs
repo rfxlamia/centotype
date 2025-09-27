@@ -1,11 +1,11 @@
 //! Session management with thread-safe state tracking and performance monitoring
 use crate::types::*;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use parking_lot::{Mutex, RwLock};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, info};
 
 /// Thread-safe session manager with performance tracking
 pub struct SessionManager {
@@ -29,7 +29,9 @@ impl SessionManager {
 
         // Validate session state
         if session_state.target_text.is_empty() {
-            return Err(CentotypeError::State("Target text cannot be empty".to_string()));
+            return Err(CentotypeError::State(
+                "Target text cannot be empty".to_string(),
+            ));
         }
 
         // Ensure consistent initial state
@@ -56,7 +58,9 @@ impl SessionManager {
 
         // Track performance
         let elapsed = start_time.elapsed();
-        self.performance_tracker.lock().record_session_start(elapsed);
+        self.performance_tracker
+            .lock()
+            .record_session_start(elapsed);
 
         info!(session_id = %session_id, "Started new typing session");
         Ok(())
@@ -167,7 +171,9 @@ impl SessionManager {
     fn apply_keystroke(&self, session: &mut SessionState, keystroke: Keystroke) -> Result<()> {
         // Validate keystroke timing
         if keystroke.timestamp < session.started_at {
-            return Err(CentotypeError::State("Invalid keystroke timestamp".to_string()));
+            return Err(CentotypeError::State(
+                "Invalid keystroke timestamp".to_string(),
+            ));
         }
 
         // Handle different keystroke types
@@ -193,7 +199,9 @@ impl SessionManager {
     fn handle_regular_input(&self, session: &mut SessionState, ch: char) -> Result<()> {
         // Validate cursor position
         if session.cursor_position > session.target_text.len() {
-            return Err(CentotypeError::State("Cursor position out of bounds".to_string()));
+            return Err(CentotypeError::State(
+                "Cursor position out of bounds".to_string(),
+            ));
         }
 
         // Add character to typed text
@@ -240,7 +248,9 @@ impl SessionManager {
 
     fn set_paused_state(&self, session: &mut SessionState, paused: bool) -> Result<()> {
         if session.is_completed {
-            return Err(CentotypeError::State("Cannot pause completed session".to_string()));
+            return Err(CentotypeError::State(
+                "Cannot pause completed session".to_string(),
+            ));
         }
 
         if session.is_paused == paused {
@@ -260,7 +270,9 @@ impl SessionManager {
 
     fn move_cursor(&self, session: &mut SessionState, position: usize) -> Result<()> {
         if position > session.target_text.len() {
-            return Err(CentotypeError::State("Cursor position out of bounds".to_string()));
+            return Err(CentotypeError::State(
+                "Cursor position out of bounds".to_string(),
+            ));
         }
 
         session.cursor_position = position;
@@ -403,7 +415,9 @@ mod tests {
         let mut manager = SessionManager::new();
         let session_state = SessionState {
             session_id: uuid::Uuid::new_v4(),
-            mode: TrainingMode::Arcade { level: LevelId::new(1).unwrap() },
+            mode: TrainingMode::Arcade {
+                level: LevelId::new(1).unwrap(),
+            },
             target_text: "hello world".to_string(),
             typed_text: String::new(),
             cursor_position: 0,
@@ -423,7 +437,9 @@ mod tests {
         let mut manager = SessionManager::new();
         let session_state = SessionState {
             session_id: uuid::Uuid::new_v4(),
-            mode: TrainingMode::Arcade { level: LevelId::new(1).unwrap() },
+            mode: TrainingMode::Arcade {
+                level: LevelId::new(1).unwrap(),
+            },
             target_text: String::new(), // Empty target text
             typed_text: String::new(),
             cursor_position: 0,
@@ -442,7 +458,9 @@ mod tests {
         let mut manager = SessionManager::new();
         let session_state = SessionState {
             session_id: uuid::Uuid::new_v4(),
-            mode: TrainingMode::Arcade { level: LevelId::new(1).unwrap() },
+            mode: TrainingMode::Arcade {
+                level: LevelId::new(1).unwrap(),
+            },
             target_text: "test".to_string(),
             typed_text: String::new(),
             cursor_position: 0,
@@ -462,7 +480,9 @@ mod tests {
             cursor_pos: 0,
         };
 
-        assert!(manager.update_state(StateUpdate::AddKeystroke(keystroke)).is_ok());
+        assert!(manager
+            .update_state(StateUpdate::AddKeystroke(keystroke))
+            .is_ok());
 
         let current = manager.current_state().unwrap();
         assert_eq!(current.typed_text, "t");

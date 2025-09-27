@@ -1,9 +1,7 @@
 //! Input handler with security sanitization and escape sequence filtering
-use crate::*;
 use centotype_core::types::*;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use regex::Regex;
-use std::collections::HashMap;
 use std::time::{Duration, Instant};
 use tracing::{debug, warn};
 use unicode_segmentation::UnicodeSegmentation;
@@ -94,8 +92,7 @@ impl Input {
         if grapheme_count > self.security_policy.max_grapheme_count {
             return Err(CentotypeError::Input(format!(
                 "Too many characters: {} > {}",
-                grapheme_count,
-                self.security_policy.max_grapheme_count
+                grapheme_count, self.security_policy.max_grapheme_count
             )));
         }
 
@@ -218,13 +215,17 @@ impl Input {
         for pattern in &self.security_policy.forbidden_patterns {
             if pattern.is_match(text) {
                 warn!("Suspicious pattern detected in input: {}", text);
-                return Err(CentotypeError::Input("Suspicious input pattern".to_string()));
+                return Err(CentotypeError::Input(
+                    "Suspicious input pattern".to_string(),
+                ));
             }
         }
 
         // Check for excessive repetition (potential DoS)
         if self.has_excessive_repetition(text) {
-            return Err(CentotypeError::Input("Excessive character repetition".to_string()));
+            return Err(CentotypeError::Input(
+                "Excessive character repetition".to_string(),
+            ));
         }
 
         Ok(())
@@ -414,11 +415,45 @@ impl AllowedCharacters {
     }
 
     fn is_punctuation(&self, ch: char) -> bool {
-        matches!(ch, '.' | ',' | ';' | ':' | '!' | '?' | '"' | '\'' | '(' | ')' | '[' | ']' | '{' | '}' | '-' | '_')
+        matches!(
+            ch,
+            '.' | ','
+                | ';'
+                | ':'
+                | '!'
+                | '?'
+                | '"'
+                | '\''
+                | '('
+                | ')'
+                | '['
+                | ']'
+                | '{'
+                | '}'
+                | '-'
+                | '_'
+        )
     }
 
     fn is_symbol(&self, ch: char) -> bool {
-        matches!(ch, '@' | '#' | '$' | '%' | '^' | '&' | '*' | '+' | '=' | '<' | '>' | '/' | '\\' | '|' | '`' | '~')
+        matches!(
+            ch,
+            '@' | '#'
+                | '$'
+                | '%'
+                | '^'
+                | '&'
+                | '*'
+                | '+'
+                | '='
+                | '<'
+                | '>'
+                | '/'
+                | '\\'
+                | '|'
+                | '`'
+                | '~'
+        )
     }
 
     fn is_complex_grapheme_allowed(&self, _grapheme: &str) -> bool {
@@ -436,9 +471,7 @@ struct EscapeSequenceFilter {
 
 impl EscapeSequenceFilter {
     fn new() -> Self {
-        Self {
-            filtered_count: 0,
-        }
+        Self { filtered_count: 0 }
     }
 
     fn filter_string(&mut self, input: &str) -> Result<String> {
@@ -479,7 +512,7 @@ impl EscapeSequenceFilter {
         let mut bracket_seen = false;
         let mut sequence_length = 0;
 
-        while let Some(ch) = chars.next() {
+        for ch in chars.by_ref() {
             sequence_length += 1;
             if sequence_length > 20 {
                 // Prevent infinite loops from malformed sequences
@@ -588,9 +621,9 @@ impl Default for SecurityPolicy {
         }
 
         Self {
-            max_input_length: 10000,    // 10KB max
-            max_grapheme_count: 5000,   // Max 5000 characters
-            max_consecutive_chars: 50,  // Max 50 consecutive identical chars
+            max_input_length: 10000,   // 10KB max
+            max_grapheme_count: 5000,  // Max 5000 characters
+            max_consecutive_chars: 50, // Max 50 consecutive identical chars
             forbidden_patterns,
         }
     }
@@ -690,7 +723,7 @@ mod tests {
 
         // Test basic tier (letters only)
         allowed.set_mode(TrainingMode::Arcade {
-            level: LevelId::new(1).unwrap()
+            level: LevelId::new(1).unwrap(),
         });
         assert!(allowed.is_allowed("a"));
         assert!(!allowed.is_allowed("1"));
@@ -698,7 +731,7 @@ mod tests {
 
         // Test advanced tier (everything)
         allowed.set_mode(TrainingMode::Arcade {
-            level: LevelId::new(91).unwrap()
+            level: LevelId::new(91).unwrap(),
         });
         assert!(allowed.is_allowed("a"));
         assert!(allowed.is_allowed("1"));
@@ -718,7 +751,9 @@ mod tests {
     fn test_text_sanitization() {
         let input_handler = Input::new();
 
-        let result = input_handler.sanitize_text("hello\x00world\x1b[31m").unwrap();
+        let result = input_handler
+            .sanitize_text("hello\x00world\x1b[31m")
+            .unwrap();
         assert!(!result.contains('\x00'));
         assert!(!result.contains('\x1b'));
     }

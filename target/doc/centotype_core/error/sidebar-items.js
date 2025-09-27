@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["EditOperation","ErrorType"],"struct":["CommonMistake","Error","ErrorAnalysis","ErrorPatterns","ErrorPosition","PositionError"]};

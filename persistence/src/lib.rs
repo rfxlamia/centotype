@@ -2,8 +2,8 @@
 //!
 //! Profile storage, configuration management, and data persistence.
 
-pub mod profile;
 pub mod config;
+pub mod profile;
 pub mod storage;
 
 use centotype_core::types::*;
@@ -26,16 +26,18 @@ impl PersistenceManager {
         std::fs::create_dir_all(&config_dir)?;
         std::fs::create_dir_all(&data_dir)?;
 
-        Ok(Self { config_dir, data_dir })
+        Ok(Self {
+            config_dir,
+            data_dir,
+        })
     }
 
     pub fn load_config(&self) -> Result<Config> {
         let config_path = self.config_dir.join("config.toml");
         if config_path.exists() {
             let content = std::fs::read_to_string(config_path)?;
-            toml::from_str(&content).map_err(|e| {
-                CentotypeError::Config(format!("Failed to parse config: {}", e))
-            })
+            toml::from_str(&content)
+                .map_err(|e| CentotypeError::Config(format!("Failed to parse config: {}", e)))
         } else {
             Ok(Config::default())
         }
@@ -43,9 +45,8 @@ impl PersistenceManager {
 
     pub fn save_config(&self, config: &Config) -> Result<()> {
         let config_path = self.config_dir.join("config.toml");
-        let content = toml::to_string_pretty(config).map_err(|e| {
-            CentotypeError::Config(format!("Failed to serialize config: {}", e))
-        })?;
+        let content = toml::to_string_pretty(config)
+            .map_err(|e| CentotypeError::Config(format!("Failed to serialize config: {}", e)))?;
         std::fs::write(config_path, content)?;
         Ok(())
     }
@@ -54,9 +55,8 @@ impl PersistenceManager {
         let profile_path = self.data_dir.join("profile.json");
         if profile_path.exists() {
             let content = std::fs::read_to_string(profile_path)?;
-            serde_json::from_str(&content).map_err(|e| {
-                CentotypeError::Persistence(format!("Failed to parse profile: {}", e))
-            })
+            serde_json::from_str(&content)
+                .map_err(|e| CentotypeError::Persistence(format!("Failed to parse profile: {}", e)))
         } else {
             Ok(UserProgress::default())
         }
@@ -65,12 +65,12 @@ impl PersistenceManager {
     pub fn save_profile(&self, profile: &UserProgress) -> Result<()> {
         let profile_path = self.data_dir.join("profile.json");
         let temp_path = profile_path.with_extension("json.tmp");
-        
+
         // Atomic write: write to temp file then rename
         let content = serde_json::to_string_pretty(profile)?;
         std::fs::write(&temp_path, content)?;
         std::fs::rename(temp_path, profile_path)?;
-        
+
         Ok(())
     }
 

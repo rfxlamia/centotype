@@ -2,7 +2,7 @@
 
 [![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
-[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)](https://github.com/centotype/centotype)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)](https://github.com/rfxlamia/centotype)
 
 > A precision-focused CLI typing trainer with 100 progressive difficulty levels, built for developers, technical writers, and competitive typists.
 
@@ -30,7 +30,7 @@ cargo install centotype
 **Option 2: Pre-built Releases**
 ```bash
 # Download latest release for your platform
-curl -LO https://github.com/centotype/centotype/releases/latest/download/centotype-linux-x64.tar.gz
+curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotype-linux-x64.tar.gz
 tar -xzf centotype-linux-x64.tar.gz
 sudo mv centotype /usr/local/bin/
 ```
@@ -42,7 +42,7 @@ npm install -g centotype-cli
 
 **Option 4: Build from Source**
 ```bash
-git clone https://github.com/centotype/centotype.git
+git clone https://github.com/rfxlamia/centotype.git
 cd centotype
 cargo build --release
 ./target/release/centotype --version
@@ -180,7 +180,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, or improv
 
 **Quick Development Setup**:
 ```bash
-git clone https://github.com/centotype/centotype.git
+git clone https://github.com/rfxlamia/centotype.git
 cd centotype
 cargo test          # Run test suite
 cargo clippy        # Lint code
@@ -204,14 +204,14 @@ cargo doc --open                    # Generate and open docs
 ```
 
 **Contributing Guidelines**:
-1. Check existing [issues](https://github.com/centotype/centotype/issues) and [discussions](https://github.com/centotype/centotype/discussions)
+1. Check existing [issues](https://github.com/rfxlamia/centotype/issues) and [discussions](https://github.com/rfxlamia/centotype/discussions)
 2. Fork the repository and create a feature branch
 3. Ensure tests pass and add tests for new functionality
 4. Follow Rust formatting conventions (`cargo fmt`)
 5. Submit a pull request with clear description
 
 **Architecture Overview**:
-For detailed technical information, see [README_ARCHITECTURE.md](./README_ARCHITECTURE.md) and [ARCHITECTURE.md](./ARCHITECTURE.md).
+For detailed technical information, see [docs/architecture/README_ARCHITECTURE.md](./docs/architecture/README_ARCHITECTURE.md) and [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md).
 
 ## 📄 License
 
@@ -219,8 +219,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE.
 
 ## 🤝 Support & Community
 
-- **Issues**: [GitHub Issues](https://github.com/centotype/centotype/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/centotype/centotype/discussions)
+- **Issues**: [GitHub Issues](https://github.com/rfxlamia/centotype/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/rfxlamia/centotype/discussions)
 - **Website**: [centotype.dev](https://centotype.dev)
 
 ## 🙏 Acknowledgments

@@ -28,6 +28,12 @@ pub struct PlatformInfo {
 
 pub struct PlatformDetector;
 
+impl Default for PlatformDetector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PlatformDetector {
     pub fn new() -> Self {
         Self

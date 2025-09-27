@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {};
+window.SIDEBAR_ITEMS = {"fn":["get_platform_manager"],"mod":["detection","input","performance","terminal"],"static":["PLATFORM_MANAGER"],"struct":["ErrorRecoveryStrategy","PlatformManager","PlatformValidation","RecommendedSettings"]};

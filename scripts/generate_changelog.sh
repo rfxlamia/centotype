@@ -125,7 +125,7 @@ echo "\`\`\`"
 echo
 echo "### Build from Source"
 echo "\`\`\`bash"
-echo "git clone https://github.com/centotype/centotype.git"
+echo "git clone https://github.com/rfxlamia/centotype.git"
 echo "cd centotype"
 echo "cargo build --release"
 echo "\`\`\`"
@@ -146,8 +146,8 @@ echo "- **Windows:** x86_64, ARM64 (Windows 10+)"
 echo
 echo "## 🐛 Known Issues"
 echo
-echo "- Check [GitHub Issues](https://github.com/centotype/centotype/issues) for current known issues"
+echo "- Check [GitHub Issues](https://github.com/rfxlamia/centotype/issues) for current known issues"
 echo
 echo "## 🤝 Contributing"
 echo
-echo "See [CONTRIBUTING.md](https://github.com/centotype/centotype/blob/main/CONTRIBUTING.md) for guidelines."
+echo "See [CONTRIBUTING.md](https://github.com/rfxlamia/centotype/blob/main/CONTRIBUTING.md) for guidelines."

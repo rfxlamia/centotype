@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["TerminalType"],"struct":["TerminalCapabilities","TerminalManager"]};

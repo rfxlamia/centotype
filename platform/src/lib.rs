@@ -21,20 +21,20 @@
 //! - Memory management tuning per OS
 //! - CPU architecture detection
 
-pub mod terminal;
+pub mod detection;
 pub mod input;
 pub mod performance;
-pub mod detection;
+pub mod terminal;
 
 // Re-export main types
-pub use terminal::{TerminalCapabilities, TerminalType, TerminalManager};
-pub use input::{PlatformInput, InputOptimizations};
+pub use detection::{Architecture, OSType, PlatformDetector, PlatformInfo};
+pub use input::{InputOptimizations, PlatformInput};
 pub use performance::{PlatformPerformance, SystemMetrics};
-pub use detection::{PlatformDetector, PlatformInfo, OSType, Architecture};
+pub use terminal::{TerminalCapabilities, TerminalManager, TerminalType};
 
 use centotype_core::types::*;
-use std::sync::Arc;
 use once_cell::sync::Lazy;
+use std::sync::Arc;
 
 /// Main platform manager that coordinates all platform-specific functionality
 pub struct PlatformManager {
@@ -146,8 +146,7 @@ impl PlatformManager {
 
     /// Check if graceful degradation is needed
     pub fn should_use_fallback_mode(&self) -> bool {
-        !self.performance_settings.can_meet_targets
-            || self.terminal_caps.has_limitations()
+        !self.performance_settings.can_meet_targets || self.terminal_caps.has_limitations()
     }
 
     /// Get platform-specific error recovery strategies
@@ -206,9 +205,8 @@ impl Default for ErrorRecoveryStrategy {
 }
 
 /// Global platform manager instance
-static PLATFORM_MANAGER: Lazy<Arc<PlatformManager>> = Lazy::new(|| {
-    Arc::new(PlatformManager::new().expect("Failed to initialize platform manager"))
-});
+static PLATFORM_MANAGER: Lazy<Arc<PlatformManager>> =
+    Lazy::new(|| Arc::new(PlatformManager::new().expect("Failed to initialize platform manager")));
 
 /// Get the global platform manager instance
 pub fn get_platform_manager() -> Arc<PlatformManager> {

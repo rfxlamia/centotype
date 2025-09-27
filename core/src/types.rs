@@ -23,12 +23,13 @@ impl LevelId {
     pub const MAX: u8 = 100;
 
     pub fn new(id: u8) -> Result<Self> {
-        if id >= Self::MIN && id <= Self::MAX {
+        if (Self::MIN..=Self::MAX).contains(&id) {
             Ok(LevelId(id))
         } else {
             Err(CentotypeError::State(format!(
                 "Level ID must be between {} and {}",
-                Self::MIN, Self::MAX
+                Self::MIN,
+                Self::MAX
             )))
         }
     }
@@ -55,9 +56,16 @@ impl Tier {
 /// Training mode selection
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum TrainingMode {
-    Arcade { level: LevelId },
-    Drill { category: DrillCategory, duration_secs: u32 },
-    Endurance { duration_secs: u32 },
+    Arcade {
+        level: LevelId,
+    },
+    Drill {
+        category: DrillCategory,
+        duration_secs: u32,
+    },
+    Endurance {
+        duration_secs: u32,
+    },
 }
 
 /// Drill practice categories
@@ -230,7 +238,7 @@ pub struct ContentMetadata {
 }
 
 /// Category of text content
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum ContentCategory {
     Code,
     Prose,

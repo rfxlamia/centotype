@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["centotype_core",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"enum\" href=\"centotype_core/types/enum.DrillCategory.html\" title=\"enum centotype_core::types::DrillCategory\">DrillCategory</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"enum\" href=\"centotype_core/types/enum.KeyboardLayout.html\" title=\"enum centotype_core::types::KeyboardLayout\">KeyboardLayout</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"enum\" href=\"centotype_core/types/enum.Language.html\" title=\"enum centotype_core::types::Language\">Language</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"enum\" href=\"centotype_core/types/enum.TrainingMode.html\" title=\"enum centotype_core::types::TrainingMode\">TrainingMode</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"struct\" href=\"centotype_core/types/struct.LevelId.html\" title=\"struct centotype_core::types::LevelId\">LevelId</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/hash/trait.Hash.html\" title=\"trait core::hash::Hash\">Hash</a> for <a class=\"struct\" href=\"centotype_core/types/struct.Tier.html\" title=\"struct centotype_core::types::Tier\">Tier</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1676]}

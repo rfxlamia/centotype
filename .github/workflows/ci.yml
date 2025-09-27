@@ -361,7 +361,7 @@ jobs:
         shell: bash
         run: |
           # Download and test the release binary
-          curl -L -o centotype "https://github.com/centotype/centotype/releases/latest/download/centotype-${{ runner.os }}"
+          curl -L -o centotype "https://github.com/rfxlamia/centotype/releases/latest/download/centotype-${{ runner.os }}"
           chmod +x centotype
           ./centotype --version
           ./centotype --help

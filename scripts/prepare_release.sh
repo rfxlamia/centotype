@@ -110,7 +110,7 @@ If you encounter issues:
 2. Try running with \`--debug\` flag for verbose output
 3. Check the GitHub repository for known issues
 
-Repository: https://github.com/centotype/centotype
+Repository: https://github.com/rfxlamia/centotype
 EOF
 
     # Create archive
@@ -163,7 +163,7 @@ done)
 
 \`\`\`bash
 # Download checksums
-curl -LO https://github.com/centotype/centotype/releases/download/v$VERSION/centotype-v$VERSION-checksums.sha256
+curl -LO https://github.com/rfxlamia/centotype/releases/download/v$VERSION/centotype-v$VERSION-checksums.sha256
 
 # Verify your download
 sha256sum -c centotype-v$VERSION-checksums.sha256

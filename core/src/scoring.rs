@@ -1,6 +1,6 @@
 //! Scoring engine with deterministic calculations for WPM, accuracy, and skill index
 use crate::types::*;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use std::collections::VecDeque;
 use std::time::Duration;
 use tracing::debug;
@@ -19,10 +19,7 @@ impl Scoring {
     }
 
     /// Calculate live metrics during an active session
-    pub fn calculate_live_metrics(
-        &mut self,
-        session: &SessionState,
-    ) -> Result<LiveMetrics> {
+    pub fn calculate_live_metrics(&mut self, session: &SessionState) -> Result<LiveMetrics> {
         let start_time = std::time::Instant::now();
 
         // Calculate session duration
@@ -31,16 +28,22 @@ impl Scoring {
             self.calculate_active_duration(session)
         } else {
             // Active session - calculate current elapsed time
-            let total_elapsed = (Utc::now() - session.started_at).to_std()
+            let total_elapsed = (Utc::now() - session.started_at)
+                .to_std()
                 .map_err(|_| CentotypeError::State("Invalid session timing".to_string()))?;
-            total_elapsed.saturating_sub(session.paused_duration).as_secs_f64()
+            total_elapsed
+                .saturating_sub(session.paused_duration)
+                .as_secs_f64()
         };
 
         // Prevent division by zero
         let elapsed_seconds = elapsed_seconds.max(0.001); // Minimum 1ms
 
         // Calculate basic metrics
-        let raw_wpm = self.calculate_wpm(session.typed_text.len(), Duration::from_secs_f64(elapsed_seconds));
+        let raw_wpm = self.calculate_wpm(
+            session.typed_text.len(),
+            Duration::from_secs_f64(elapsed_seconds),
+        );
         let accuracy = self.calculate_accuracy(&session.target_text, &session.typed_text);
 
         // Calculate streaks and errors
@@ -61,7 +64,8 @@ impl Scoring {
 
         // Track performance
         let calculation_time = start_time.elapsed();
-        self.performance_tracker.record_calculation(calculation_time);
+        self.performance_tracker
+            .record_calculation(calculation_time);
 
         debug!(
             raw_wpm = %raw_wpm,
@@ -74,10 +78,7 @@ impl Scoring {
     }
 
     /// Calculate final metrics for a completed session
-    pub fn calculate_final_metrics(
-        &mut self,
-        session: &SessionState,
-    ) -> Result<FinalMetrics> {
+    pub fn calculate_final_metrics(&mut self, session: &SessionState) -> Result<FinalMetrics> {
         if !session.is_completed {
             return Err(CentotypeError::State("Session not completed".to_string()));
         }
@@ -85,8 +86,10 @@ impl Scoring {
         let start_time = std::time::Instant::now();
 
         // Calculate session duration
-        let total_duration = (session.started_at + chrono::Duration::seconds(1)) - session.started_at;
-        let active_duration = total_duration.to_std()
+        let total_duration =
+            (session.started_at + chrono::Duration::seconds(1)) - session.started_at;
+        let active_duration = total_duration
+            .to_std()
             .map_err(|_| CentotypeError::State("Invalid session duration".to_string()))?
             .saturating_sub(session.paused_duration);
 
@@ -114,7 +117,8 @@ impl Scoring {
 
         // Track performance
         let calculation_time = start_time.elapsed();
-        self.performance_tracker.record_calculation(calculation_time);
+        self.performance_tracker
+            .record_calculation(calculation_time);
 
         debug!(
             duration_seconds = %duration_seconds,
@@ -152,7 +156,8 @@ impl Scoring {
         let streak_bonus = (metrics.longest_streak as f64 / 10.0).min(100.0);
 
         // Base skill index before tier adjustment
-        let base_skill_index = wpm_score + accuracy_bonus + consistency_bonus + streak_bonus - error_penalty;
+        let base_skill_index =
+            wpm_score + accuracy_bonus + consistency_bonus + streak_bonus - error_penalty;
 
         // Apply tier weight (higher tiers are harder)
         let final_skill_index = base_skill_index * tier_weight;
@@ -223,7 +228,8 @@ impl Scoring {
         current_streak = streak;
 
         // Count backspace events from keystrokes
-        errors.backspace_count = session.keystrokes
+        errors.backspace_count = session
+            .keystrokes
             .iter()
             .filter(|k| k.char_typed.is_none())
             .count() as u32;
@@ -239,10 +245,11 @@ impl Scoring {
         // Calculate inter-keystroke intervals
         let mut intervals = Vec::new();
         for i in 1..keystrokes.len() {
-            let prev_ts = keystrokes[i-1].timestamp.timestamp_millis();
+            let prev_ts = keystrokes[i - 1].timestamp.timestamp_millis();
             let curr_ts = keystrokes[i].timestamp.timestamp_millis();
             let interval = (curr_ts - prev_ts) as f64;
-            if interval > 0.0 && interval < 2000.0 { // Ignore pauses > 2 seconds
+            if interval > 0.0 && interval < 2000.0 {
+                // Ignore pauses > 2 seconds
                 intervals.push(interval);
             }
         }
@@ -253,9 +260,8 @@ impl Scoring {
 
         // Calculate coefficient of variation (lower is more consistent)
         let mean = intervals.iter().sum::<f64>() / intervals.len() as f64;
-        let variance = intervals.iter()
-            .map(|x| (x - mean).powi(2))
-            .sum::<f64>() / intervals.len() as f64;
+        let variance =
+            intervals.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / intervals.len() as f64;
         let std_dev = variance.sqrt();
 
         if mean == 0.0 {
@@ -277,10 +283,11 @@ impl Scoring {
         // Calculate inter-keystroke intervals
         let mut intervals = Vec::new();
         for i in 1..keystrokes.len() {
-            let prev_ts = keystrokes[i-1].timestamp.timestamp_millis();
+            let prev_ts = keystrokes[i - 1].timestamp.timestamp_millis();
             let curr_ts = keystrokes[i].timestamp.timestamp_millis();
             let interval_ms = (curr_ts - prev_ts) as u64;
-            if interval_ms > 0 && interval_ms < 2000 { // Filter out pauses
+            if interval_ms > 0 && interval_ms < 2000 {
+                // Filter out pauses
                 intervals.push(Duration::from_millis(interval_ms));
             }
         }
@@ -525,7 +532,9 @@ mod tests {
 
         let session = SessionState {
             session_id: uuid::Uuid::new_v4(),
-            mode: TrainingMode::Arcade { level: LevelId::new(1).unwrap() },
+            mode: TrainingMode::Arcade {
+                level: LevelId::new(1).unwrap(),
+            },
             target_text: "hello world".to_string(),
             typed_text: "hello w".to_string(),
             cursor_position: 7,

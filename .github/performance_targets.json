@@ -1,0 +1,44 @@
+{
+  "performance_targets": {
+    "input_latency_p99_ms": 25,
+    "input_latency_p95_ms": 15,
+    "render_time_p95_ms": 33,
+    "render_time_p99_ms": 50,
+    "content_loading_p99_ms": 25,
+    "peak_memory_mb": 50,
+    "startup_time_p95_ms": 200,
+    "cache_hit_rate_percent": 90.0
+  },
+  "regression_sensitivity": {
+    "min_regression_percent": 5.0,
+    "confidence_level": 0.95,
+    "comparison_window": 10,
+    "severity_thresholds": {
+      "minor_regression_percent": 5.0,
+      "major_regression_percent": 15.0,
+      "critical_regression_percent": 30.0
+    }
+  },
+  "budget_enforcement": {
+    "enforce_in_ci": true,
+    "allow_emergency_overrides": true,
+    "strictness_level": "Moderate",
+    "grace_period_days": 7
+  },
+  "alerting": {
+    "slack_enabled": true,
+    "email_enabled": false,
+    "github_comments_enabled": true,
+    "notification_threshold": "Warning"
+  },
+  "data_storage": {
+    "local_storage_path": "./.performance_data",
+    "retention_days": 90,
+    "enable_compression": false
+  },
+  "pipeline_integration": {
+    "github_actions": true,
+    "gitlab_ci": false,
+    "jenkins": false
+  }
+}

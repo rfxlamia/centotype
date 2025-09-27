@@ -1,0 +1,391 @@
+name: Performance Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+  schedule:
+    # Run nightly performance regression tests
+    - cron: '0 2 * * *'
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  performance-validation:
+    name: Performance Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for performance comparison
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy, rustfmt
+
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Install performance tools
+      run: |
+        cargo install criterion-cli || true
+        sudo apt-get update
+        sudo apt-get install -y valgrind time
+
+    - name: Build release binary for performance testing
+      run: |
+        cargo build --release --profile perf-test
+
+    - name: Run input latency benchmarks
+      run: |
+        cargo bench --bench input_latency_benchmark -- --output-format json > input_latency_results.json
+        echo "Input latency benchmark completed"
+
+    - name: Run render performance benchmarks
+      run: |
+        cargo bench --bench render_performance_benchmark -- --output-format json > render_performance_results.json
+        echo "Render performance benchmark completed"
+
+    - name: Run content system benchmarks
+      run: |
+        cargo bench --bench content_performance_benchmark -- --output-format json > content_performance_results.json
+        echo "Content system benchmark completed"
+
+    - name: Run memory and concurrency benchmarks
+      run: |
+        cargo bench --bench memory_concurrency_benchmark -- --output-format json > memory_concurrency_results.json
+        echo "Memory and concurrency benchmark completed"
+
+    - name: Run comprehensive performance validation
+      run: |
+        cargo run --release --bin performance_validator -- \
+          --commit-hash ${{ github.sha }} \
+          --branch ${{ github.ref_name }} \
+          --pr-number ${{ github.event.number }} \
+          --ci-system github_actions \
+          --output-format json > comprehensive_performance_results.json
+
+    - name: Validate performance targets
+      id: performance_check
+      run: |
+        # Run performance target validation
+        if cargo run --release --bin performance_gate_check -- \
+          --input-file comprehensive_performance_results.json \
+          --targets-file .github/performance_targets.json \
+          --strict-mode ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}; then
+          echo "performance_passed=true" >> $GITHUB_OUTPUT
+          echo "✅ All performance targets met"
+        else
+          echo "performance_passed=false" >> $GITHUB_OUTPUT
+          echo "❌ Performance targets not met"
+          exit 1
+        fi
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-results-${{ github.sha }}
+        path: |
+          *_results.json
+          performance_report_*.json
+        retention-days: 30
+
+    - name: Store performance data
+      if: always()
+      run: |
+        # Store results in GitHub repository data
+        mkdir -p .performance_data
+        cp comprehensive_performance_results.json .performance_data/perf_${{ github.sha }}.json
+
+        # Commit back to repository if on main branch
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .performance_data/
+          git commit -m "Add performance data for ${{ github.sha }}" || exit 0
+          git push
+        fi
+
+    - name: Comment on PR with performance results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+
+          try {
+            const perfData = JSON.parse(fs.readFileSync('comprehensive_performance_results.json', 'utf8'));
+
+            const formatDuration = (ms) => `${ms.toFixed(1)}ms`;
+            const formatPercentage = (val) => `${val.toFixed(1)}%`;
+            const formatMB = (mb) => `${mb.toFixed(1)}MB`;
+
+            const passed = '${{ steps.performance_check.outputs.performance_passed }}' === 'true';
+            const statusIcon = passed ? '✅' : '❌';
+            const statusText = passed ? 'PASSED' : 'FAILED';
+
+            const comment = `## ${statusIcon} Performance Validation ${statusText}
+
+            ### Performance Metrics Summary
+
+            | Metric | Current | Target | Status |
+            |--------|---------|--------|--------|
+            | Input Latency P99 | ${formatDuration(perfData.measurements.input_latency.p99_ms)} | 25ms | ${perfData.measurements.input_latency.p99_ms <= 25 ? '✅' : '❌'} |
+            | Render Time P95 | ${formatDuration(perfData.measurements.render_performance.p95_frame_time_ms)} | 33ms | ${perfData.measurements.render_performance.p95_frame_time_ms <= 33 ? '✅' : '❌'} |
+            | Content Loading P99 | ${formatDuration(perfData.measurements.content_loading.p99_loading_time_ms)} | 25ms | ${perfData.measurements.content_loading.p99_loading_time_ms <= 25 ? '✅' : '❌'} |
+            | Peak Memory Usage | ${formatMB(perfData.measurements.memory_usage.peak_memory_mb)} | 50MB | ${perfData.measurements.memory_usage.peak_memory_mb <= 50 ? '✅' : '❌'} |
+            | Startup Time P95 | ${formatDuration(perfData.measurements.startup_time.p95_startup_time_ms)} | 200ms | ${perfData.measurements.startup_time.p95_startup_time_ms <= 200 ? '✅' : '❌'} |
+
+            **Overall Performance Score: ${formatPercentage(perfData.measurements.overall_score * 100)}**
+
+            ### Regression Analysis
+            ${perfData.regression_analysis.regression_detected ?
+              `⚠️ **Regression Detected**: ${perfData.regression_analysis.affected_metrics.length} metrics affected` :
+              '✅ No performance regressions detected'
+            }
+
+            ${perfData.regression_analysis.affected_metrics.length > 0 ?
+              '#### Affected Metrics:\n' +
+              perfData.regression_analysis.affected_metrics.map(m =>
+                `- **${m.metric_name}**: ${m.change_percentage.toFixed(1)}% increase (${m.baseline_value.toFixed(1)} → ${m.current_value.toFixed(1)})`
+              ).join('\n') : ''
+            }
+
+            ### Recommendations
+            ${perfData.compliance_status.target_violations.length > 0 ?
+              perfData.compliance_status.target_violations.map(v => `- ${v.impact_description}`).join('\n') :
+              '✅ All performance targets are within acceptable ranges'
+            }
+
+            <details>
+            <summary>Detailed Performance Data</summary>
+
+            \`\`\`json
+            ${JSON.stringify(perfData, null, 2)}
+            \`\`\`
+
+            </details>
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.error('Failed to post performance comment:', error);
+          }
+
+    - name: Fail on performance regression
+      if: github.event_name == 'pull_request' && steps.performance_check.outputs.performance_passed == 'false'
+      run: |
+        echo "Performance validation failed. See PR comment for details."
+        exit 1
+
+  nightly-performance-regression:
+    name: Nightly Performance Regression Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    timeout-minutes: 60
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 100  # Get more history for trend analysis
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-nightly-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run extended performance test suite
+      run: |
+        # Run all benchmarks with extended sample counts for nightly testing
+        cargo run --release --bin extended_performance_validator -- \
+          --extended-samples \
+          --trend-analysis \
+          --memory-leak-detection \
+          --duration 300 \
+          --output-file nightly_performance_results.json
+
+    - name: Analyze long-term performance trends
+      run: |
+        cargo run --release --bin performance_trend_analyzer -- \
+          --data-directory .performance_data \
+          --window-days 30 \
+          --generate-report \
+          --output-file performance_trend_report.json
+
+    - name: Upload nightly results
+      uses: actions/upload-artifact@v3
+      with:
+        name: nightly-performance-results-${{ github.run_number }}
+        path: |
+          nightly_performance_results.json
+          performance_trend_report.json
+        retention-days: 90
+
+    - name: Send Slack notification on regression
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#performance-alerts'
+        text: |
+          🚨 Nightly performance regression detected!
+
+          Commit: ${{ github.sha }}
+          Branch: ${{ github.ref_name }}
+
+          Check the full results: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  performance-comparison:
+    name: Performance Comparison
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 45
+
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-pr-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run PR branch benchmarks
+      run: |
+        cargo run --release --bin performance_validator -- \
+          --commit-hash ${{ github.event.pull_request.head.sha }} \
+          --branch ${{ github.event.pull_request.head.ref }} \
+          --output-file pr_performance_results.json
+
+    - name: Checkout base branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.base.sha }}
+
+    - name: Run base branch benchmarks
+      run: |
+        cargo run --release --bin performance_validator -- \
+          --commit-hash ${{ github.event.pull_request.base.sha }} \
+          --branch ${{ github.event.pull_request.base.ref }} \
+          --output-file base_performance_results.json
+
+    - name: Compare performance results
+      run: |
+        cargo run --release --bin performance_comparator -- \
+          --baseline base_performance_results.json \
+          --comparison pr_performance_results.json \
+          --output-file performance_comparison.json \
+          --threshold 5.0
+
+    - name: Generate performance comparison report
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+
+          try {
+            const comparison = JSON.parse(fs.readFileSync('performance_comparison.json', 'utf8'));
+
+            const formatChange = (change) => {
+              const sign = change >= 0 ? '+' : '';
+              return `${sign}${change.toFixed(1)}%`;
+            };
+
+            const getIcon = (change, threshold = 5.0) => {
+              if (Math.abs(change) < threshold) return '➡️';
+              return change > 0 ? '📈' : '📉';
+            };
+
+            const comment = `## 📊 Performance Comparison Report
+
+            Comparing **${{ github.event.pull_request.head.ref }}** against **${{ github.event.pull_request.base.ref }}**
+
+            ### Key Metrics Changes
+
+            | Metric | Base | PR | Change | Impact |
+            |--------|------|----|---------|----|
+            | Input Latency P99 | ${comparison.baseline.input_latency.p99_ms.toFixed(1)}ms | ${comparison.comparison.input_latency.p99_ms.toFixed(1)}ms | ${formatChange(comparison.changes.input_latency_p99_change)} | ${getIcon(comparison.changes.input_latency_p99_change)} |
+            | Render Time P95 | ${comparison.baseline.render_performance.p95_frame_time_ms.toFixed(1)}ms | ${comparison.comparison.render_performance.p95_frame_time_ms.toFixed(1)}ms | ${formatChange(comparison.changes.render_time_p95_change)} | ${getIcon(comparison.changes.render_time_p95_change)} |
+            | Content Loading P99 | ${comparison.baseline.content_loading.p99_loading_time_ms.toFixed(1)}ms | ${comparison.comparison.content_loading.p99_loading_time_ms.toFixed(1)}ms | ${formatChange(comparison.changes.content_loading_p99_change)} | ${getIcon(comparison.changes.content_loading_p99_change)} |
+            | Peak Memory | ${comparison.baseline.memory_usage.peak_memory_mb.toFixed(1)}MB | ${comparison.comparison.memory_usage.peak_memory_mb.toFixed(1)}MB | ${formatChange(comparison.changes.peak_memory_change)} | ${getIcon(comparison.changes.peak_memory_change)} |
+
+            ${comparison.significant_changes.length > 0 ?
+              '### ⚠️ Significant Changes Detected\n' +
+              comparison.significant_changes.map(c => `- **${c.metric}**: ${formatChange(c.change)} (${c.impact})`).join('\n') :
+              '✅ No significant performance changes detected'
+            }
+
+            ### Performance Score
+            **Overall Score Change: ${formatChange(comparison.changes.overall_score_change)}**
+
+            ${comparison.changes.overall_score_change > 5 ? '🎉 Performance improvement!' :
+              comparison.changes.overall_score_change < -5 ? '⚠️ Performance degradation' :
+              '➡️ Performance remains stable'
+            }
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.error('Failed to generate comparison report:', error);
+          }
+
+    - name: Upload comparison results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-comparison-${{ github.event.pull_request.number }}
+        path: |
+          performance_comparison.json
+          pr_performance_results.json
+          base_performance_results.json
+        retention-days: 30

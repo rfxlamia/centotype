@@ -47,11 +47,11 @@ cat > "$NPM_DIR/package.json" << EOF
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/centotype/centotype.git"
+    "url": "https://github.com/rfxlamia/centotype.git"
   },
   "homepage": "https://centotype.dev",
   "bugs": {
-    "url": "https://github.com/centotype/centotype/issues"
+    "url": "https://github.com/rfxlamia/centotype/issues"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -183,7 +183,7 @@ async function install() {
     console.error('❌ Installation failed:', error.message);
     console.error('');
     console.error('Alternative installation methods:');
-    console.error('1. Download directly from: https://github.com/centotype/centotype/releases');
+    console.error('1. Download directly from: https://github.com/rfxlamia/centotype/releases');
     console.error('2. Install via Cargo: cargo install centotype');
     process.exit(1);
   }
@@ -322,8 +322,8 @@ console.log(centotype.binaryPath);
 ## Links
 
 - [Homepage](https://centotype.dev)
-- [GitHub Repository](https://github.com/centotype/centotype)
-- [Issue Tracker](https://github.com/centotype/centotype/issues)
+- [GitHub Repository](https://github.com/rfxlamia/centotype)
+- [Issue Tracker](https://github.com/rfxlamia/centotype/issues)
 
 ## License
 

@@ -1,2 +1,2 @@
-createSrcSidebar('[["centotype_platform",["",[],["lib.rs"]]]]');
-//{"start":19,"fragment_lengths":[41]}
+createSrcSidebar('[["centotype",["",[],["main.rs"]]],["centotype_analytics",["",[],["analysis.rs","export.rs","lib.rs","metrics.rs","trends.rs"]]],["centotype_cli",["",[],["commands.rs","interface.rs","lib.rs","menus.rs","navigation.rs"]]],["centotype_content",["",[],["cache.rs","corpus.rs","difficulty.rs","generator.rs","lib.rs","validation.rs"]]],["centotype_core",["",[],["error.rs","level.rs","lib.rs","scoring.rs","session.rs","types.rs"]]],["centotype_engine",["",[],["event.rs","input.rs","lib.rs","performance.rs","render.rs","tty.rs"]]],["centotype_persistence",["",[],["config.rs","lib.rs","profile.rs","storage.rs"]]],["centotype_platform",["",[],["detection.rs","input.rs","lib.rs","performance.rs","terminal.rs"]]],["centotype_platform",["",[],["lib.rs"]]]]');
+//{"start":19,"fragment_lengths":[33,94,93,111,97,100,83,99,42]}
