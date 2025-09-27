@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["error","level","scoring","session","types"],"struct":["CentotypeCore"]};

@@ -1,1 +1,0 @@
-searchState.loadedDescShard("centotype", 0, "Centotype - CLI-based typing trainer with 100 progressive …")

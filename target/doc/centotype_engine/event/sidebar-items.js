@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["EngineEvent","RenderCommand"],"struct":["Event","EventMetrics","EventPerformanceTracker"]};

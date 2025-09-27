@@ -1,2 +1,0 @@
-window.ALL_CRATES = ["centotype","centotype_analytics","centotype_cli","centotype_content","centotype_core","centotype_engine","centotype_persistence","centotype_platform"];
-//{"start":21,"fragment_lengths":[11,22,16,20,17,19,24,21]}
