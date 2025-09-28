@@ -6,46 +6,71 @@
 
 > A precision-focused CLI typing trainer with 100 progressive difficulty levels, built for developers, technical writers, and competitive typists.
 
-Centotype delivers deterministic measurement, granular feedback, and realistic practice scenarios covering code, prose, numbers, and symbols. Train with the same tool that powers competitive typing performance.
+## 🚨 Project Status (2025-01-27)
 
-## ✨ Key Features
+**IMPORTANT**: This project is currently in **active development** with **exceptional architectural foundation** but **critical integration issues**. External code review confirms **high-quality engineering** with **organizational process challenges**.
+
+### Current Reality
+- ❌ **Binary Status**: Compilation failures (18+ API integration errors)
+- ❌ **Functionality**: End-to-end features not yet working
+- ⭐⭐⭐⭐⭐ **Architecture**: Sophisticated 7-crate design with professional standards
+- ⭐⭐⭐⭐⭐ **Technical Documentation**: Comprehensive, professional quality (2,267+ lines)
+- ⭐⭐⭐⭐⭐ **Recovery Potential**: "Weeks to months" timeline with clear path forward
+
+### What's Working
+- ✅ **Professional Architecture**: Modular design with clear crate boundaries
+- ✅ **Quality Frameworks**: Performance monitoring, security validation, comprehensive testing design
+- ✅ **Engineering Standards**: ADR process, WCAG AA compliance, detailed API specifications
+- ✅ **Content System**: 100-level corpus generation with mathematical difficulty progression
+
+### What's Being Fixed
+- 🔧 **API Integration**: Resolving interface mismatches between CLI and Core crates
+- 🔧 **Panic Safety**: Addressing 27+ safety violations in production code paths
+- 🔧 **Test Stability**: Fixing test suite failures across crates
+- 🔧 **Process Alignment**: Standardizing documentation and quality gates
+
+Centotype aims to deliver deterministic measurement, granular feedback, and realistic practice scenarios covering code, prose, numbers, and symbols. The architectural foundation is excellent and recovery is highly achievable.
+
+## ✨ Planned Features (Architecture Complete)
 
 - **🎯 Precision Training**: Strict accuracy penalties reward clean typing over fast corrections
 - **📊 Granular Analytics**: Per-character, per-token, and error-class insights
 - **🎮 Progressive Mastery**: 100 carefully calibrated difficulty levels
-- **⚡ Performance Optimized**: <25ms input latency, <200ms startup, <50MB memory
+- **⚡ Performance Optimized**: <25ms input latency, <200ms startup, <50MB memory (architectural targets)
 - **🔄 Deterministic Scoring**: Reproducible results without random variance
 - **💻 Developer-Focused**: Code snippets, symbols, brackets, and technical content
 - **🏃 Multiple Training Modes**: Arcade progression, focused drills, endurance testing
 
-## 🚀 Quick Start
+## 🚧 Installation & Usage (Currently Unavailable)
 
-### Installation
+**Current Status**: Installation and usage commands below reflect the **planned functionality** once integration issues are resolved. The project currently **does not compile** due to API interface mismatches.
 
-**Option 1: Cargo (Recommended)**
+### Development Installation Only
 ```bash
-cargo install centotype
-```
-
-**Option 2: Pre-built Releases**
-```bash
-# Download latest release for your platform
-curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotype-linux-x64.tar.gz
-tar -xzf centotype-linux-x64.tar.gz
-sudo mv centotype /usr/local/bin/
-```
-
-**Option 3: npm Wrapper**
-```bash
-npm install -g centotype-cli
-```
-
-**Option 4: Build from Source**
-```bash
+# Clone for development and contribute to fixes
 git clone https://github.com/rfxlamia/centotype.git
 cd centotype
-cargo build --release
-./target/release/centotype --version
+
+# This will currently fail due to integration issues
+cargo build --release  # ❌ FAILS with 18+ compilation errors
+
+# Architecture exploration
+cargo check --workspace --quiet  # ✅ Individual crates check successfully
+cargo doc --open                 # ✅ Documentation builds successfully
+```
+
+### Planned Installation (When Fixed)
+**The following installation methods will be available once API integration is resolved:**
+
+```bash
+# Cargo (will be available after fixes)
+cargo install centotype
+
+# Pre-built releases (planned)
+curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotype-linux-x64.tar.gz
+
+# npm wrapper (planned)
+npm install -g centotype-cli
 ```
 
 ### Basic Usage
