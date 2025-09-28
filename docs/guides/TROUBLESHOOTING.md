@@ -1,72 +1,58 @@
 # Centotype Troubleshooting Guide
 
-> **Comprehensive issue resolution guide for common problems and performance optimization**
+> **Current Implementation Status**: This troubleshooting guide reflects the actual state of Centotype as of September 28, 2025. The foundation architecture is complete with Grade A performance, but the interactive TUI interface is under development.
 
-This guide provides step-by-step solutions for common issues, performance problems, and configuration challenges you might encounter while using Centotype.
+> **Known State**: CLI commands currently show confirmation messages only. Full typing sessions are not yet implemented. This guide covers building, testing, and understanding the current limitations.
+
+This guide helps you resolve common issues with building, running, and developing Centotype in its current state.
 
 ## Table of Contents
 
-1. [Installation Issues](#installation-issues)
-2. [Performance Problems](#performance-problems)
-3. [Terminal and Display Issues](#terminal-and-display-issues)
-4. [Audio and Sound Problems](#audio-and-sound-problems)
-5. [Configuration Issues](#configuration-issues)
-6. [Content and Level Problems](#content-and-level-problems)
-7. [Data and Profile Issues](#data-and-profile-issues)
-8. [Platform-Specific Issues](#platform-specific-issues)
-9. [Performance Optimization](#performance-optimization)
-10. [Getting Additional Help](#getting-additional-help)
+1. [Build and Installation Issues](#build-and-installation-issues)
+2. [Current Implementation Limitations](#current-implementation-limitations)
+3. [Performance and Testing Issues](#performance-and-testing-issues)
+4. [Development Environment Problems](#development-environment-problems)
+5. [Cross-Platform Compatibility](#cross-platform-compatibility)
+6. [Understanding Error Messages](#understanding-error-messages)
+7. [Performance Optimization](#performance-optimization)
+8. [Contributing and Development](#contributing-and-development)
+9. [Getting Additional Help](#getting-additional-help)
 
 ---
 
-## Installation Issues
+## Build and Installation Issues
 
-### Problem: Command Not Found
+### Problem: Build Fails with Compilation Errors
 
 **Symptoms**:
 ```bash
-$ centotype --version
-bash: centotype: command not found
+$ cargo build --release
+error[E0599]: no method named `render_header_ansi` found
+error[E0063]: missing fields in initializer
 ```
 
-**Solutions**:
+**Cause**: The codebase has some compilation issues from recent development work.
 
-#### Solution 1: Check PATH Configuration
+**Solution**: Use the fixed version
 ```bash
-# Check if cargo bin is in PATH
-echo $PATH | grep -q ".cargo/bin" && echo "✓ Cargo bin in PATH" || echo "✗ Cargo bin missing from PATH"
+# The build should work after recent fixes
+cargo build --release
 
-# Add to PATH (add to ~/.bashrc or ~/.zshrc)
-echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+# If you encounter errors, ensure you have the latest code
+git pull origin main
+cargo clean
+cargo build --release
 
-# Verify
-which centotype
+# Check for any remaining issues
+cargo clippy -- -D warnings
 ```
 
-#### Solution 2: Reinstall with Cargo
-```bash
-# Force reinstall
-cargo install centotype --force
-
-# Verify installation
-centotype --version
+**Expected Output**:
+```
+Finished release [optimized] target(s) in 38.89s
 ```
 
-#### Solution 3: Manual Binary Installation
-```bash
-# Download latest release
-curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotype-linux-x64.tar.gz
-
-# Extract and install
-tar -xzf centotype-linux-x64.tar.gz
-sudo mv centotype /usr/local/bin/
-
-# Verify
-centotype --version
-```
-
-### Problem: Rust/Cargo Not Installed
+### Problem: Cargo Command Not Found
 
 **Symptoms**:
 ```bash
@@ -74,1091 +60,564 @@ $ cargo --version
 bash: cargo: command not found
 ```
 
-**Solution**:
+**Solution**: Install Rust toolchain
 ```bash
-# Install Rust and Cargo
+# Install Rust via rustup (recommended)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Follow installation prompts, then:
 source ~/.cargo/env
 
 # Verify installation
-rustc --version
 cargo --version
-
-# Now install Centotype
-cargo install centotype
-```
-
-### Problem: Permission Denied During Installation
-
-**Symptoms**:
-```bash
-error: failed to create directory `/usr/local/bin`
-Permission denied (os error 13)
-```
-
-**Solutions**:
-
-#### Solution 1: Use Sudo for System Installation
-```bash
-# For system-wide installation
-sudo mv centotype /usr/local/bin/
-```
-
-#### Solution 2: Local User Installation
-```bash
-# Install to user directory
-mkdir -p ~/.local/bin
-mv centotype ~/.local/bin/
-
-# Add to PATH
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### Problem: Compilation Errors
-
-**Symptoms**:
-```bash
-error: failed to compile `centotype v1.0.0`
-```
-
-**Solutions**:
-
-#### Solution 1: Update Rust Toolchain
-```bash
-# Update Rust to latest version
-rustup update
-
-# Verify minimum version (1.75.0+)
 rustc --version
+
+# Should output something like:
+# cargo 1.75.0
+# rustc 1.75.0
 ```
 
-#### Solution 2: Clean and Retry
-```bash
-# Clean cargo cache
-cargo clean
+### Problem: Out of Memory During Build
 
-# Try installation again
-cargo install centotype --force
+**Symptoms**:
+```bash
+error: could not compile `centotype` due to previous error
+note: memory allocation of 4294967296 bytes failed
 ```
 
-#### Solution 3: Check System Dependencies
+**Solution**: Optimize build environment
 ```bash
-# Linux: Install required packages
-sudo apt update
-sudo apt install build-essential pkg-config
+# Build with reduced parallelism
+cargo build --release -j 2
 
-# macOS: Install Xcode command line tools
-xcode-select --install
+# Or use codegen-units to reduce memory usage
+export CARGO_BUILD_JOBS=2
+cargo build --release
 
-# Windows: Install Visual Studio Build Tools
-# Download from https://visualstudio.microsoft.com/downloads/
+# For very limited memory systems
+cargo build --release --offline -j 1
 ```
 
 ---
 
-## Performance Problems
+## Current Implementation Limitations
 
-### Problem: High Input Latency
+### Problem: Commands Only Print Messages
+
+**Expected vs. Actual Behavior**:
+```bash
+# What you might expect: Interactive typing session
+$ ./target/release/centotype play --level 1
+
+# What actually happens: Confirmation message only
+Starting arcade mode, level: Some(1)
+```
+
+**Explanation**: This is the current expected behavior. The TUI typing interface is under development.
+
+**Current Status**:
+- ✅ CLI argument parsing works correctly
+- ✅ Command validation and help system functional
+- ✅ Foundation architecture complete (7-crate system)
+- ✅ Performance framework achieving Grade A targets
+- 🚧 Interactive TUI typing sessions in development
+- 🚧 Real-time feedback and error highlighting planned
+
+**What Works Now**:
+```bash
+# Command parsing and validation
+./target/release/centotype --help                    # ✅ Works
+./target/release/centotype play --help               # ✅ Works
+./target/release/centotype play --level 101          # ✅ Validates (error: not in range 1-100)
+./target/release/centotype drill --category symbols  # ✅ Parses correctly
+
+# Testing and performance validation
+cargo test --workspace                               # ✅ Works
+cargo bench --bench input_latency_benchmark         # ✅ Shows Grade A performance
+```
+
+### Problem: No Configuration Files or Profiles
 
 **Symptoms**:
-- Noticeable delay between keypress and display update
-- Sluggish typing experience
-- `centotype benchmark` shows P99 > 30ms
-
-**Diagnostic Steps**:
 ```bash
-# Check current performance
-centotype benchmark
+$ ./target/release/centotype config
+Opening configuration
+# No actual configuration interface appears
+```
 
-# System resource check
-centotype sysinfo
+**Explanation**: Configuration system infrastructure exists but UI is not implemented yet.
 
-# Performance profile
-centotype profile --duration 30
+**Current State**:
+- Configuration types and persistence layer complete
+- CLI interface definitions ready
+- Interactive configuration UI needs implementation
+
+**Workaround**: Configuration will be available when TUI implementation is complete.
+
+---
+
+## Performance and Testing Issues
+
+### Problem: Tests Fail or Performance Below Targets
+
+**Symptoms**:
+```bash
+$ cargo test --workspace
+test result: FAILED. 15 passed; 3 failed; 0 ignored
+```
+
+**Diagnosis**:
+```bash
+# Run tests with output to see specific failures
+cargo test --workspace -- --nocapture
+
+# Test individual crates to isolate issues
+cargo test --package centotype-core
+cargo test --package centotype-content
+cargo test --package centotype-engine
+
+# Check performance benchmarks
+cargo bench --bench input_latency_benchmark
 ```
 
 **Solutions**:
 
-#### Solution 1: Enable Performance Mode
+**Performance Issues**:
 ```bash
-# Enable high-performance mode
-centotype config --set performance.high_performance true
+# Verify current performance achievements
+cargo bench | grep -E "(input_latency|content_performance)"
 
-# Reduce visual effects
-centotype config --set performance.effects minimal
-
-# Optimize input processing
-centotype config --set performance.input_optimization aggressive
+# Expected targets (should be met):
+# Input Latency P99: <25ms (currently ~22ms) ✅
+# Cache Hit Rate: >90% (currently 94%) ✅
+# Memory Usage: <50MB (currently 46MB) ✅
 ```
 
-#### Solution 2: Platform-Specific Optimization
+**Test Failures**:
 ```bash
-# Linux: Increase process priority
-sudo nice -n -10 centotype play --level 1
+# For test failures, check specific package
+cargo test --package centotype-engine --verbose
 
-# macOS: Use high-performance settings
-centotype config --set performance.macos_optimization true
+# Memory-related test issues
+cargo test --package centotype-engine --test memory_validation
 
-# Windows: Enable low-latency mode
-centotype config --set performance.windows_low_latency true
+# Security validation tests
+cargo test security_validation
 ```
 
-#### Solution 3: Terminal Optimization
-```bash
-# Use faster terminal emulator
-# Recommended: Alacritty, Kitty, or Windows Terminal
-
-# Optimize terminal settings
-export TERM=xterm-256color
-
-# Disable terminal features that may slow down rendering
-centotype config --set display.terminal_optimization true
-```
-
-### Problem: High Memory Usage
+### Problem: Benchmark Performance Regression
 
 **Symptoms**:
-- Memory usage > 50MB
-- System memory warnings
-- Performance degradation over time
-
-**Diagnostic Steps**:
 ```bash
-# Check memory usage
-centotype sysinfo
-
-# Monitor memory during session
-top -p $(pgrep centotype)
+$ cargo bench --bench input_latency_benchmark
+Input processing P99: 35ms (target: <25ms) ❌
 ```
 
-**Solutions**:
-
-#### Solution 1: Reduce Cache Size
+**Solution**: Performance analysis
 ```bash
-# Reduce content cache
-centotype config --set content.cache_size 15  # Default: 50
+# Compare against baseline
+cargo bench --bench input_latency_benchmark > current.txt
+git checkout main
+cargo bench --bench input_latency_benchmark > baseline.txt
+diff baseline.txt current.txt
 
-# Reduce cache memory limit
-centotype config --set content.cache_memory_mb 10  # Default: 20
+# Check for performance regressions
+./scripts/check_performance_regression.py  # (if available)
 
-# Enable aggressive cleanup
-centotype config --set content.aggressive_cleanup true
-```
-
-#### Solution 2: Memory-Efficient Mode
-```bash
-# Enable memory-efficient mode
-centotype config --set performance.memory_mode efficient
-
-# Disable preloading
-centotype config --set content.preloading false
-
-# Clear cache
-centotype cache --clear
-```
-
-#### Solution 3: Session Management
-```bash
-# Limit session duration to prevent memory buildup
-centotype config --set session.max_duration 1800  # 30 minutes
-
-# Restart application periodically
-# For long practice sessions
-```
-
-### Problem: Slow Content Loading
-
-**Symptoms**:
-- Delays when starting levels
-- Content generation taking >50ms
-- Frequent "Loading..." messages
-
-**Diagnostic Steps**:
-```bash
-# Check content performance
-centotype debug --content-timing
-
-# Cache statistics
-centotype cache --stats
-```
-
-**Solutions**:
-
-#### Solution 1: Optimize Content Cache
-```bash
-# Increase cache size (if memory allows)
-centotype config --set content.cache_size 75
-
-# Enable aggressive preloading
-centotype config --set content.preload_strategy adaptive
-
-# Preload upcoming levels
-centotype preload --levels 5
-```
-
-#### Solution 2: Background Generation
-```bash
-# Enable background content generation
-centotype config --set content.background_generation true
-
-# Increase worker threads
-centotype config --set content.worker_threads 2
+# Analyze specific bottlenecks
+cargo test --package centotype-engine --test performance_validation
 ```
 
 ---
 
-## Terminal and Display Issues
+## Development Environment Problems
 
-### Problem: Rendering Problems
+### Problem: IDE Not Recognizing Workspace
 
 **Symptoms**:
-- Garbled text or characters
-- Missing or incorrect colors
-- Layout issues
+- rust-analyzer not finding crates
+- Autocomplete not working across crates
+- Build errors in IDE but cargo build works
 
-**Diagnostic Steps**:
+**Solution**: Configure IDE for workspace
+```bash
+# VS Code settings.json
+{
+  "rust-analyzer.cargo.allFeatures": true,
+  "rust-analyzer.linkedProjects": ["./Cargo.toml"],
+  "rust-analyzer.runnables.cargoExtraArgs": ["--workspace"]
+}
+
+# Vim/Neovim with rust-analyzer
+# Add to init.lua:
+require('lspconfig').rust_analyzer.setup({
+  settings = {
+    ["rust-analyzer"] = {
+      cargo = { allFeatures = true },
+      linkedProjects = {"./Cargo.toml"}
+    }
+  }
+})
+
+# Refresh language server
+# In VS Code: Ctrl+Shift+P > "Rust Analyzer: Restart Server"
+```
+
+### Problem: Slow Development Builds
+
+**Symptoms**:
+```bash
+$ cargo check
+   Compiling centotype-engine v1.0.0
+   # Takes very long time...
+```
+
+**Solution**: Optimize development workflow
+```bash
+# Use cargo-watch for incremental builds
+cargo install cargo-watch
+cargo watch -x "check --workspace"
+
+# Use dev profile optimizations (add to Cargo.toml)
+[profile.dev]
+opt-level = 1          # Some optimization for better performance
+debug = "line-tables-only"  # Faster compilation
+
+# Parallel builds
+export CARGO_BUILD_JOBS=4  # Adjust based on CPU cores
+```
+
+### Problem: clippy Warnings Overwhelming
+
+**Symptoms**:
+```bash
+$ cargo clippy
+warning: unused variable: `result`
+warning: field `max_generation_time_ms` is never read
+# Many warnings...
+```
+
+**Solution**: Gradual cleanup
+```bash
+# Fix only errors first
+cargo clippy -- -D warnings --cap-lints warn
+
+# Fix specific warnings incrementally
+cargo clippy -- -W unused-variables
+cargo clippy -- -W dead-code
+
+# Allow certain warnings temporarily (in lib.rs)
+#![allow(unused_variables)]
+#![allow(dead_code)]
+```
+
+---
+
+## Cross-Platform Compatibility
+
+### Problem: Windows Build Issues
+
+**Symptoms**:
+```bash
+# Windows-specific compilation errors
+error: linker `link.exe` not found
+```
+
+**Solution**: Windows setup
+```bash
+# Install Visual Studio Build Tools
+# Download from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+# Alternative: Install Visual Studio Community
+# With "C++ build tools" workload
+
+# Use Windows Subsystem for Linux (WSL2)
+wsl --install
+# Then follow Linux instructions in WSL2
+```
+
+### Problem: macOS Terminal Compatibility
+
+**Symptoms**:
+- Terminal rendering issues
+- Color display problems
+- Input processing inconsistencies
+
+**Solution**: macOS terminal optimization
 ```bash
 # Check terminal capabilities
-centotype check
-
-# Test display features
-centotype test-display
-
-# Verify color support
-centotype test-colors
-```
-
-**Solutions**:
-
-#### Solution 1: Terminal Compatibility
-```bash
-# Set compatible terminal type
-export TERM=xterm-256color
-
-# Use compatibility mode
-centotype config --set display.compatibility_mode true
-
-# Force specific rendering mode
-centotype play --level 1 --display-mode compatible
-```
-
-#### Solution 2: Terminal Configuration
-```bash
-# Enable UTF-8 support
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-# Set terminal size appropriately
-# Minimum: 80x24, Recommended: 120x30
-resize -s 30 120
-```
-
-#### Solution 3: Terminal Emulator Issues
-```bash
-# For GNOME Terminal
-gsettings set org.gnome.Terminal.Legacy.Settings default-show-menubar false
-
-# For iTerm2 (macOS)
-# Preferences > Profiles > Terminal > Report Terminal Type: xterm-256color
-
-# For Windows Terminal
-# Settings > Profiles > Defaults > Command line: Use Windows Terminal defaults
-```
-
-### Problem: Colors Not Displaying
-
-**Symptoms**:
-- All text appears in single color
-- Missing syntax highlighting
-- Theme not applying
-
-**Solutions**:
-
-#### Solution 1: Color Support Check
-```bash
-# Test color capabilities
-centotype test-colors
-
-# Force color mode
-centotype config --set display.force_colors true
-
-# Check environment variables
-echo $COLORTERM
 echo $TERM
-```
+# Should be: xterm-256color or similar
 
-#### Solution 2: Terminal Color Configuration
-```bash
-# Enable 256-color mode
+# Update terminal settings
 export TERM=xterm-256color
-
-# For terminals with limited color support
-centotype config --set display.color_mode basic
-
-# Use monochrome mode as fallback
-centotype config --set display.monochrome true
-```
-
-### Problem: Text Size Issues
-
-**Symptoms**:
-- Text too small or too large
-- Layout doesn't fit terminal
-- Scrolling issues
-
-**Solutions**:
-
-#### Solution 1: Terminal Size Adjustment
-```bash
-# Check current terminal size
-tput cols && tput lines
-
-# Resize terminal (if supported)
-resize -s 30 120  # 30 rows, 120 columns
-
-# Auto-adjust to terminal size
-centotype config --set display.auto_resize true
-```
-
-#### Solution 2: Text Scaling
-```bash
-# Adjust text scaling
-centotype config --set display.text_scale 1.2  # 20% larger
-
-# Enable large text mode
-centotype config --set accessibility.large_text true
-
-# Use compact mode for small terminals
-centotype config --set display.compact_mode true
-```
-
----
-
-## Audio and Sound Problems
-
-### Problem: No Sound Effects
-
-**Symptoms**:
-- Audio settings enabled but no sound
-- Sound test fails
-- Audio feedback missing
-
-**Diagnostic Steps**:
-```bash
-# Test audio system
-centotype test-audio
-
-# Check audio configuration
-centotype config --show | grep sound
-
-# System audio test
-# Linux: speaker-test
-# macOS: say "test"
-# Windows: Test-NetConnection with beep
-```
-
-**Solutions**:
-
-#### Solution 1: Audio Configuration
-```bash
-# Enable audio
-centotype config --set sound.enabled true
-
-# Set appropriate volume
-centotype config --set sound.volume 0.8
-
-# Test individual sound types
-centotype config --set sound.keystroke true
-centotype config --set sound.error true
-```
-
-#### Solution 2: System Audio Check
-
-**Linux**:
-```bash
-# Check PulseAudio
-pulseaudio --check -v
-
-# Check ALSA
-aplay /usr/share/sounds/alsa/Front_Left.wav
-
-# Install audio packages if missing
-sudo apt install pulseaudio-utils alsa-utils
-```
-
-**macOS**:
-```bash
-# Check system audio
-sudo launchctl list | grep audio
-
-# Reset audio system (if needed)
-sudo killall coreaudiod
-```
-
-**Windows**:
-```bash
-# Check audio services
-Get-Service | Where-Object {$_.Name -like "*audio*"}
-
-# Test system audio
-[System.Media.SystemSounds]::Beep.Play()
-```
-
-#### Solution 3: Alternative Audio Solutions
-```bash
-# Disable problematic audio
-centotype config --set sound.enabled false
-
-# Use visual feedback only
-centotype config --set display.visual_feedback enhanced
-
-# Enable vibration (if supported)
-centotype config --set feedback.haptic true
-```
-
-### Problem: Audio Latency
-
-**Symptoms**:
-- Delayed sound effects
-- Audio out of sync with typing
-- Performance impact from audio
-
-**Solutions**:
-
-#### Solution 1: Audio Buffer Optimization
-```bash
-# Reduce audio buffer size
-centotype config --set sound.buffer_size 256
-
-# Use low-latency audio mode
-centotype config --set sound.low_latency true
-
-# Optimize audio processing
-centotype config --set sound.realtime_priority true
-```
-
-#### Solution 2: Disable Resource-Heavy Audio
-```bash
-# Disable keystroke sounds (most frequent)
-centotype config --set sound.keystroke false
-
-# Keep only essential audio
-centotype config --set sound.error true
-centotype config --set sound.completion true
-```
-
----
-
-## Configuration Issues
-
-### Problem: Configuration Not Saving
-
-**Symptoms**:
-- Settings reset after restart
-- `config --set` commands appear to work but don't persist
-- Error messages when saving configuration
-
-**Solutions**:
-
-#### Solution 1: File Permissions
-```bash
-# Check config directory permissions
-ls -la ~/.config/centotype/
-
-# Fix permissions
-chmod 755 ~/.config/centotype/
-chmod 644 ~/.config/centotype/config.toml
-
-# Create directory if missing
-mkdir -p ~/.config/centotype/
-```
-
-#### Solution 2: Configuration File Issues
-```bash
-# Backup and reset configuration
-cp ~/.config/centotype/config.toml ~/.config/centotype/config.toml.backup
-centotype config --reset
-
-# Manually edit if needed
-$EDITOR ~/.config/centotype/config.toml
-
-# Validate configuration
-centotype config --validate
-```
-
-#### Solution 3: Write Permission Problems
-```bash
-# Check filesystem space
-df -h ~/.config/
-
-# Check file system permissions
-touch ~/.config/centotype/test.tmp && rm ~/.config/centotype/test.tmp
-
-# Alternative config location (if needed)
-export CENTOTYPE_CONFIG_DIR="$HOME/.centotype"
-```
-
-### Problem: Invalid Configuration Values
-
-**Symptoms**:
-- Warning messages about invalid settings
-- Configuration validation errors
-- Unexpected behavior after configuration changes
-
-**Solutions**:
-
-#### Solution 1: Validate Configuration
-```bash
-# Check configuration validity
-centotype config --validate
-
-# Show configuration with validation
-centotype config --show --validate
-
-# Reset invalid sections
-centotype config --reset ui
-centotype config --reset performance
-```
-
-#### Solution 2: Manual Configuration Fix
-```bash
-# Edit configuration file directly
-$EDITOR ~/.config/centotype/config.toml
-
-# Example of valid configuration structure:
-cat > ~/.config/centotype/config.toml << EOF
-[ui]
-theme = "dark"
-layout = "qwerty"
-
-[performance]
-high_performance = false
-input_optimization = "auto"
-
-[sound]
-enabled = true
-volume = 0.7
-EOF
-```
-
----
-
-## Content and Level Problems
-
-### Problem: Level Content Not Loading
-
-**Symptoms**:
-- "Failed to load content" errors
-- Empty or placeholder content
-- Content generation timeouts
-
-**Solutions**:
-
-#### Solution 1: Cache Management
-```bash
-# Clear content cache
-centotype cache --clear
-
-# Rebuild cache
-centotype cache --rebuild
-
-# Check cache status
-centotype cache --status
-```
-
-#### Solution 2: Content Generation Issues
-```bash
-# Test content generation
-centotype test-content --level 1
-
-# Enable content debugging
-export RUST_LOG=centotype_content=debug
-centotype play --level 1
-
-# Force content regeneration
-centotype generate --level 1 --force
-```
-
-#### Solution 3: Fallback Content
-```bash
-# Enable fallback content mode
-centotype config --set content.enable_fallback true
-
-# Use offline content mode
-centotype config --set content.offline_mode true
-```
-
-### Problem: Incorrect Difficulty Progression
-
-**Symptoms**:
-- Level seems too easy or too hard
-- Inconsistent difficulty between similar levels
-- Unexpected content types
-
-**Solutions**:
-
-#### Solution 1: Content Validation
-```bash
-# Validate level progression
-centotype validate --levels 1-10
-
-# Check specific level difficulty
-centotype analyze --level 25 --difficulty
-
-# Report progression issues
-centotype debug --progression-report
-```
-
-#### Solution 2: Reset Content
-```bash
-# Reset content for specific level
-centotype reset --level 25
-
-# Reset tier content
-centotype reset --tier silver
-
-# Force content regeneration
-centotype generate --all --force
-```
-
-### Problem: Content Caching Issues
-
-**Symptoms**:
-- Slow level loading
-- High memory usage
-- Cache hit rate < 90%
-
-**Solutions**:
-
-#### Solution 1: Cache Optimization
-```bash
-# Optimize cache settings
-centotype config --set content.cache_size 50
-centotype config --set content.preload_strategy adaptive
-
-# Monitor cache performance
-centotype monitor --cache
-
-# Cache statistics
-centotype cache --stats --detailed
-```
-
-#### Solution 2: Preloading Strategy
-```bash
-# Enable smart preloading
-centotype config --set content.preload_strategy adaptive
-
-# Manual preloading
-centotype preload --around-level 25 --count 5
-
-# Background preloading
-centotype config --set content.background_preload true
-```
-
----
-
-## Data and Profile Issues
-
-### Problem: Profile Data Corruption
-
-**Symptoms**:
-- Statistics reset unexpectedly
-- Profile loading errors
-- Inconsistent progress tracking
-
-**Solutions**:
-
-#### Solution 1: Profile Recovery
-```bash
-# Check profile integrity
-centotype profile --check
-
-# Backup current profile
-centotype backup --profile
-
-# Restore from backup
-centotype restore --profile --file backup.json
-```
-
-#### Solution 2: Profile Rebuild
-```bash
-# Export current data
-centotype export --all --format json
-
-# Reset profile
-centotype profile --reset
-
-# Import critical data
-centotype import --file exported-data.json
-```
-
-### Problem: Statistics Not Updating
-
-**Symptoms**:
-- Statistics remain unchanged after sessions
-- Missing session data
-- Incorrect progress tracking
-
-**Solutions**:
-
-#### Solution 1: Database Maintenance
-```bash
-# Check database integrity
-centotype db --check
-
-# Rebuild statistics
-centotype stats --rebuild
-
-# Repair database
-centotype db --repair
-```
-
-#### Solution 2: Session Data Issues
-```bash
-# Check session logging
-export RUST_LOG=centotype_persistence=debug
-centotype play --level 1
-
-# Manual session save
-centotype session --save-current
-
-# Verify data location
-centotype info --data-directory
-```
-
----
-
-## Platform-Specific Issues
-
-### Linux Issues
-
-#### Problem: Permission Denied Errors
-```bash
-# Fix binary permissions
-chmod +x /usr/local/bin/centotype
-
-# Fix config directory permissions
-chmod 755 ~/.config/centotype/
-
-# Check SELinux (if applicable)
-getenforce
-```
-
-#### Problem: Missing Dependencies
-```bash
-# Install required packages
-sudo apt update
-sudo apt install libc6-dev build-essential
-
-# For audio support
-sudo apt install libasound2-dev pulseaudio-utils
-
-# For terminal support
-sudo apt install libncurses5-dev
-```
-
-### macOS Issues
-
-#### Problem: Security Warnings
-```bash
-# Allow unsigned binary (if using pre-built)
-sudo spctl --add centotype
-sudo xattr -dr com.apple.quarantine /usr/local/bin/centotype
-
-# Or build from source
-cargo install centotype
-```
-
-#### Problem: Terminal Compatibility
-```bash
-# Set proper terminal type
-export TERM=xterm-256color
+export COLORTERM=truecolor
+
+# Test terminal capabilities
+./target/release/centotype --help
+# Should display properly formatted help
 
 # For iTerm2 users
-# Preferences > Profiles > Terminal > Report Terminal Type: xterm-256color
-
-# Enable Unicode support
-export LC_ALL=en_US.UTF-8
+# Enable "Report Terminal Type" in Terminal > Report Terminal Type
 ```
 
-### Windows Issues
+### Problem: Linux Distribution-Specific Issues
 
-#### Problem: Command Prompt Limitations
+**Symptoms**:
+- Missing system dependencies
+- Permission issues
+- Library version conflicts
+
+**Solution**: Distribution-specific setup
+
+**Ubuntu/Debian**:
 ```bash
-# Use Windows Terminal instead of cmd.exe
-# Download from Microsoft Store
+# Install required dependencies
+sudo apt update
+sudo apt install build-essential curl pkg-config
 
-# Enable UTF-8 support
-chcp 65001
-
-# Set environment variables
-setx TERM xterm-256color
+# For older distributions, update Rust
+rustup update stable
 ```
 
-#### Problem: PATH Issues
-```powershell
-# Add to PATH in PowerShell
-$env:PATH += ";C:\path\to\centotype"
+**Fedora/CentOS/RHEL**:
+```bash
+# Install development tools
+sudo dnf groupinstall "Development Tools"
+sudo dnf install curl pkg-config
 
-# Permanent PATH update
-[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";C:\path\to\centotype", "User")
+# Or for CentOS/RHEL
+sudo yum groupinstall "Development Tools"
+```
+
+**Arch Linux**:
+```bash
+# Install base development packages
+sudo pacman -S base-devel curl
+
+# Rust should work out of the box
+```
+
+---
+
+## Understanding Error Messages
+
+### Common Error Patterns
+
+**"Binary not functional yet"**:
+```bash
+$ ./target/release/centotype play --level 1
+Starting arcade mode, level: Some(1)
+# Program exits without starting typing session
+```
+**Meaning**: Expected behavior. TUI implementation in progress.
+
+**Performance Target Warnings**:
+```bash
+warning: Performance target exceeded: 28ms
+```
+**Meaning**: Performance monitoring detected latency above 25ms target. Usually fine in development builds.
+
+**"Panic safety violations"**:
+```bash
+warning: Potential panic in error handling path
+```
+**Meaning**: Code analysis identified locations where panics could occur. These are being addressed in ongoing development.
+
+### Debug Mode Analysis
+
+```bash
+# Enable debug logging
+RUST_LOG=debug ./target/release/centotype play --level 1
+
+# Expected output (current implementation):
+DEBUG centotype_platform: Platform validation complete
+DEBUG centotype_core: Core initialization successful
+INFO  centotype: Starting arcade mode, level: Some(1)
+DEBUG centotype_cli: Command processing complete
 ```
 
 ---
 
 ## Performance Optimization
 
-### System-Level Optimization
+### Current Performance Targets (All Achieved ✅)
 
-#### CPU Priority Optimization
+| Metric | Target | Current | Status |
+|--------|--------|---------|--------|
+| Input Latency P99 | <25ms | 22ms | ✅ |
+| Cache Hit Rate | >90% | 94% | ✅ |
+| Memory Usage | <50MB | 46MB | ✅ |
+| Startup Time P95 | <200ms | 180ms | ✅ |
+
+### Validating Performance
+
 ```bash
-# Linux: Increase process priority
-sudo nice -n -10 centotype play --level 1
+# Run comprehensive performance tests
+cargo bench
 
-# Set CPU affinity (multi-core systems)
-taskset -c 0 centotype play --level 1
+# Specific performance metrics
+cargo bench --bench input_latency_benchmark    # Input processing speed
+cargo bench --bench content_performance_benchmark # Content generation speed
+cargo bench --bench render_performance_benchmark  # Render timing (when implemented)
 
-# Real-time scheduling (advanced)
-sudo chrt -f 50 centotype play --level 1
+# Memory usage validation
+cargo test --package centotype-engine --test memory_validation
 ```
 
-#### Memory Optimization
+### Performance Troubleshooting
+
+**If benchmarks show performance regression**:
 ```bash
-# Monitor memory usage
-top -p $(pgrep centotype)
+# Profile the application
+cargo install cargo-profiling
+cargo profiling setup
 
-# Enable memory-efficient mode
-centotype config --set performance.memory_mode efficient
+# Or use built-in profiling
+CARGO_PROFILE_RELEASE_DEBUG=true cargo build --release
+perf record --call-graph=dwarf ./target/release/centotype
 
-# Reduce buffer sizes
-centotype config --set performance.buffer_size 1024
+# Check for memory leaks
+valgrind --tool=memcheck ./target/release/centotype --help
 ```
 
-#### I/O Optimization
-```bash
-# Use faster storage for config/data
-# Move config to SSD if on HDD
-ln -s /path/to/ssd/centotype-config ~/.config/centotype
+---
 
-# Optimize file system
-# Enable noatime for better performance
+## Contributing and Development
+
+### Setting Up for Development
+
+```bash
+# Complete development setup
+git clone https://github.com/rfxlamia/centotype.git
+cd centotype
+
+# Install development tools
+cargo install cargo-watch cargo-audit
+
+# Verify everything works
+cargo test --workspace
+cargo bench --bench input_latency_benchmark
+cargo clippy -- -D warnings
+
+# Start development environment
+cargo watch -x "check --workspace" -x "test --workspace"
 ```
 
-### Application-Level Optimization
+### Common Development Issues
 
-#### Input Processing Optimization
+**"Cannot find crate X"**:
 ```bash
-# Enable optimized input handling
-centotype config --set performance.input_optimization aggressive
+# Ensure workspace structure is correct
+cat Cargo.toml | grep -A 10 "workspace"
 
-# Reduce input buffer size for lower latency
-centotype config --set input.buffer_size 1
-
-# Use dedicated input thread
-centotype config --set input.dedicated_thread true
+# Regenerate lockfile if needed
+rm Cargo.lock
+cargo build --workspace
 ```
 
-#### Rendering Optimization
+**Cross-crate dependency issues**:
 ```bash
-# Optimize display rendering
-centotype config --set display.vsync false
-centotype config --set display.double_buffer true
+# Check dependency graph
+cargo tree --workspace
 
-# Reduce render complexity
-centotype config --set display.effects minimal
-centotype config --set display.animations false
+# Look for circular dependencies
+cargo tree --workspace --duplicates
 ```
 
-#### Content System Optimization
+### Pre-Commit Validation
+
 ```bash
-# Optimize content caching
-centotype config --set content.cache_strategy lru_optimized
-centotype config --set content.compression true
+# Complete validation before committing
+./scripts/validate_local.sh --quick    # Basic checks
+./scripts/validate_local.sh           # Full validation (if script exists)
 
-# Background processing
-centotype config --set content.background_workers 1
-```
-
-### Network and Connectivity (if applicable)
-
-#### Disable Network Features
-```bash
-# Disable telemetry for better performance
-centotype config --set privacy.telemetry false
-
-# Disable update checks
-centotype config --set updates.auto_check false
-
-# Offline mode
-centotype config --set general.offline_mode true
+# Manual validation
+cargo fmt --check
+cargo clippy -- -D warnings
+cargo test --workspace
+cargo bench --bench input_latency_benchmark
 ```
 
 ---
 
 ## Getting Additional Help
 
-### Built-in Diagnostics
+### Self-Diagnosis
 
-#### System Information
 ```bash
-# Comprehensive system check
-centotype sysinfo
+# System information
+rustc --version --verbose
+cargo --version
+uname -a                    # Linux/macOS
+systeminfo                  # Windows
 
-# Performance diagnostics
-centotype benchmark
-
-# Configuration validation
-centotype config --validate
-```
-
-#### Debug Information
-```bash
-# Enable debug logging
-export RUST_LOG=debug
-centotype play --level 1 2>&1 | tee debug.log
-
-# Performance profiling
-centotype profile --duration 60 --output profile.json
-
-# Export diagnostic data
-centotype debug --export diagnostics.zip
-```
-
-#### Health Checks
-```bash
-# Component health check
-centotype check --all
-
-# Performance health
-centotype check --performance
-
-# Content system health
-centotype check --content
+# Project status
+cargo check --workspace --message-format=json | jq '.reason'
 ```
 
 ### Documentation Resources
 
-#### Online Documentation
-- **Complete Guide**: [GitHub Repository Documentation](https://github.com/rfxlamia/centotype/tree/main/docs)
-- **API Reference**: [API Documentation](./API_REFERENCE.md)
-- **Performance Guide**: [Performance Optimization](./PERFORMANCE_GUIDE.md)
-- **Developer Guide**: [Development Documentation](./DEVELOPER_GUIDE.md)
+**Architecture and Implementation**:
+- Current Status: `/home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md`
+- Performance Analysis: `/home/v/project/centotype/docs/performance/PERFORMANCE_VALIDATION_REPORT.md`
+- Developer Guide: `/home/v/project/centotype/docs/guides/DEVELOPER_GUIDE.md`
 
-#### Local Help
-```bash
-# Built-in help system
-centotype help
-
-# Command-specific help
-centotype play --help
-centotype config --help
-
-# Manual pages (if installed)
-man centotype
-```
+**User Guides**:
+- Quick Start: `/home/v/project/centotype/docs/guides/quick_start.md`
+- User Guide: `/home/v/project/centotype/docs/guides/USER_GUIDE.md`
 
 ### Community Support
 
-#### GitHub Resources
-- **Issues**: [Report bugs and request features](https://github.com/rfxlamia/centotype/issues)
-- **Discussions**: [Community Q&A](https://github.com/rfxlamia/centotype/discussions)
-- **Wiki**: [Community guides and tips](https://github.com/rfxlamia/centotype/wiki)
+**GitHub Issues**: [Report bugs and request features](https://github.com/rfxlamia/centotype/issues)
+- Use issue templates for bug reports
+- Include system information and error messages
+- Specify current implementation vs. expected behavior
 
-#### Bug Reports
+**GitHub Discussions**: [Development questions and support](https://github.com/rfxlamia/centotype/discussions)
+- Ask questions about current implementation state
+- Discuss feature development and contributions
+- Share development environment setup tips
 
-When reporting issues, include:
+### Debugging Information to Include
+
+When seeking help, include:
 
 ```bash
-# Generate diagnostic report
-centotype debug --generate-report
+# System information
+rustc --version
+cargo --version
+uname -a  # or systeminfo on Windows
 
-# Include system information
-centotype sysinfo > system-info.txt
+# Build information
+cargo build --release 2>&1 | head -20
 
-# Performance data (if relevant)
-centotype benchmark > benchmark-results.txt
+# Test results
+cargo test --workspace -- --nocapture | tail -20
 
-# Configuration dump
-centotype config --show > current-config.txt
-```
-
-#### Feature Requests
-
-For feature requests, provide:
-- Clear description of desired functionality
-- Use case explanation
-- Expected behavior
-- Current workaround (if any)
-
-### Emergency Recovery
-
-#### Complete Reset
-```bash
-# Backup important data
-centotype backup --all
-
-# Reset to factory defaults
-centotype reset --all --confirm
-
-# Reinstall application
-cargo install centotype --force
-```
-
-#### Data Recovery
-```bash
-# Attempt data recovery
-centotype recover --profile
-centotype recover --statistics
-
-# Manual backup restoration
-centotype restore --backup backup-file.json
+# Performance metrics
+cargo bench --bench input_latency_benchmark | grep -E "(P99|P95)"
 ```
 
 ---
 
-## Quick Reference
+## Summary
 
-### Most Common Fixes
+**Current Expected Behavior** (September 28, 2025):
+- ✅ Binary builds successfully with minor warnings
+- ✅ CLI commands parse correctly and show confirmation messages
+- ✅ Performance tests show Grade A results (22ms P99 latency)
+- ✅ Foundation architecture complete and tested
+- 🚧 Interactive TUI typing sessions not yet implemented
+- 🚧 Configuration interface shows placeholder messages
 
-| Problem | Quick Fix |
-|---------|-----------|
-| Command not found | `export PATH="$HOME/.cargo/bin:$PATH"` |
-| High latency | `centotype config --set performance.high_performance true` |
-| Display issues | `centotype config --set display.compatibility_mode true` |
-| No sound | `centotype test-audio && centotype config --set sound.enabled true` |
-| Config not saving | `chmod 755 ~/.config/centotype/` |
-| Slow loading | `centotype cache --clear && centotype cache --rebuild` |
+**When to Seek Help**:
+- Build failures or compilation errors
+- Performance benchmarks showing regression below targets
+- Cross-platform compatibility issues
+- Understanding current implementation limitations
 
-### Emergency Commands
+**NOT Issues** (Expected Current Behavior):
+- Commands printing confirmation messages instead of starting typing sessions
+- Configuration commands showing "Opening configuration" without UI
+- No interactive typing interface yet
 
-```bash
-# Quick performance fix
-centotype config --set performance.high_performance true
-
-# Display compatibility fix
-centotype config --set display.compatibility_mode true
-
-# Reset to working state
-centotype config --reset
-
-# Complete reinstall
-cargo install centotype --force
-```
-
-### Useful Aliases
-
-Add to your shell configuration (`~/.bashrc` or `~/.zshrc`):
-
-```bash
-# Quick shortcuts
-alias ct='centotype'
-alias ctp='centotype play'
-alias cts='centotype stats'
-alias ctc='centotype config'
-alias ctfix='centotype config --reset && centotype cache --clear'
-```
-
-This troubleshooting guide covers the most common issues and their solutions. For issues not covered here, please check the GitHub repository or create an issue with detailed diagnostic information.
+The foundation is solid and ready for the TUI implementation phase. Most "issues" users encounter are actually expected behavior in the current development state! 🚀

@@ -1,21 +1,82 @@
 # Centotype Developer Guide
 
-> **Complete technical implementation guide for developers working on Centotype**
+> **Current Implementation Status**: This developer guide reflects the actual state of Centotype as of September 28, 2025. The foundation architecture is production-ready with Grade A performance (22ms P99 latency), but the interactive TUI interface is under active development.
 
-This guide provides comprehensive technical guidance for developers contributing to Centotype, covering development setup, coding standards, testing strategies, and advanced implementation details.
+> **For Contributors**: This guide documents what's implemented, what works, and what needs to be completed. Perfect for developers wanting to contribute to the TUI implementation or performance optimizations.
+
+This comprehensive technical guide covers development setup, architecture understanding, testing strategies, and contribution guidelines for the Centotype typing trainer project.
 
 ## Table of Contents
 
-1. [Development Environment Setup](#development-environment-setup)
-2. [Project Structure](#project-structure)
-3. [Development Workflow](#development-workflow)
-4. [Testing Strategies](#testing-strategies)
-5. [Performance Development](#performance-development)
-6. [Inter-Crate Development](#inter-crate-development)
-7. [API Design Guidelines](#api-design-guidelines)
-8. [Security Implementation](#security-implementation)
-9. [Error Handling Patterns](#error-handling-patterns)
+1. [Current Implementation Status](#current-implementation-status)
+2. [Development Environment Setup](#development-environment-setup)
+3. [Project Architecture](#project-architecture)
+4. [Development Workflow](#development-workflow)
+5. [Testing and Performance](#testing-and-performance)
+6. [Code Quality Standards](#code-quality-standards)
+7. [Inter-Crate Development](#inter-crate-development)
+8. [TUI Implementation Guide](#tui-implementation-guide)
+9. [Performance Development](#performance-development)
 10. [Contributing Guidelines](#contributing-guidelines)
+
+---
+
+## Current Implementation Status
+
+### What's Production-Ready ✅
+
+**Core Architecture (100% Complete)**:
+- 7-crate workspace with modular design
+- Type system with shared interfaces
+- Error handling with CentotypeError
+- Performance monitoring infrastructure
+- Cross-platform compatibility layer
+- Security validation framework
+
+**Content System (100% Complete)**:
+- Dynamic 100-level corpus generation
+- Mathematical difficulty progression
+- LRU caching with 94% hit rate
+- Content validation and sanitization
+- Deterministic generation with ChaCha8Rng
+
+**Performance Framework (Grade A)**:
+- Input processing: 22ms P99 (target: <25ms) ✅
+- Memory usage: 46MB (target: <50MB) ✅
+- Cache performance: 94% hit rate ✅
+- Startup time: 180ms P95 ✅
+
+**CLI Interface (Parsing Complete)**:
+- Command argument parsing with clap
+- Proper validation and error messages
+- Help system and command structure
+- Platform initialization sequence
+
+### What's Under Development 🚧
+
+**TUI Implementation (In Progress)**:
+- Interactive typing interface (crossterm + ratatui)
+- Real-time input processing and feedback
+- Session state management
+- Live metrics display and error highlighting
+
+**Integration Layer (Needs Work)**:
+- Engine ↔ Core communication
+- Session persistence integration
+- Configuration system implementation
+- Profile management functionality
+
+### Critical Issues ⚠️
+
+**Safety Violations** (Production Blocker):
+- 27+ panic safety violations identified
+- Error propagation needs improvement
+- Resource cleanup patterns need hardening
+
+**Missing Functionality**:
+- TUI typing sessions (placeholder implementations)
+- Real-time render pipeline incomplete
+- Configuration system non-functional
 
 ---
 
@@ -24,576 +85,600 @@ This guide provides comprehensive technical guidance for developers contributing
 ### Prerequisites
 
 ```bash
-# Required tools and versions
-rustc 1.75.0+          # Rust compiler
-cargo 1.75.0+          # Rust package manager
+# Required Rust toolchain
+rustc 1.75.0+          # Latest stable Rust
+cargo 1.75.0+          # Cargo package manager
 git 2.30+              # Version control
-docker 20.10+          # For containerized testing (optional)
+
+# Development tools (recommended)
+cargo-watch            # File watching during development
+cargo-audit            # Security auditing
+criterion              # Benchmarking framework
 ```
 
-### Initial Setup
+### Quick Setup
 
 ```bash
-# Clone and setup the repository
+# Clone the repository
 git clone https://github.com/rfxlamia/centotype.git
 cd centotype
 
 # Install development dependencies
-cargo install cargo-watch cargo-audit cargo-tarpaulin
-cargo install criterion
+cargo install cargo-watch cargo-audit
 
-# Setup pre-commit hooks
-./scripts/setup-dev-environment.sh
+# Verify build works
+cargo build --release
 
-# Verify installation
-cargo check --all-targets
+# Run test suite
 cargo test --workspace
-cargo clippy --all-targets -- -D warnings
+
+# Check performance benchmarks
+cargo bench --bench input_latency_benchmark
 ```
 
-### Development Tools Configuration
+### Development Dependencies
 
-#### VS Code Setup
+The workspace uses these key dependencies:
 
+```toml
+# Core dependencies (shared across crates)
+tokio = { version = "1.47", features = ["full"] }
+tracing = "0.1"
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+
+# TUI and terminal handling
+crossterm = "0.27"
+ratatui = "0.24"
+
+# Performance and caching
+moka = { version = "0.12", features = ["future"] }
+criterion = "0.5"
+
+# Testing
+proptest = "1.4"
+```
+
+### IDE Configuration
+
+**VS Code (Recommended)**:
 ```json
-// .vscode/settings.json
 {
-    "rust-analyzer.cargo.allFeatures": true,
-    "rust-analyzer.checkOnSave.command": "clippy",
-    "rust-analyzer.checkOnSave.allTargets": false,
-    "rust-analyzer.cargo.loadOutDirsFromCheck": true,
-    "files.watcherExclude": {
-        "**/target/**": true
-    },
-    "editor.formatOnSave": true,
-    "rust-analyzer.inlayHints.enable": true
+  "rust-analyzer.cargo.allFeatures": true,
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.linkedProjects": ["./Cargo.toml"],
+  "rust-analyzer.runnables.cargoExtraArgs": ["--workspace"]
 }
 ```
 
-#### IntelliJ IDEA Setup
-
-```xml
-<!-- IntelliJ Rust plugin configuration -->
-<application>
-  <component name="RustProjectSettings">
-    <option name="autoUpdateEnabled" value="true" />
-    <option name="useOffline" value="false" />
-    <option name="version" value="1.75.0" />
-  </component>
-</application>
-```
-
-### Environment Variables
-
-```bash
-# Development environment setup
-export RUST_LOG=debug
-export RUST_BACKTRACE=1
-export CENTOTYPE_ENV=development
-export CENTOTYPE_CONTENT_CACHE_SIZE=50  # Reduced for development
-export CENTOTYPE_ENABLE_METRICS=true
+**Vim/Neovim with rust-analyzer**:
+```lua
+-- LSP configuration for rust-analyzer
+require('lspconfig').rust_analyzer.setup({
+  settings = {
+    ["rust-analyzer"] = {
+      cargo = { allFeatures = true },
+      checkOnSave = { command = "clippy" }
+    }
+  }
+})
 ```
 
 ---
 
-## Project Structure
+## Project Architecture
 
-### Workspace Organization
+### 7-Crate Workspace Structure
 
 ```
-centotype/
-├── Cargo.toml                 # Workspace configuration
-├── Cargo.lock                 # Dependency lock file
-├── README.md                  # Project documentation
-├── LICENSE.md                 # License information
-├── docs/                      # Comprehensive documentation
-├── scripts/                   # Development and build scripts
-├── tests/                     # Integration tests
-├── benches/                   # Performance benchmarks
-├── examples/                  # Usage examples
-├── .github/                   # GitHub workflows and templates
-│
-├── core/                      # Core business logic crate
-│   ├── Cargo.toml
+centotype/                         # Root workspace
+├── Cargo.toml                     # Workspace configuration
+├── core/                          # ✅ Complete
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── error.rs           # Error types and handling
-│   │   ├── level.rs           # Level management
-│   │   ├── scoring.rs         # Scoring algorithms
-│   │   ├── session.rs         # Session state management
-│   │   └── types.rs           # Core type definitions
-│   └── tests/
-│
-├── engine/                    # Real-time processing engine
-│   ├── Cargo.toml
+│   │   ├── lib.rs                 # Main coordinator
+│   │   ├── types.rs               # Shared types (critical file)
+│   │   ├── session.rs             # State management
+│   │   ├── scoring.rs             # Performance calculation
+│   │   ├── level.rs               # Progression logic
+│   │   └── error.rs               # Error classification
+├── engine/                        # 🚧 TUI implementation needed
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── event_loop.rs      # Main event processing
-│   │   ├── input.rs           # Input handling
-│   │   ├── render.rs          # Display rendering
-│   │   └── performance.rs     # Performance monitoring
-│   └── tests/
-│
-├── content/                   # Content generation and caching
-│   ├── Cargo.toml
+│   │   ├── lib.rs                 # Event loop coordinator
+│   │   ├── input.rs               # Input processing (complete)
+│   │   ├── render.rs              # Render system (placeholders)
+│   │   ├── tty.rs                 # Terminal control
+│   │   └── performance.rs         # Latency monitoring
+├── content/                       # ✅ Complete
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── cache.rs           # LRU caching implementation
-│   │   ├── corpus.rs          # Text corpus management
-│   │   ├── difficulty.rs      # Difficulty analysis
-│   │   ├── generator.rs       # Content generation engine
-│   │   └── validation.rs      # Security validation
-│   └── tests/
-│
-├── analytics/                 # Performance analysis
-│   ├── Cargo.toml
+│   │   ├── lib.rs                 # Content manager
+│   │   ├── generator.rs           # Text generation
+│   │   ├── corpus.rs              # 100-level corpus
+│   │   ├── difficulty.rs          # Difficulty analysis
+│   │   └── cache.rs               # LRU caching
+├── platform/                     # ✅ Complete
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── metrics.rs         # Metrics collection
-│   │   ├── analysis.rs        # Statistical analysis
-│   │   └── reporting.rs       # Report generation
-│   └── tests/
-│
-├── cli/                       # Command-line interface
-│   ├── Cargo.toml
+│   │   ├── lib.rs                 # Platform manager
+│   │   ├── detection.rs           # OS/terminal detection
+│   │   ├── terminal.rs            # Terminal capabilities
+│   │   └── performance.rs         # System metrics
+├── analytics/                     # ✅ Complete
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── commands.rs        # Command definitions
-│   │   ├── navigation.rs      # Interactive navigation
-│   │   └── ui.rs              # User interface components
-│   └── tests/
-│
-├── persistence/               # Data storage and configuration
-│   ├── Cargo.toml
+│   │   ├── lib.rs                 # Analytics coordinator
+│   │   ├── metrics.rs             # Performance tracking
+│   │   └── insights.rs            # User analytics
+├── cli/                          # ✅ Parsing complete, handlers stub
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── config.rs          # Configuration management
-│   │   ├── profile.rs         # User profile storage
-│   │   └── storage.rs         # File system operations
-│   └── tests/
-│
-├── platform/                  # OS and terminal abstraction
-│   ├── Cargo.toml
+│   │   ├── lib.rs                 # CLI interface
+│   │   ├── commands.rs            # Command definitions
+│   │   └── navigation.rs          # Menu systems
+├── persistence/                  # ✅ Infrastructure complete
 │   ├── src/
-│   │   ├── lib.rs
-│   │   ├── detection.rs       # Platform capability detection
-│   │   ├── input.rs           # Platform-specific input handling
-│   │   ├── performance.rs     # Performance monitoring
-│   │   └── terminal.rs        # Terminal management
-│   └── tests/
-│
-└── centotype-bin/             # Main binary crate
-    ├── Cargo.toml
-    ├── src/
-    │   └── main.rs
-    └── tests/
+│   │   ├── lib.rs                 # Persistence manager
+│   │   ├── profile.rs             # User profiles
+│   │   └── config.rs              # Configuration
+└── centotype-bin/                # ✅ Complete integration
+    └── src/main.rs                # Application entry point
 ```
 
-### Code Organization Principles
+### Data Flow Architecture
 
-1. **Separation of Concerns**: Each crate has a single, well-defined responsibility
-2. **Dependency Direction**: Dependencies flow upward (platform → core → engine → cli)
-3. **Interface Segregation**: Clean, minimal interfaces between crates
-4. **Performance Isolation**: Performance-critical code is clearly separated
-5. **Testing Strategy**: Comprehensive unit, integration, and performance tests
+**Current Working Flow**:
+```
+main.rs → CLI Parser → CliManager → Print Confirmation
+    ↓
+Platform Detection → Core Initialization → Engine Setup (unused)
+```
+
+**Target Implementation** (TUI Integration Needed):
+```
+User Input → Input Processor (22ms P99) → Core State → Render System
+    ↓
+Terminal Events → Event Loop → Session Manager → Live Feedback
+    ↓
+Content Generator → Cache (94% hit) → Difficulty Analysis → Display
+```
+
+### Key Integration Points
+
+**Critical Files for TUI Implementation**:
+1. `engine/src/lib.rs` - Main event loop integration
+2. `engine/src/render.rs` - TUI rendering (needs real implementation)
+3. `cli/src/lib.rs` - Command handlers (currently stubs)
+4. `core/src/session.rs` - Session state management
+
+**Performance-Critical Paths**:
+1. Input processing → Core state updates
+2. Content generation → Cache lookups
+3. Render pipeline → Terminal output
+4. Session persistence → Profile updates
 
 ---
 
 ## Development Workflow
 
-### Git Workflow
+### Daily Development
 
 ```bash
-# Feature development workflow
-git checkout main
-git pull origin main
-git checkout -b feature/your-feature-name
+# Start development session
+cargo watch -x "build --workspace" -x "test --workspace"
 
-# Make changes and commit
-git add .
-git commit -m "feat: add new feature description"
+# Run specific crate tests
+cargo test --package centotype-engine
+cargo test --package centotype-content --all-features
 
-# Push and create pull request
-git push origin feature/your-feature-name
-# Create PR via GitHub UI
+# Performance validation
+cargo bench --bench input_latency_benchmark
+
+# Check for regressions
+./scripts/validate_local.sh --quick
 ```
 
-### Commit Message Convention
+### Feature Development Process
 
-```
-<type>(<scope>): <description>
+1. **Understand Current State**: Review what's implemented
+2. **Identify Dependencies**: Check inter-crate requirements
+3. **Write Tests First**: Add tests for new functionality
+4. **Implement Incrementally**: Small, focused changes
+5. **Validate Performance**: Ensure targets are maintained
+6. **Update Documentation**: Keep guides current
 
-[optional body]
-
-[optional footer]
-```
-
-**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
-
-**Examples**:
-```
-feat(content): add mathematical difficulty progression
-fix(engine): resolve input latency in event loop
-perf(cache): optimize LRU eviction strategy
-docs(api): add comprehensive API documentation
-```
-
-### Development Commands
+### Testing Strategy
 
 ```bash
-# Development workflow
-cargo check --all-targets              # Fast compilation check
-cargo test --workspace                 # Run all tests
-cargo clippy --all-targets -- -D warnings  # Lint code
-cargo fmt                              # Format code
-cargo audit                            # Security audit
+# Unit tests (fast feedback)
+cargo test --lib --workspace
 
-# Performance testing
-cargo bench                            # Run benchmarks
-cargo test --release performance_tests # Performance regression tests
+# Integration tests (cross-crate functionality)
+cargo test --test integration_tests
 
-# Documentation
-cargo doc --open                       # Generate and open docs
-mdbook serve docs/                     # Serve documentation locally
+# Performance tests (ensure no regressions)
+cargo bench
 
-# Continuous development
-cargo watch -x "check --all-targets"   # Auto-recompile on changes
-cargo watch -x "test"                  # Auto-test on changes
-```
-
-### Code Quality Gates
-
-Before submitting a pull request, ensure all quality gates pass:
-
-```bash
-#!/bin/bash
-# scripts/quality-gate.sh
-
-set -e
-
-echo "Running quality gate checks..."
-
-# 1. Compilation check
-echo "Checking compilation..."
-cargo check --all-targets
-
-# 2. Test suite
-echo "Running test suite..."
-cargo test --workspace
-
-# 3. Code formatting
-echo "Checking code formatting..."
-cargo fmt -- --check
-
-# 4. Linting
-echo "Running clippy lints..."
-cargo clippy --all-targets -- -D warnings
-
-# 5. Security audit
-echo "Running security audit..."
+# Security validation
 cargo audit
+cargo test security_validation
+```
 
-# 6. Performance regression tests
-echo "Running performance tests..."
-cargo test --release performance_tests
+### Common Development Tasks
 
-# 7. Documentation tests
-echo "Testing documentation..."
-cargo test --doc
+**Adding New Content Level**:
+```rust
+// In content/src/generator.rs
+impl ContentGenerator {
+    fn generate_level_x(&self, seed: u64) -> Result<TextContent> {
+        // Implementation following existing pattern
+    }
+}
+```
 
-echo "All quality gates passed! ✅"
+**Adding TUI Component**:
+```rust
+// In engine/src/render.rs
+impl Render {
+    fn render_new_component(&mut self, frame: &mut Frame) -> Result<()> {
+        // Follow existing ratatui patterns
+    }
+}
+```
+
+**Performance Optimization**:
+```rust
+// Add benchmark first
+#[bench]
+fn bench_new_feature(b: &mut Bencher) {
+    // Benchmark implementation
+}
+
+// Then optimize implementation
 ```
 
 ---
 
-## Testing Strategies
+## Testing and Performance
 
-### Test Organization
+### Testing Hierarchy
 
+**Unit Tests** (Fast, Isolated):
+```bash
+# Test individual crate functionality
+cargo test --package centotype-core
+cargo test --package centotype-content
+cargo test --package centotype-engine
+```
+
+**Integration Tests** (Cross-Crate):
+```bash
+# Test crate interactions
+cargo test --test integration_tests
+cargo test --workspace --test "*"
+```
+
+**Performance Tests** (Regression Prevention):
+```bash
+# Input latency validation
+cargo bench --bench input_latency_benchmark
+
+# Content system performance
+cargo bench --bench content_performance_benchmark
+
+# Memory usage validation
+cargo test --package centotype-engine --test memory_validation
+```
+
+### Performance Targets
+
+All development must maintain these targets:
+
+| Component | Metric | Target | Current | Status |
+|-----------|--------|--------|---------|--------|
+| Input Processing | P99 Latency | <25ms | 22ms | ✅ |
+| Content Loading | P95 Time | <25ms | <25ms | ✅ |
+| Memory Usage | Peak RSS | <50MB | 46MB | ✅ |
+| Cache Performance | Hit Rate | >90% | 94% | ✅ |
+| Startup Time | P95 Duration | <200ms | 180ms | ✅ |
+
+### Performance Development Workflow
+
+```bash
+# Before implementing new feature
+cargo bench --bench input_latency_benchmark > before.txt
+
+# Implement feature
+
+# After implementation
+cargo bench --bench input_latency_benchmark > after.txt
+
+# Compare results (should not regress)
+diff before.txt after.txt
+```
+
+---
+
+## Code Quality Standards
+
+### Rust Code Guidelines
+
+**Safety and Reliability**:
 ```rust
-// Test module organization pattern
-#[cfg(test)]
-mod tests {
-    use super::*;
+// Prefer Result<T, E> over panic!() or unwrap()
+fn safe_operation() -> Result<String, CentotypeError> {
+    // Implementation that can fail gracefully
+}
 
-    // Unit tests for individual functions
-    mod unit_tests {
-        use super::*;
+// Use RAII for resource management
+struct ResourceManager {
+    resource: Resource,
+}
 
-        #[test]
-        fn test_specific_function() {
-            // Test implementation
-        }
-    }
-
-    // Integration tests for module interactions
-    mod integration_tests {
-        use super::*;
-
-        #[tokio::test]
-        async fn test_module_integration() {
-            // Integration test implementation
-        }
-    }
-
-    // Performance tests
-    mod performance_tests {
-        use super::*;
-        use std::time::Instant;
-
-        #[test]
-        fn test_performance_target() {
-            // Performance test implementation
-        }
+impl Drop for ResourceManager {
+    fn drop(&mut self) {
+        // Cleanup resources
     }
 }
 ```
 
-### Unit Testing Patterns
+**Performance Patterns**:
+```rust
+// Use Arc<T> for shared ownership across crates
+let shared_core = Arc::new(CentotypeCore::new());
 
-#### Content System Testing
+// Clone Arc, not the underlying data
+let core_ref = Arc::clone(&shared_core);
+
+// Prefer borrowing over cloning when possible
+fn process_data(data: &TextContent) -> Result<Metrics> {
+    // Work with borrowed data
+}
+```
+
+**Error Handling**:
+```rust
+// Use consistent error types
+#[derive(Debug, thiserror::Error)]
+pub enum CentotypeError {
+    #[error("Performance target exceeded: {metric}")]
+    PerformanceViolation { metric: String },
+
+    #[error("Content generation failed: {reason}")]
+    ContentGeneration { reason: String },
+}
+```
+
+### Documentation Standards
+
+**Public APIs**:
+```rust
+/// Processes user input with performance monitoring
+///
+/// # Arguments
+/// * `input` - Raw keyboard input event
+/// * `mode` - Current training mode for validation
+///
+/// # Returns
+/// * `Ok(ProcessedInput)` - Validated and sanitized input
+/// * `Err(CentotypeError)` - Input validation or security failure
+///
+/// # Performance
+/// This function targets <25ms P99 latency and includes performance monitoring.
+pub fn process_input(
+    &mut self,
+    input: KeyEvent,
+    mode: TrainingMode
+) -> Result<ProcessedInput> {
+    // Implementation
+}
+```
+
+### Code Review Checklist
+
+- [ ] No panics or unwraps in production code
+- [ ] Error handling follows CentotypeError patterns
+- [ ] Performance targets maintained (run benchmarks)
+- [ ] Tests added for new functionality
+- [ ] Documentation updated for public APIs
+- [ ] Cross-platform compatibility verified
+- [ ] Memory usage patterns reviewed
+
+---
+
+## Inter-Crate Development
+
+### Dependency Management
+
+**Current Dependencies** (Working):
+```
+centotype-bin → all crates
+core → (no dependencies, shared types)
+engine → core, platform
+content → core
+cli → core
+analytics → core
+persistence → core
+platform → (no dependencies)
+```
+
+**Communication Patterns**:
+```rust
+// Shared state via Arc
+let core = Arc::new(CentotypeCore::new());
+let engine = CentotypeEngine::new(Arc::clone(&core), platform).await?;
+
+// Event passing via channels
+let (tx, rx) = tokio::sync::mpsc::channel(100);
+
+// Error propagation via Result
+fn cross_crate_operation() -> Result<Output, CentotypeError> {
+    let content = content_manager.generate(level)?;
+    let metrics = analytics.process(content)?;
+    Ok(metrics)
+}
+```
+
+### Adding New Inter-Crate Features
+
+1. **Define in Core Types**: Add shared types to `core/src/types.rs`
+2. **Implement in Specific Crate**: Add functionality to relevant crate
+3. **Test Integration**: Add tests in `tests/` directory
+4. **Update Documentation**: Document new interfaces
+
+### Performance Optimization Across Crates
 
 ```rust
-#[cfg(test)]
-mod content_tests {
-    use super::*;
-    use tokio_test;
+// Use efficient data sharing
+pub struct SharedContext {
+    content: Arc<ContentManager>,
+    analytics: Arc<AnalyticsManager>,
+    // Avoid cloning large data structures
+}
 
-    #[tokio::test]
-    async fn test_deterministic_content_generation() {
-        let generator = CentotypeContentGenerator::new(
-            Arc::new(ContentValidator::new().unwrap())
-        );
-
-        let level = LevelId::new(5).unwrap();
-        let seed = 12345;
-
-        // Generate content multiple times with same seed
-        let content1 = generator.generate_level_content(level, seed).unwrap();
-        let content2 = generator.generate_level_content(level, seed).unwrap();
-
-        assert_eq!(content1, content2, "Content generation must be deterministic");
-        assert!(!content1.is_empty(), "Generated content must not be empty");
-
-        // Validate content meets level requirements
-        let difficulty_params = DifficultyParams::calculate(level);
-        let actual_length = content1.len();
-        let expected_length = difficulty_params.content_length;
-
-        assert!(
-            (actual_length as f64 - expected_length as f64).abs() / expected_length as f64 < 0.1,
-            "Content length {} should be within 10% of expected {}",
-            actual_length, expected_length
-        );
-    }
-
-    #[tokio::test]
-    async fn test_cache_performance() {
-        let cache = ContentCache::new(CacheConfig::default()).unwrap();
-        let level = LevelId::new(1).unwrap();
-        let seed = 54321;
-
-        // First access (cache miss)
-        let start = Instant::now();
-        let content1 = cache.get_content(level, seed).await.unwrap();
-        let miss_duration = start.elapsed();
-
-        // Second access (cache hit)
-        let start = Instant::now();
-        let content2 = cache.get_content(level, seed).await.unwrap();
-        let hit_duration = start.elapsed();
-
-        assert_eq!(content1, content2, "Cache should return same content");
-        assert!(hit_duration < miss_duration, "Cache hit should be faster than miss");
-        assert!(hit_duration.as_millis() < 5, "Cache hit should be <5ms");
-
-        let metrics = cache.get_metrics();
-        assert!(metrics.hit_count > 0, "Should have recorded cache hit");
+// Minimize allocations in hot paths
+impl InputProcessor {
+    fn process_hot_path(&self, input: &KeyEvent) -> ProcessedInput {
+        // Reuse buffers, avoid allocations
+        self.buffer.clear();
+        // Process without allocating
     }
 }
 ```
 
-#### Engine Testing
+---
+
+## TUI Implementation Guide
+
+### Current TUI State
+
+**What's Working**:
+- Terminal initialization and cleanup
+- Basic ratatui setup and frame management
+- Input event capturing with crossterm
+- Performance monitoring infrastructure
+
+**What Needs Implementation**:
+- Real typing session interface
+- Live feedback and error highlighting
+- Progress display and metrics
+- Interactive help overlay
+
+### TUI Architecture Pattern
 
 ```rust
-#[cfg(test)]
-mod engine_tests {
-    use super::*;
+// Main TUI structure
+pub struct TypingSession {
+    terminal: Terminal<CrosstermBackend<Stdout>>,
+    state: SessionState,
+    render: Render,
+    input_processor: InputProcessor,
+}
 
-    #[tokio::test]
-    async fn test_input_processing_latency() {
-        let mut engine = CentotypeEngine::new().await.unwrap();
-        let mut latencies = Vec::new();
+impl TypingSession {
+    pub async fn run(
+        &mut self,
+        content: TextContent
+    ) -> Result<SessionResult> {
+        loop {
+            // Render current state
+            self.render.draw(&mut self.terminal, &self.state)?;
 
-        // Process 100 keystrokes and measure latency
-        for i in 0..100 {
-            let test_char = ((i % 26) as u8 + b'a') as char;
-            let start = Instant::now();
+            // Process input events
+            if let Some(event) = self.input_processor.poll().await? {
+                match event {
+                    InputEvent::Character(c) => {
+                        self.state.process_character(c)?;
+                    }
+                    InputEvent::Control(ctrl) => {
+                        if matches!(ctrl, ControlEvent::Quit) {
+                            break;
+                        }
+                    }
+                }
+            }
 
-            engine.process_keystroke(test_char).await.unwrap();
-
-            let latency = start.elapsed();
-            latencies.push(latency);
+            // Check completion
+            if self.state.is_complete() {
+                break;
+            }
         }
 
-        // Validate latency targets
-        latencies.sort();
-        let p50 = latencies[50];
-        let p95 = latencies[95];
-        let p99 = latencies[99];
-
-        assert!(p99.as_millis() < 25, "P99 latency {} exceeds 25ms target", p99.as_millis());
-        assert!(p95.as_millis() < 15, "P95 latency {} exceeds 15ms target", p95.as_millis());
-        assert!(p50.as_millis() < 10, "P50 latency {} exceeds 10ms target", p50.as_millis());
+        Ok(self.state.into_result())
     }
+}
+```
 
-    #[tokio::test]
-    async fn test_engine_state_consistency() {
-        let engine = CentotypeEngine::new().await.unwrap();
+### Implementing Real Typing Sessions
 
-        // Start a session
-        let session_id = engine.start_session(
-            TrainingMode::Arcade { level: LevelId::new(1).unwrap() },
-            "test content".to_string()
-        ).await.unwrap();
+**Step 1: Replace Placeholder Render Methods**:
+```rust
+// In engine/src/render.rs
+impl Render {
+    fn render_typing_pane(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
+        let state = &self.render_state;
 
-        // Process some keystrokes
-        let keystrokes = "test";
-        for ch in keystrokes.chars() {
-            engine.process_keystroke(ch).await.unwrap();
+        // Show target text
+        let target_paragraph = Paragraph::new(state.target_text.as_str())
+            .style(Style::default().fg(self.colors.normal_text));
+
+        // Show user input with highlighting
+        let input_paragraph = Paragraph::new(state.user_input.as_str())
+            .style(Style::default().fg(self.colors.input_text));
+
+        // Render with proper layout
+        frame.render_widget(target_paragraph, target_area);
+        frame.render_widget(input_paragraph, input_area);
+
+        Ok(())
+    }
+}
+```
+
+**Step 2: Implement Real Session Logic**:
+```rust
+// In cli/src/lib.rs
+impl CliManager {
+    pub fn run(&self, cli: Cli) -> Result<()> {
+        match cli.command {
+            Commands::Play { level } => {
+                // Instead of printing, start real session
+                let session = TypingSession::new(level)?;
+                let result = session.run().await?;
+                self.display_results(result)?;
+            }
+            // Other commands...
         }
-
-        // Verify state consistency
-        let session_state = engine.get_session_state(session_id).await.unwrap();
-        assert_eq!(session_state.typed_text, "test");
-        assert_eq!(session_state.cursor_position, 4);
-        assert!(!session_state.is_completed);
-
-        // Complete session
-        let result = engine.complete_session().await.unwrap();
-        assert_eq!(result.session_id, session_id);
+        Ok(())
     }
 }
 ```
 
-### Integration Testing
+### TUI Component Guidelines
 
+**Layout Management**:
 ```rust
-// tests/integration_tests.rs
-use centotype_content::ContentManager;
-use centotype_core::CentotypeCore;
-use centotype_engine::CentotypeEngine;
+use ratatui::{
+    layout::{Constraint, Direction, Layout},
+    widgets::{Block, Borders, Paragraph},
+};
 
-#[tokio::test]
-async fn test_end_to_end_typing_session() {
-    // Initialize all components
-    let content_manager = ContentManager::new().await.unwrap();
-    let core = CentotypeCore::new();
-    let engine = CentotypeEngine::new().await.unwrap();
+fn create_layout(area: Rect) -> (Rect, Rect, Rect) {
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(3),      // Header
+            Constraint::Min(10),        // Typing area
+            Constraint::Length(3),      // Status bar
+        ])
+        .split(area);
 
-    // Get content for level 1
-    let level = LevelId::new(1).unwrap();
-    let content = content_manager.get_level_content(level, None).await.unwrap();
-
-    // Start session
-    let session_id = core.start_session(
-        TrainingMode::Arcade { level },
-        content.clone()
-    ).unwrap();
-
-    // Simulate typing the content
-    let mut typed_chars = 0;
-    for ch in content.chars().take(50) { // Type first 50 characters
-        let metrics = core.process_keystroke(Some(ch), false).unwrap();
-        typed_chars += 1;
-
-        // Validate metrics are reasonable
-        assert!(metrics.raw_wpm >= 0.0);
-        assert!(metrics.accuracy >= 0.0 && metrics.accuracy <= 100.0);
-
-        // Simulate realistic typing speed (50ms between keystrokes)
-        tokio::time::sleep(Duration::from_millis(50)).await;
-    }
-
-    // Complete session
-    let result = core.complete_session().unwrap();
-    assert_eq!(result.session_id, session_id);
-    assert!(result.metrics.effective_wpm > 0.0);
-    assert!(result.metrics.accuracy > 95.0); // Should be high with perfect typing
-}
-
-#[tokio::test]
-async fn test_cross_crate_performance_targets() {
-    let content_manager = ContentManager::new().await.unwrap();
-    let engine = CentotypeEngine::new().await.unwrap();
-
-    // Test content loading performance
-    let content_start = Instant::now();
-    let content = content_manager.get_level_content(LevelId::new(1).unwrap(), None).await.unwrap();
-    let content_duration = content_start.elapsed();
-
-    assert!(content_duration.as_millis() < 50, "Content loading too slow: {}ms", content_duration.as_millis());
-
-    // Test engine processing performance
-    let engine_start = Instant::now();
-    engine.process_keystroke('a').await.unwrap();
-    let engine_duration = engine_start.elapsed();
-
-    assert!(engine_duration.as_millis() < 25, "Engine processing too slow: {}ms", engine_duration.as_millis());
-
-    // Test memory usage
-    let memory_usage = get_current_memory_usage();
-    assert!(memory_usage < 50 * 1024 * 1024, "Memory usage {} exceeds 50MB", memory_usage);
+    (chunks[0], chunks[1], chunks[2])
 }
 ```
 
-### Property-Based Testing
-
+**Color Scheme (WCAG AA Compliant)**:
 ```rust
-use proptest::prelude::*;
-
-proptest! {
-    #[test]
-    fn test_difficulty_progression_properties(
-        level1 in 1u8..100,
-        level2 in 1u8..100
-    ) {
-        prop_assume!(level1 < level2);
-
-        let params1 = DifficultyParams::calculate(LevelId::new(level1).unwrap());
-        let params2 = DifficultyParams::calculate(LevelId::new(level2).unwrap());
-
-        // Difficulty should increase with level
-        prop_assert!(params2.symbol_ratio >= params1.symbol_ratio);
-        prop_assert!(params2.number_ratio >= params1.number_ratio);
-        prop_assert!(params2.tech_ratio >= params1.tech_ratio);
-        prop_assert!(params2.content_length >= params1.content_length);
-    }
-
-    #[test]
-    fn test_content_generation_bounds(
-        level in 1u8..=100,
-        seed in any::<u64>()
-    ) {
-        let generator = CentotypeContentGenerator::new(
-            Arc::new(ContentValidator::new().unwrap())
-        );
-
-        let level_id = LevelId::new(level).unwrap();
-        let content = generator.generate_level_content(level_id, seed).unwrap();
-
-        let params = DifficultyParams::calculate(level_id);
-
-        // Content length should be within reasonable bounds
-        prop_assert!(content.len() >= params.content_length / 2);
-        prop_assert!(content.len() <= params.content_length * 2);
-
-        // Content should not be empty
-        prop_assert!(!content.is_empty());
-
-        // Content should contain printable characters
-        prop_assert!(content.chars().all(|c| c.is_ascii_graphic() || c.is_whitespace()));
-    }
+pub struct UiColors {
+    pub correct_text: Color,    // Green: RGB(144, 238, 144)
+    pub error_text: Color,      // Red: RGB(255, 182, 193)
+    pub cursor: Color,          // Yellow: High contrast
+    pub normal_text: Color,     // Gray: Readable
 }
 ```
 
@@ -601,711 +686,73 @@ proptest! {
 
 ## Performance Development
 
-### Performance-First Development
-
-When developing performance-critical code:
-
-1. **Measure First**: Always establish baseline performance before optimizing
-2. **Profile**: Use profiling tools to identify actual bottlenecks
-3. **Test**: Include performance tests with every change
-4. **Document**: Document performance characteristics and assumptions
-
-### Performance Testing Framework
+### Performance Monitoring Integration
 
 ```rust
-// Performance test helper macros
-macro_rules! benchmark_function {
-    ($name:ident, $func:expr, $iterations:expr, $target_ms:expr) => {
-        #[test]
-        fn $name() {
-            let mut durations = Vec::new();
+// Add performance monitoring to new features
+use std::time::Instant;
+use centotype_analytics::PerformanceMonitor;
 
-            for _ in 0..$iterations {
-                let start = Instant::now();
-                $func();
-                durations.push(start.elapsed());
-            }
+impl NewFeature {
+    pub fn performance_critical_operation(&mut self) -> Result<Output> {
+        let start = Instant::now();
 
-            durations.sort();
-            let p50 = durations[$iterations / 2];
-            let p95 = durations[($iterations * 95) / 100];
-            let p99 = durations[($iterations * 99) / 100];
+        // Your implementation
+        let result = self.do_work()?;
 
-            println!("Performance results for {}: P50: {}ms, P95: {}ms, P99: {}ms",
-                    stringify!($name), p50.as_millis(), p95.as_millis(), p99.as_millis());
+        // Record performance metrics
+        let duration = start.elapsed();
+        self.performance_monitor.record_latency("operation_name", duration);
 
-            assert!(p99.as_millis() <= $target_ms,
-                   "P99 latency {}ms exceeds target {}ms",
-                   p99.as_millis(), $target_ms);
-        }
-    };
-}
-
-// Usage example
-benchmark_function!(
-    test_content_cache_performance,
-    || {
-        let cache = ContentCache::new(CacheConfig::default()).unwrap();
-        let _content = cache.get_cached_content(LevelId::new(1).unwrap(), 0);
-    },
-    1000,
-    5
-);
-```
-
-### Memory Profiling
-
-```rust
-#[cfg(test)]
-mod memory_tests {
-    use super::*;
-
-    #[test]
-    fn test_memory_usage_bounds() {
-        let initial_memory = get_process_memory_usage();
-
-        // Create content manager and perform operations
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        rt.block_on(async {
-            let content_manager = ContentManager::new().await.unwrap();
-
-            // Generate content for all levels to test maximum memory usage
-            for level_num in 1..=100 {
-                let level = LevelId::new(level_num).unwrap();
-                let _content = content_manager.get_level_content(level, None).await.unwrap();
-            }
-
-            let peak_memory = get_process_memory_usage();
-            let memory_delta = peak_memory - initial_memory;
-
-            assert!(memory_delta < 50 * 1024 * 1024,
-                   "Memory usage {} exceeds 50MB limit", memory_delta);
-        });
-    }
-
-    fn get_process_memory_usage() -> u64 {
-        #[cfg(target_os = "linux")]
-        {
-            let status = std::fs::read_to_string("/proc/self/status").unwrap();
-            for line in status.lines() {
-                if line.starts_with("VmRSS:") {
-                    let kb: u64 = line.split_whitespace().nth(1).unwrap().parse().unwrap();
-                    return kb * 1024; // Convert to bytes
-                }
-            }
+        // Validate performance target
+        if duration > Duration::from_millis(25) {
+            warn!("Performance target exceeded: {}ms", duration.as_millis());
         }
 
-        // Fallback for other platforms
-        0
+        Ok(result)
     }
 }
 ```
 
-### Continuous Performance Monitoring
+### Benchmark Development
 
 ```rust
-// Include in CI/CD pipeline
-pub struct PerformanceCI {
-    baseline_metrics: BaselineMetrics,
-    current_metrics: CurrentMetrics,
-}
+// In benches/feature_benchmark.rs
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-impl PerformanceCI {
-    pub fn validate_performance_regression(&self) -> Result<(), PerformanceRegressionError> {
-        // Input latency regression check
-        if self.current_metrics.input_latency_p99 >
-           self.baseline_metrics.input_latency_p99 * 1.1 {
-            return Err(PerformanceRegressionError::InputLatencyRegression {
-                current: self.current_metrics.input_latency_p99,
-                baseline: self.baseline_metrics.input_latency_p99,
-                regression_percent: (
-                    (self.current_metrics.input_latency_p99.as_millis() as f64 -
-                     self.baseline_metrics.input_latency_p99.as_millis() as f64) /
-                    self.baseline_metrics.input_latency_p99.as_millis() as f64
-                ) * 100.0,
-            });
-        }
+fn bench_new_feature(c: &mut Criterion) {
+    let mut feature = NewFeature::new();
 
-        // Memory usage regression check
-        if self.current_metrics.memory_usage_mb >
-           self.baseline_metrics.memory_usage_mb * 1.15 {
-            return Err(PerformanceRegressionError::MemoryUsageRegression {
-                current_mb: self.current_metrics.memory_usage_mb,
-                baseline_mb: self.baseline_metrics.memory_usage_mb,
-            });
-        }
-
-        // Cache performance regression check
-        if self.current_metrics.cache_hit_rate <
-           self.baseline_metrics.cache_hit_rate * 0.95 {
-            return Err(PerformanceRegressionError::CachePerformanceRegression {
-                current_rate: self.current_metrics.cache_hit_rate,
-                baseline_rate: self.baseline_metrics.cache_hit_rate,
-            });
-        }
-
-        Ok(())
-    }
-}
-```
-
----
-
-## Inter-Crate Development
-
-### Crate Dependencies and Interfaces
-
-```rust
-// Example: Adding a new feature that spans multiple crates
-
-// 1. Core crate: Define the domain types
-// core/src/types.rs
-#[derive(Debug, Clone)]
-pub struct TypingStatistics {
-    pub session_id: uuid::Uuid,
-    pub keystroke_intervals: Vec<Duration>,
-    pub error_patterns: Vec<ErrorPattern>,
-    pub skill_progression: SkillProgression,
-}
-
-// 2. Analytics crate: Implement analysis logic
-// analytics/src/statistics.rs
-impl StatisticsAnalyzer {
-    pub fn analyze_session(&self, session_result: &SessionResult) -> TypingStatistics {
-        // Implementation that uses core types
-        TypingStatistics {
-            session_id: session_result.session_id,
-            keystroke_intervals: self.calculate_intervals(&session_result.keystrokes),
-            error_patterns: self.analyze_errors(&session_result.errors),
-            skill_progression: self.assess_skill_progression(session_result),
-        }
-    }
-}
-
-// 3. Engine crate: Integrate with real-time processing
-// engine/src/session.rs
-impl SessionEngine {
-    pub async fn complete_session_with_analysis(&mut self) -> Result<SessionAnalysis> {
-        // Get session result from core
-        let session_result = self.core.complete_session()?;
-
-        // Perform analysis
-        let statistics = self.analytics.analyze_session(&session_result)?;
-
-        // Store results
-        self.persistence.save_session_analysis(&statistics).await?;
-
-        Ok(SessionAnalysis {
-            result: session_result,
-            statistics,
+    c.bench_function("new_feature_operation", |b| {
+        b.iter(|| {
+            black_box(feature.operation(black_box(input_data)))
         })
-    }
+    });
 }
+
+criterion_group!(benches, bench_new_feature);
+criterion_main!(benches);
 ```
 
-### Cross-Crate Communication Patterns
-
-#### Synchronous Communication (Performance Critical)
+### Memory Usage Optimization
 
 ```rust
-// For performance-critical paths, use direct function calls
-pub trait FastContentProvider {
-    fn get_cached_content(&self, level_id: LevelId) -> Option<&str>;
+// Use memory-efficient patterns
+pub struct MemoryEfficientProcessor {
+    // Reuse buffers instead of allocating
+    buffer: Vec<char>,
+    // Use Box<str> for immutable strings
+    cached_content: Box<str>,
 }
 
-impl FastContentProvider for ContentManager {
-    #[inline]
-    fn get_cached_content(&self, level_id: LevelId) -> Option<&str> {
-        // Direct cache access with no async overhead
-        self.hot_cache.get(&level_id).map(|s| s.as_str())
-    }
-}
-```
-
-#### Asynchronous Communication (Non-Critical Path)
-
-```rust
-// For non-critical operations, use message passing
-pub struct BackgroundTaskCoordinator {
-    content_tasks: mpsc::Sender<ContentTask>,
-    analytics_tasks: mpsc::Sender<AnalyticsTask>,
-}
-
-impl BackgroundTaskCoordinator {
-    pub async fn schedule_content_preload(&self, level_id: LevelId) -> Result<()> {
-        self.content_tasks.send(ContentTask::Preload(level_id)).await?;
-        Ok(())
-    }
-
-    pub async fn schedule_analytics_update(&self, session_data: SessionData) -> Result<()> {
-        self.analytics_tasks.send(AnalyticsTask::UpdateMetrics(session_data)).await?;
-        Ok(())
-    }
-}
-```
-
-### Dependency Injection Patterns
-
-```rust
-// Use dependency injection for testability and modularity
-pub struct CentotypeApp {
-    content_manager: Arc<dyn ContentProvider>,
-    scoring_engine: Arc<dyn ScoringProvider>,
-    analytics_engine: Arc<dyn AnalyticsProvider>,
-    persistence_manager: Arc<dyn PersistenceProvider>,
-}
-
-impl CentotypeApp {
-    pub fn new(
-        content_manager: Arc<dyn ContentProvider>,
-        scoring_engine: Arc<dyn ScoringProvider>,
-        analytics_engine: Arc<dyn AnalyticsProvider>,
-        persistence_manager: Arc<dyn PersistenceProvider>,
-    ) -> Self {
-        Self {
-            content_manager,
-            scoring_engine,
-            analytics_engine,
-            persistence_manager,
-        }
-    }
-
-    // Production constructor
-    pub async fn production() -> Result<Self> {
-        let content_manager = Arc::new(ContentManager::new().await?);
-        let scoring_engine = Arc::new(ScoringEngine::new());
-        let analytics_engine = Arc::new(AnalyticsEngine::new());
-        let persistence_manager = Arc::new(PersistenceManager::new().await?);
-
-        Ok(Self::new(
-            content_manager,
-            scoring_engine,
-            analytics_engine,
-            persistence_manager,
-        ))
-    }
-
-    // Test constructor with mocks
-    #[cfg(test)]
-    pub fn test() -> Self {
-        let content_manager = Arc::new(MockContentProvider::new());
-        let scoring_engine = Arc::new(MockScoringProvider::new());
-        let analytics_engine = Arc::new(MockAnalyticsProvider::new());
-        let persistence_manager = Arc::new(MockPersistenceProvider::new());
-
-        Self::new(
-            content_manager,
-            scoring_engine,
-            analytics_engine,
-            persistence_manager,
-        )
-    }
-}
-```
-
----
-
-## API Design Guidelines
-
-### Interface Design Principles
-
-1. **Consistency**: Similar operations should have similar signatures
-2. **Clarity**: Function names should clearly indicate their purpose
-3. **Safety**: Use Rust's type system to prevent misuse
-4. **Performance**: Design APIs to enable optimization
-5. **Testability**: APIs should be easy to test and mock
-
-### Error Handling API Design
-
-```rust
-// Consistent error handling across crates
-#[derive(Debug, thiserror::Error)]
-pub enum CentotypeError {
-    #[error("Content generation failed: {message}")]
-    ContentGeneration { message: String },
-
-    #[error("Cache operation failed: {operation}")]
-    CacheOperation { operation: String },
-
-    #[error("Performance target violated: {metric} = {actual}, target = {target}")]
-    PerformanceTarget {
-        metric: String,
-        actual: String,
-        target: String,
-    },
-
-    #[error("IO operation failed")]
-    Io(#[from] std::io::Error),
-
-    #[error("Serialization failed")]
-    Serialization(#[from] serde_json::Error),
-}
-
-// Result type alias for consistency
-pub type Result<T> = std::result::Result<T, CentotypeError>;
-
-// Context extension for better error messages
-pub trait ResultExt<T> {
-    fn with_context<F>(self, f: F) -> Result<T>
-    where
-        F: FnOnce() -> String;
-}
-
-impl<T, E> ResultExt<T> for std::result::Result<T, E>
-where
-    E: Into<CentotypeError>,
-{
-    fn with_context<F>(self, f: F) -> Result<T>
-    where
-        F: FnOnce() -> String,
-    {
-        self.map_err(|e| {
-            let base_error = e.into();
-            match base_error {
-                CentotypeError::ContentGeneration { message } => {
-                    CentotypeError::ContentGeneration {
-                        message: format!("{}: {}", f(), message),
-                    }
-                },
-                other => other,
-            }
-        })
-    }
-}
-```
-
-### Async API Design
-
-```rust
-// Consistent async patterns
-pub trait AsyncContentProvider {
-    async fn get_content(&self, level_id: LevelId) -> Result<String>;
-
-    // Provide both async and sync variants where appropriate
-    fn get_cached_content(&self, level_id: LevelId) -> Option<String>;
-
-    // Use streams for ongoing data
-    fn content_updates(&self) -> impl Stream<Item = ContentUpdate>;
-
-    // Provide cancellation support for long operations
-    async fn generate_content_with_cancellation(
-        &self,
-        level_id: LevelId,
-        cancellation_token: CancellationToken,
-    ) -> Result<String>;
-}
-
-// Configuration API pattern
-pub trait Configurable {
-    type Config: Clone + Send + Sync;
-
-    async fn get_config(&self) -> Self::Config;
-    async fn update_config(&self, config: Self::Config) -> Result<()>;
-
-    // Validate configuration before applying
-    fn validate_config(config: &Self::Config) -> Result<()>;
-}
-```
-
-### Builder Pattern for Complex Configuration
-
-```rust
-// Builder pattern for complex initialization
-pub struct ContentManagerBuilder {
-    cache_config: Option<CacheConfig>,
-    difficulty_config: Option<DifficultyConfig>,
-    validator: Option<Arc<ContentValidator>>,
-    corpus_data: Option<CorpusData>,
-}
-
-impl ContentManagerBuilder {
-    pub fn new() -> Self {
-        Self {
-            cache_config: None,
-            difficulty_config: None,
-            validator: None,
-            corpus_data: None,
-        }
-    }
-
-    pub fn with_cache_config(mut self, config: CacheConfig) -> Self {
-        self.cache_config = Some(config);
-        self
-    }
-
-    pub fn with_difficulty_config(mut self, config: DifficultyConfig) -> Self {
-        self.difficulty_config = Some(config);
-        self
-    }
-
-    pub fn with_validator(mut self, validator: Arc<ContentValidator>) -> Self {
-        self.validator = Some(validator);
-        self
-    }
-
-    pub async fn build(self) -> Result<ContentManager> {
-        let cache_config = self.cache_config.unwrap_or_default();
-        let difficulty_config = self.difficulty_config.unwrap_or_default();
-        let validator = self.validator.unwrap_or_else(|| {
-            Arc::new(ContentValidator::new().expect("Failed to create default validator"))
-        });
-
-        ContentManager::with_components(cache_config, difficulty_config, validator).await
-    }
-}
-```
-
----
-
-## Security Implementation
-
-### Input Validation
-
-```rust
-// Comprehensive input validation framework
-pub struct InputValidator {
-    character_whitelist: HashSet<char>,
-    max_input_rate: RateLimiter,
-    sequence_detector: MaliciousSequenceDetector,
-}
-
-impl InputValidator {
-    pub fn validate_keystroke(&mut self, input: char, timestamp: Instant) -> Result<ValidatedInput> {
-        // Rate limiting
-        if !self.max_input_rate.check_rate(timestamp) {
-            return Err(CentotypeError::Security("Input rate limit exceeded".to_string()));
-        }
-
-        // Character validation
-        if !self.character_whitelist.contains(&input) {
-            return Err(CentotypeError::Security(
-                format!("Unauthorized character: {:?}", input)
-            ));
-        }
-
-        // Sequence detection
-        self.sequence_detector.add_character(input);
-        if let Some(malicious_sequence) = self.sequence_detector.detect_malicious_sequence() {
-            return Err(CentotypeError::Security(
-                format!("Malicious sequence detected: {}", malicious_sequence)
-            ));
-        }
-
-        Ok(ValidatedInput {
-            character: input,
-            timestamp,
-            validation_level: ValidationLevel::Passed,
-        })
-    }
-}
-
-// Content security validation
-pub struct ContentSecurityValidator {
-    escape_detector: EscapeSequenceDetector,
-    content_scanner: ContentScanner,
-    length_validator: LengthValidator,
-}
-
-impl ContentSecurityValidator {
-    pub fn validate_content(&self, content: &str) -> SecurityValidationResult {
-        let mut issues = Vec::new();
-
-        // Check for escape sequences
-        if let Some(escape_issues) = self.escape_detector.scan(content) {
-            issues.extend(escape_issues.into_iter().map(SecurityIssue::EscapeSequence));
-        }
-
-        // Check content length
-        if content.len() > self.length_validator.max_length {
-            issues.push(SecurityIssue::ContentTooLong {
-                actual: content.len(),
-                maximum: self.length_validator.max_length,
-            });
-        }
-
-        // Deep content scan
-        if let Some(content_issues) = self.content_scanner.scan(content) {
-            issues.extend(content_issues.into_iter().map(SecurityIssue::SuspiciousContent));
-        }
-
-        SecurityValidationResult {
-            is_safe: issues.is_empty(),
-            issues,
-            confidence_score: self.calculate_confidence_score(&issues),
-        }
-    }
-}
-```
-
-### Secure Data Handling
-
-```rust
-// Secure configuration management
-pub struct SecureConfig {
-    inner: RwLock<ConfigData>,
-    encryption_key: SecretKey,
-}
-
-impl SecureConfig {
-    pub fn new(encryption_key: SecretKey) -> Self {
-        Self {
-            inner: RwLock::new(ConfigData::default()),
-            encryption_key,
-        }
-    }
-
-    pub async fn load_from_file<P: AsRef<Path>>(
-        &self,
-        path: P,
-    ) -> Result<()> {
-        let encrypted_data = tokio::fs::read(path).await?;
-        let decrypted_data = self.decrypt_data(&encrypted_data)?;
-        let config_data: ConfigData = serde_json::from_slice(&decrypted_data)?;
-
-        let mut inner = self.inner.write();
-        *inner = config_data;
-
-        Ok(())
-    }
-
-    pub async fn save_to_file<P: AsRef<Path>>(
-        &self,
-        path: P,
-    ) -> Result<()> {
-        let inner = self.inner.read();
-        let serialized = serde_json::to_vec(&*inner)?;
-        let encrypted_data = self.encrypt_data(&serialized)?;
-
-        // Atomic write operation
-        let temp_path = path.as_ref().with_extension("tmp");
-        tokio::fs::write(&temp_path, encrypted_data).await?;
-        tokio::fs::rename(temp_path, path).await?;
-
-        Ok(())
-    }
-
-    fn encrypt_data(&self, data: &[u8]) -> Result<Vec<u8>> {
-        // Implementation using secure encryption
-        // (placeholder - use actual encryption library)
-        Ok(data.to_vec())
-    }
-
-    fn decrypt_data(&self, data: &[u8]) -> Result<Vec<u8>> {
-        // Implementation using secure decryption
-        // (placeholder - use actual encryption library)
-        Ok(data.to_vec())
-    }
-}
-```
-
----
-
-## Error Handling Patterns
-
-### Structured Error Handling
-
-```rust
-// Hierarchical error types
-#[derive(Debug, thiserror::Error)]
-pub enum CentotypeError {
-    #[error("System error: {0}")]
-    System(#[from] SystemError),
-
-    #[error("Content error: {0}")]
-    Content(#[from] ContentError),
-
-    #[error("Engine error: {0}")]
-    Engine(#[from] EngineError),
-
-    #[error("Analytics error: {0}")]
-    Analytics(#[from] AnalyticsError),
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum ContentError {
-    #[error("Generation failed: {message}")]
-    GenerationFailed { message: String },
-
-    #[error("Cache miss for level {level}")]
-    CacheMiss { level: u8 },
-
-    #[error("Validation failed: {reason}")]
-    ValidationFailed { reason: String },
-
-    #[error("Security issue: {issue}")]
-    SecurityIssue { issue: String },
-}
-
-// Error context and recovery
-pub struct ErrorContext {
-    pub operation: String,
-    pub component: String,
-    pub timestamp: DateTime<Utc>,
-    pub session_id: Option<uuid::Uuid>,
-    pub user_id: Option<String>,
-    pub system_state: SystemState,
-}
-
-pub trait ErrorRecovery {
-    fn can_recover(&self, error: &CentotypeError, context: &ErrorContext) -> bool;
-    async fn attempt_recovery(&self, error: CentotypeError, context: ErrorContext) -> Result<()>;
-}
-```
-
-### Error Recovery Strategies
-
-```rust
-pub struct ContentErrorRecovery;
-
-impl ErrorRecovery for ContentErrorRecovery {
-    fn can_recover(&self, error: &CentotypeError, context: &ErrorContext) -> bool {
-        match error {
-            CentotypeError::Content(ContentError::CacheMiss { .. }) => true,
-            CentotypeError::Content(ContentError::GenerationFailed { .. }) => true,
-            CentotypeError::Content(ContentError::SecurityIssue { .. }) => false,
-            _ => false,
-        }
-    }
-
-    async fn attempt_recovery(&self, error: CentotypeError, context: ErrorContext) -> Result<()> {
-        match error {
-            CentotypeError::Content(ContentError::CacheMiss { level }) => {
-                // Attempt to generate content for the missing level
-                warn!("Cache miss for level {}, attempting generation", level);
-
-                let level_id = LevelId::new(level)?;
-                let generator = ContentGenerator::new();
-                let content = generator.generate_level_content(level_id, 0).await?;
-
-                // Cache the generated content
-                let cache = ContentCache::global();
-                cache.insert(level_id, content).await;
-
-                info!("Successfully recovered from cache miss for level {}", level);
-                Ok(())
-            },
-
-            CentotypeError::Content(ContentError::GenerationFailed { message }) => {
-                // Attempt with fallback content
-                warn!("Content generation failed: {}, using fallback", message);
-
-                let fallback_content = get_fallback_content(&context)?;
-
-                // Use the fallback temporarily
-                if let Some(session_id) = context.session_id {
-                    let session_manager = SessionManager::global();
-                    session_manager.update_content(session_id, fallback_content).await?;
-                }
-
-                info!("Successfully recovered using fallback content");
-                Ok(())
-            },
-
-            _ => Err(CentotypeError::System(SystemError::RecoveryFailed {
-                original_error: Box::new(error),
-                recovery_context: context,
-            })),
-        }
+impl MemoryEfficientProcessor {
+    pub fn process(&mut self, input: &str) -> Result<ProcessedOutput> {
+        // Clear and reuse buffer
+        self.buffer.clear();
+        self.buffer.extend(input.chars());
+
+        // Process without additional allocations
+        self.process_buffer()
     }
 }
 ```
@@ -1314,67 +761,129 @@ impl ErrorRecovery for ContentErrorRecovery {
 
 ## Contributing Guidelines
 
-### Code Review Process
+### Getting Started with Contributions
 
-1. **Self Review**: Review your own changes thoroughly before submitting
-2. **Automated Checks**: Ensure all CI checks pass
-3. **Peer Review**: Get at least one approving review from a team member
-4. **Performance Review**: For performance-critical changes, get review from performance team
-5. **Security Review**: For security-related changes, get review from security team
+1. **Choose Your Area**:
+   - **TUI Implementation**: High impact, needs crossterm/ratatui experience
+   - **Performance Optimization**: Requires benchmarking and profiling skills
+   - **Safety Improvements**: Needs experience with error handling patterns
+   - **Feature Implementation**: Good for learning the codebase
 
-### Pull Request Template
+2. **Review Current State**:
+   ```bash
+   # Understand what's working
+   cargo test --workspace
+   cargo bench
 
-```markdown
-## Description
-Brief description of changes and motivation.
+   # Check for current issues
+   cargo clippy -- -D warnings
+   ```
 
-## Type of Change
-- [ ] Bug fix (non-breaking change that fixes an issue)
-- [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Performance improvement
-- [ ] Documentation update
+3. **Start Small**:
+   - Fix compilation warnings
+   - Add missing tests
+   - Improve documentation
+   - Optimize existing code
 
-## Testing
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Performance tests added/updated
-- [ ] Manual testing completed
-
-## Performance Impact
-- [ ] No performance impact
-- [ ] Performance improvement (include benchmark results)
-- [ ] Potential performance impact (include analysis)
-
-## Security Considerations
-- [ ] No security implications
-- [ ] Security review completed
-- [ ] Input validation added/updated
-- [ ] Error handling reviewed
-
-## Checklist
-- [ ] Code follows project style guidelines
-- [ ] Self-review completed
-- [ ] Comments added for complex logic
-- [ ] Documentation updated
-- [ ] All tests pass
-- [ ] No compiler warnings
-```
-
-### Release Process
+### Contribution Workflow
 
 ```bash
-# Release checklist
-1. Version bump in Cargo.toml files
-2. Update CHANGELOG.md
-3. Run full test suite
-4. Performance regression testing
-5. Security audit
-6. Create release branch
-7. Generate release notes
-8. Tag release
-9. Publish to crates.io
-10. Update documentation
+# 1. Setup development environment
+git clone https://github.com/rfxlamia/centotype.git
+cd centotype
+cargo build --workspace
+
+# 2. Create feature branch
+git checkout -b feature/tui-typing-session
+
+# 3. Implement with tests
+cargo test --package centotype-engine
+
+# 4. Validate performance
+cargo bench --bench input_latency_benchmark
+
+# 5. Check code quality
+cargo clippy -- -D warnings
+cargo fmt --check
+
+# 6. Submit PR with description
 ```
 
-This Developer Guide provides comprehensive technical guidance for contributing to Centotype. It covers all aspects of development from environment setup to release processes, ensuring consistent, high-quality contributions to the project.
+### High-Priority Contribution Areas
+
+**Critical (Production Blockers)**:
+1. **TUI Typing Sessions**: Replace placeholder render methods with real TUI
+2. **Panic Safety**: Fix 27+ identified panic safety violations
+3. **Session Integration**: Connect engine to CLI command handlers
+
+**High Impact**:
+1. **Performance Optimization**: Further reduce input latency
+2. **Error Recovery**: Improve graceful failure handling
+3. **Memory Optimization**: Reduce memory footprint
+4. **Cross-Platform Testing**: Ensure compatibility across platforms
+
+**Good for Learning**:
+1. **Documentation**: Improve code comments and guides
+2. **Test Coverage**: Add tests for edge cases
+3. **Configuration System**: Implement config file handling
+4. **Profile Management**: Complete persistence integration
+
+### Code Review Process
+
+**What Reviewers Look For**:
+- Performance impact (run benchmarks)
+- Error handling patterns (no panics)
+- Test coverage for new code
+- Documentation for public APIs
+- Cross-platform compatibility
+- Memory usage patterns
+
+**PR Requirements**:
+- All tests pass: `cargo test --workspace`
+- No clippy warnings: `cargo clippy -- -D warnings`
+- Formatted code: `cargo fmt`
+- Performance validation: `cargo bench` (if applicable)
+- Updated documentation
+
+---
+
+## Support and Resources
+
+### Architecture Documentation
+
+- **Implementation Status**: `/home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md`
+- **Performance Analysis**: `/home/v/project/centotype/docs/performance/PERFORMANCE_VALIDATION_REPORT.md`
+- **Content System**: `/home/v/project/centotype/docs/design/CONTENT_SYSTEM.md`
+
+### Development References
+
+- **Rust Performance Book**: https://nnethercote.github.io/perf-book/
+- **Ratatui Documentation**: https://ratatui.rs/
+- **Crossterm Documentation**: https://docs.rs/crossterm/
+- **Tokio Async Programming**: https://tokio.rs/tokio/tutorial
+
+### Community Support
+
+- **GitHub Issues**: Bug reports and feature requests
+- **GitHub Discussions**: Development questions and design discussions
+- **Code Reviews**: Submit PRs for guidance and feedback
+
+---
+
+## Summary
+
+Centotype has a solid foundation architecture achieving production-grade performance targets. The next major milestone is completing the TUI implementation to provide interactive typing sessions.
+
+**For New Contributors**:
+- Start by understanding the current architecture
+- Focus on the TUI implementation in `engine/src/render.rs`
+- Maintain performance targets and safety standards
+- Write tests for new functionality
+
+**Architecture Strengths**:
+- Modular 7-crate design enables parallel development
+- Performance monitoring ensures quality targets
+- Comprehensive test suite provides confidence
+- Clear separation of concerns simplifies maintenance
+
+The foundation is ready for building the interactive experience - contributions welcome! 🚀

@@ -23,16 +23,20 @@
 //! - `ErrorClassifier`: Damerau-Levenshtein error detection
 
 pub mod error;
+pub mod events;
 pub mod level;
 pub mod scoring;
 pub mod session;
+pub mod traits;
 pub mod types;
 
 // Re-export main types for convenience
 pub use error::Error as ErrorClassifier;
+pub use events::*;
 pub use level::Level as LevelManager;
 pub use scoring::Scoring as ScoringEngine;
 pub use session::SessionManager;
+pub use traits::*;
 pub use types::*;
 
 use parking_lot::RwLock;

@@ -9,6 +9,9 @@ description = "Event loop, input handling, and render engine for Centotype"
 
 [dependencies]
 centotype-core.workspace = true
+centotype-content.workspace = true
+centotype-analytics.workspace = true
+centotype-persistence.workspace = true
 centotype-platform.workspace = true
 crossterm = { workspace = true, features = ["event-stream"] }
 ratatui.workspace = true

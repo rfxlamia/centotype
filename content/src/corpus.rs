@@ -51,11 +51,18 @@ impl CorpusManager {
     /// Add a corpus to the manager
     pub fn add_corpus(&mut self, corpus: TextCorpus) {
         let key = (corpus.category, corpus.language);
-        self.corpora.entry(key).or_insert_with(Vec::new).push(corpus);
+        self.corpora
+            .entry(key)
+            .or_insert_with(Vec::new)
+            .push(corpus);
     }
 
     /// Get corpora for a specific category and language
-    pub fn get_corpora(&self, category: ContentCategory, language: Language) -> Option<&Vec<TextCorpus>> {
+    pub fn get_corpora(
+        &self,
+        category: ContentCategory,
+        language: Language,
+    ) -> Option<&Vec<TextCorpus>> {
         self.corpora.get(&(category, language))
     }
 
@@ -196,11 +203,7 @@ mod tests {
         assert!(!combinations.is_empty());
 
         // Test getting random content
-        let content = manager.get_random_content(
-            ContentCategory::Prose,
-            Language::English,
-            50
-        );
+        let content = manager.get_random_content(ContentCategory::Prose, Language::English, 50);
         assert!(content.is_some());
     }
 

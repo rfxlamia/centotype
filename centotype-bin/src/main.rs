@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
     let persistence_manager = Arc::new(PersistenceManager::new()?);
 
     // Initialize engine
-    let mut engine = CentotypeEngine::new(Arc::clone(&core), Arc::clone(&platform_manager))?;
+    let mut engine = CentotypeEngine::new(Arc::clone(&core), Arc::clone(&platform_manager)).await?;
 
     // Initialize CLI manager
     let cli_manager = CliManager::new();

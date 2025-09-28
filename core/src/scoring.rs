@@ -563,4 +563,302 @@ mod tests {
         assert!(metrics.accuracy > 0.0);
         assert!(metrics.elapsed_seconds > 0.0);
     }
+
+    #[test]
+    fn test_wpm_calculation_deterministic() {
+        let scoring = Scoring::new();
+
+        // Test deterministic WPM calculation
+        let char_count = 50;
+        let duration = Duration::from_secs(60); // 1 minute
+
+        let wpm = scoring.calculate_wpm(char_count, duration);
+        assert_eq!(wpm, 10.0); // 50 chars / 5 chars per word / 1 minute = 10 WPM
+
+        // Edge cases
+        assert_eq!(scoring.calculate_wpm(0, Duration::from_secs(60)), 0.0);
+        assert_eq!(scoring.calculate_wpm(25, Duration::from_secs(30)), 10.0); // 25 chars in 30 seconds = 10 WPM
+    }
+
+    #[test]
+    fn test_accuracy_calculation_deterministic() {
+        let scoring = Scoring::new();
+
+        // Perfect accuracy
+        let accuracy = scoring.calculate_accuracy("hello world", "hello world");
+        assert_eq!(accuracy, 100.0);
+
+        // 90% accuracy (9 out of 10 chars correct)
+        let accuracy = scoring.calculate_accuracy("hello", "hallo"); // 4/5 = 80%
+        assert_eq!(accuracy, 80.0);
+
+        // Edge cases
+        assert_eq!(scoring.calculate_accuracy("", ""), 100.0); // No input = perfect
+        assert_eq!(scoring.calculate_accuracy("hello", ""), 0.0); // No typed content
+    }
+
+    #[test]
+    fn test_error_classification_deterministic() {
+        let scoring = Scoring::new();
+
+        // Test known error patterns with deterministic results
+        struct TestCase {
+            target: &'static str,
+            typed: &'static str,
+            expected_substitution: u32,
+            expected_insertion: u32,
+            expected_deletion: u32,
+            expected_transposition: u32,
+        }
+
+        let test_cases = vec![
+            TestCase {
+                target: "hello",
+                typed: "hello",
+                expected_substitution: 0,
+                expected_insertion: 0,
+                expected_deletion: 0,
+                expected_transposition: 0,
+            },
+            TestCase {
+                target: "hello",
+                typed: "hallo", // e -> a substitution
+                expected_substitution: 1,
+                expected_insertion: 0,
+                expected_deletion: 0,
+                expected_transposition: 0,
+            },
+            TestCase {
+                target: "hello",
+                typed: "helloo", // extra o insertion
+                expected_substitution: 0,
+                expected_insertion: 1,
+                expected_deletion: 0,
+                expected_transposition: 0,
+            },
+            TestCase {
+                target: "hello",
+                typed: "hell", // missing o deletion
+                expected_substitution: 0,
+                expected_insertion: 0,
+                expected_deletion: 1,
+                expected_transposition: 0,
+            },
+            TestCase {
+                target: "hello",
+                typed: "hlelo", // e and l transposed (detected as 2 substitutions)
+                expected_substitution: 2,
+                expected_insertion: 0,
+                expected_deletion: 0,
+                expected_transposition: 0,
+            },
+        ];
+
+        for (i, test_case) in test_cases.iter().enumerate() {
+            let errors = scoring.classify_errors(test_case.target, test_case.typed);
+            assert_eq!(
+                errors.substitution, test_case.expected_substitution,
+                "Test case {}: substitution mismatch for '{}' -> '{}'",
+                i, test_case.target, test_case.typed
+            );
+            assert_eq!(
+                errors.insertion, test_case.expected_insertion,
+                "Test case {}: insertion mismatch for '{}' -> '{}'",
+                i, test_case.target, test_case.typed
+            );
+            assert_eq!(
+                errors.deletion, test_case.expected_deletion,
+                "Test case {}: deletion mismatch for '{}' -> '{}'",
+                i, test_case.target, test_case.typed
+            );
+            assert_eq!(
+                errors.transposition, test_case.expected_transposition,
+                "Test case {}: transposition mismatch for '{}' -> '{}'",
+                i, test_case.target, test_case.typed
+            );
+        }
+    }
+
+    #[test]
+    fn test_consistency_calculation_deterministic() {
+        let scoring = Scoring::new();
+
+        // Test with consistent timing (low variance)
+        let keystrokes = vec![
+            create_test_keystroke(0, 'h', false),
+            create_test_keystroke(100, 'e', false),
+            create_test_keystroke(110, 'l', false),
+            create_test_keystroke(105, 'l', false),
+            create_test_keystroke(95, 'o', false),
+        ];
+
+        let consistency = scoring.calculate_consistency(&keystrokes);
+        assert!(consistency > 50.0, "Consistent timings should have high consistency score");
+
+        // Test with inconsistent timing (high variance)
+        let keystrokes = vec![
+            create_test_keystroke(0, 'h', false),
+            create_test_keystroke(50, 'e', false),
+            create_test_keystroke(200, 'l', false),
+            create_test_keystroke(75, 'l', false),
+            create_test_keystroke(300, 'o', false),
+        ];
+
+        let consistency = scoring.calculate_consistency(&keystrokes);
+        assert!(consistency < 80.0, "Inconsistent timings should have lower consistency score");
+
+        // Edge case: single keystroke
+        let consistency = scoring.calculate_consistency(&[create_test_keystroke(0, 'a', false)]);
+        assert_eq!(consistency, 100.0, "Single keystroke should have perfect consistency");
+
+        // Edge case: no keystrokes
+        let consistency = scoring.calculate_consistency(&[]);
+        assert_eq!(consistency, 100.0, "No keystrokes should have perfect consistency");
+    }
+
+    #[test]
+    fn test_grade_calculation_deterministic() {
+        let scoring = Scoring::new();
+
+        // Test grade boundaries using skill index
+        struct GradeTest {
+            wpm: f64,
+            accuracy: f64,
+            consistency: f64,
+            tier: Tier,
+            expected_grade: Grade,
+        }
+
+        let grade_tests = vec![
+            GradeTest {
+                wpm: 130.0,
+                accuracy: 99.0,
+                consistency: 95.0,
+                tier: Tier(1),
+                expected_grade: Grade::S,
+            },
+            GradeTest {
+                wpm: 110.0,
+                accuracy: 97.0,
+                consistency: 90.0,
+                tier: Tier(1),
+                expected_grade: Grade::A,
+            },
+            GradeTest {
+                wpm: 90.0,
+                accuracy: 95.0,
+                consistency: 85.0,
+                tier: Tier(1),
+                expected_grade: Grade::B,
+            },
+            GradeTest {
+                wpm: 70.0,
+                accuracy: 92.0,
+                consistency: 80.0,
+                tier: Tier(1),
+                expected_grade: Grade::C,
+            },
+            GradeTest {
+                wpm: 50.0,
+                accuracy: 88.0,
+                consistency: 75.0,
+                tier: Tier(1),
+                expected_grade: Grade::D,
+            },
+        ];
+
+        for (i, test) in grade_tests.iter().enumerate() {
+            // Create metrics to calculate skill index
+            let metrics = FinalMetrics {
+                raw_wpm: test.wpm,
+                effective_wpm: test.wpm * (test.accuracy / 100.0),
+                accuracy: test.accuracy,
+                consistency: test.consistency,
+                longest_streak: 50,
+                errors: ErrorStats::default(),
+                latency_p99: Duration::from_millis(20),
+            };
+
+            let skill_index = scoring.calculate_skill_index(&metrics, test.tier);
+            let grade = Grade::from_skill_index(skill_index, test.tier);
+
+            assert_eq!(
+                grade, test.expected_grade,
+                "Grade test {}: expected {:?} for WPM={}, accuracy={}, consistency={}, skill_index={}",
+                i, test.expected_grade, test.wpm, test.accuracy, test.consistency, skill_index
+            );
+        }
+    }
+
+    #[test]
+    fn test_skill_index_progression() {
+        let scoring = Scoring::new();
+
+        // Test that skill index increases with tier for same performance
+        let metrics = FinalMetrics {
+            raw_wpm: 80.0,
+            effective_wpm: 75.0,
+            accuracy: 95.0,
+            consistency: 85.0,
+            longest_streak: 50,
+            errors: ErrorStats::default(),
+            latency_p99: Duration::from_millis(20),
+        };
+
+        let mut previous_skill_index = 0.0;
+        for tier_level in 1..=10 {
+            let tier = Tier(tier_level);
+            let skill_index = scoring.calculate_skill_index(&metrics, tier);
+
+            assert!(
+                skill_index > previous_skill_index,
+                "Skill index should increase with tier level (tier {}: {}, previous: {})",
+                tier_level, skill_index, previous_skill_index
+            );
+
+            previous_skill_index = skill_index;
+        }
+    }
+
+    #[test]
+    fn test_latency_p99_calculation() {
+        let scoring = Scoring::new();
+
+        // Test P99 latency calculation with known data
+        let keystrokes = vec![
+            create_test_keystroke_with_latency(0, 'a', Duration::from_millis(10)),
+            create_test_keystroke_with_latency(100, 'b', Duration::from_millis(15)),
+            create_test_keystroke_with_latency(200, 'c', Duration::from_millis(12)),
+            create_test_keystroke_with_latency(300, 'd', Duration::from_millis(20)),
+            create_test_keystroke_with_latency(400, 'e', Duration::from_millis(8)),
+        ];
+
+        let p99_latency = scoring.calculate_latency_p99(&keystrokes);
+        assert!(p99_latency <= Duration::from_millis(25), "P99 latency should be reasonable");
+
+        // Edge case: single keystroke
+        let single_keystroke = vec![create_test_keystroke_with_latency(0, 'a', Duration::from_millis(15))];
+        let p99_latency = scoring.calculate_latency_p99(&single_keystroke);
+        assert_eq!(p99_latency, Duration::from_millis(15), "Single keystroke P99 should equal its latency");
+    }
+
+    // Helper function for creating test keystrokes
+    fn create_test_keystroke(timestamp_offset_ms: i64, ch: char, is_correction: bool) -> Keystroke {
+        Keystroke {
+            timestamp: Utc::now() + chrono::Duration::milliseconds(timestamp_offset_ms),
+            char_typed: Some(ch),
+            is_correction,
+            cursor_pos: 0, // Simplified for testing
+        }
+    }
+
+    // Helper function for creating test keystrokes with specific latency
+    fn create_test_keystroke_with_latency(timestamp_offset_ms: i64, ch: char, _latency: Duration) -> Keystroke {
+        Keystroke {
+            timestamp: Utc::now() + chrono::Duration::milliseconds(timestamp_offset_ms),
+            char_typed: Some(ch),
+            is_correction: false,
+            cursor_pos: 0,
+        }
+    }
 }

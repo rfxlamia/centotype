@@ -18,6 +18,8 @@ unicode-segmentation.workspace = true
 once_cell.workspace = true
 parking_lot.workspace = true
 tracing.workspace = true
+async-trait = "0.1"
+crossterm.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true

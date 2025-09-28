@@ -97,53 +97,142 @@ impl Default for CorpusData {
         let mut tech_terms = HashMap::new();
 
         // English basic vocabulary
-        basic_words.insert(Language::English, vec![
-            "the".to_string(), "and".to_string(), "you".to_string(), "that".to_string(),
-            "was".to_string(), "for".to_string(), "are".to_string(), "with".to_string(),
-            "his".to_string(), "they".to_string(), "have".to_string(), "this".to_string(),
-            "will".to_string(), "can".to_string(), "had".to_string(), "her".to_string(),
-            "what".to_string(), "said".to_string(), "each".to_string(), "which".to_string(),
-            "she".to_string(), "how".to_string(), "when".to_string(), "them".to_string(),
-            "these".to_string(), "way".to_string(), "many".to_string(), "then".to_string(),
-            "write".to_string(), "code".to_string(), "program".to_string(), "function".to_string(),
-            "data".to_string(), "system".to_string(), "computer".to_string(), "software".to_string(),
-        ]);
+        basic_words.insert(
+            Language::English,
+            vec![
+                "the".to_string(),
+                "and".to_string(),
+                "you".to_string(),
+                "that".to_string(),
+                "was".to_string(),
+                "for".to_string(),
+                "are".to_string(),
+                "with".to_string(),
+                "his".to_string(),
+                "they".to_string(),
+                "have".to_string(),
+                "this".to_string(),
+                "will".to_string(),
+                "can".to_string(),
+                "had".to_string(),
+                "her".to_string(),
+                "what".to_string(),
+                "said".to_string(),
+                "each".to_string(),
+                "which".to_string(),
+                "she".to_string(),
+                "how".to_string(),
+                "when".to_string(),
+                "them".to_string(),
+                "these".to_string(),
+                "way".to_string(),
+                "many".to_string(),
+                "then".to_string(),
+                "write".to_string(),
+                "code".to_string(),
+                "program".to_string(),
+                "function".to_string(),
+                "data".to_string(),
+                "system".to_string(),
+                "computer".to_string(),
+                "software".to_string(),
+            ],
+        );
 
         // Indonesian basic vocabulary
-        basic_words.insert(Language::Indonesian, vec![
-            "dan".to_string(), "yang".to_string(), "di".to_string(), "dengan".to_string(),
-            "untuk".to_string(), "dari".to_string(), "pada".to_string(), "ini".to_string(),
-            "dalam".to_string(), "tidak".to_string(), "adalah".to_string(), "atau".to_string(),
-            "akan".to_string(), "ada".to_string(), "oleh".to_string(), "dapat".to_string(),
-            "juga".to_string(), "sebagai".to_string(), "ke".to_string(), "kode".to_string(),
-            "program".to_string(), "fungsi".to_string(), "data".to_string(), "sistem".to_string(),
-            "komputer".to_string(), "perangkat".to_string(), "lunak".to_string(), "aplikasi".to_string(),
-        ]);
+        basic_words.insert(
+            Language::Indonesian,
+            vec![
+                "dan".to_string(),
+                "yang".to_string(),
+                "di".to_string(),
+                "dengan".to_string(),
+                "untuk".to_string(),
+                "dari".to_string(),
+                "pada".to_string(),
+                "ini".to_string(),
+                "dalam".to_string(),
+                "tidak".to_string(),
+                "adalah".to_string(),
+                "atau".to_string(),
+                "akan".to_string(),
+                "ada".to_string(),
+                "oleh".to_string(),
+                "dapat".to_string(),
+                "juga".to_string(),
+                "sebagai".to_string(),
+                "ke".to_string(),
+                "kode".to_string(),
+                "program".to_string(),
+                "fungsi".to_string(),
+                "data".to_string(),
+                "sistem".to_string(),
+                "komputer".to_string(),
+                "perangkat".to_string(),
+                "lunak".to_string(),
+                "aplikasi".to_string(),
+            ],
+        );
 
         // Technical terms
-        tech_terms.insert(Language::English, vec![
-            "function".to_string(), "variable".to_string(), "array".to_string(), "object".to_string(),
-            "method".to_string(), "class".to_string(), "interface".to_string(), "struct".to_string(),
-            "enum".to_string(), "trait".to_string(), "impl".to_string(), "match".to_string(),
-            "async".to_string(), "await".to_string(), "Result".to_string(), "Option".to_string(),
-            "HashMap".to_string(), "Vector".to_string(), "String".to_string(), "iterator".to_string(),
-            "closure".to_string(), "lifetime".to_string(), "borrowing".to_string(), "ownership".to_string(),
-        ]);
+        tech_terms.insert(
+            Language::English,
+            vec![
+                "function".to_string(),
+                "variable".to_string(),
+                "array".to_string(),
+                "object".to_string(),
+                "method".to_string(),
+                "class".to_string(),
+                "interface".to_string(),
+                "struct".to_string(),
+                "enum".to_string(),
+                "trait".to_string(),
+                "impl".to_string(),
+                "match".to_string(),
+                "async".to_string(),
+                "await".to_string(),
+                "Result".to_string(),
+                "Option".to_string(),
+                "HashMap".to_string(),
+                "Vector".to_string(),
+                "String".to_string(),
+                "iterator".to_string(),
+                "closure".to_string(),
+                "lifetime".to_string(),
+                "borrowing".to_string(),
+                "ownership".to_string(),
+            ],
+        );
 
-        tech_terms.insert(Language::Indonesian, vec![
-            "fungsi".to_string(), "variabel".to_string(), "array".to_string(), "objek".to_string(),
-            "metode".to_string(), "kelas".to_string(), "antarmuka".to_string(), "struktur".to_string(),
-            "tipe".to_string(), "sifat".to_string(), "implementasi".to_string(), "cocok".to_string(),
-            "asinkron".to_string(), "menunggu".to_string(), "hasil".to_string(), "pilihan".to_string(),
-        ]);
+        tech_terms.insert(
+            Language::Indonesian,
+            vec![
+                "fungsi".to_string(),
+                "variabel".to_string(),
+                "array".to_string(),
+                "objek".to_string(),
+                "metode".to_string(),
+                "kelas".to_string(),
+                "antarmuka".to_string(),
+                "struktur".to_string(),
+                "tipe".to_string(),
+                "sifat".to_string(),
+                "implementasi".to_string(),
+                "cocok".to_string(),
+                "asinkron".to_string(),
+                "menunggu".to_string(),
+                "hasil".to_string(),
+                "pilihan".to_string(),
+            ],
+        );
 
         Self {
             basic_words,
             tech_terms,
             symbols: vec![
-                '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+',
-                '[', ']', '{', '}', '\\', '|', ';', ':', '\'', '"', ',', '.', '<', '>',
-                '/', '?', '~', '`'
+                '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']',
+                '{', '}', '\\', '|', ';', ':', '\'', '"', ',', '.', '<', '>', '/', '?', '~', '`',
             ],
             programming_patterns: vec![
                 "function {}()".to_string(),
@@ -158,10 +247,26 @@ impl Default for CorpusData {
                 "{}.filter(|{}| {})".to_string(),
             ],
             common_numbers: vec![
-                "0".to_string(), "1".to_string(), "2".to_string(), "3".to_string(), "4".to_string(),
-                "5".to_string(), "6".to_string(), "7".to_string(), "8".to_string(), "9".to_string(),
-                "10".to_string(), "100".to_string(), "1000".to_string(), "2023".to_string(), "2024".to_string(),
-                "0x1F".to_string(), "0xFF".to_string(), "42".to_string(), "3.14".to_string(), "1.0".to_string(),
+                "0".to_string(),
+                "1".to_string(),
+                "2".to_string(),
+                "3".to_string(),
+                "4".to_string(),
+                "5".to_string(),
+                "6".to_string(),
+                "7".to_string(),
+                "8".to_string(),
+                "9".to_string(),
+                "10".to_string(),
+                "100".to_string(),
+                "1000".to_string(),
+                "2023".to_string(),
+                "2024".to_string(),
+                "0x1F".to_string(),
+                "0xFF".to_string(),
+                "42".to_string(),
+                "3.14".to_string(),
+                "1.0".to_string(),
             ],
         }
     }
@@ -194,7 +299,12 @@ impl CentotypeContentGenerator {
             5..=6 => self.generate_intermediate_content(&mut rng, &difficulty)?,
             7..=8 => self.generate_advanced_content(&mut rng, &difficulty)?,
             9..=10 => self.generate_expert_content(&mut rng, &difficulty)?,
-            _ => return Err(CentotypeError::Content(format!("Invalid tier: {}", params.tier.0))),
+            _ => {
+                return Err(CentotypeError::Content(format!(
+                    "Invalid tier: {}",
+                    params.tier.0
+                )))
+            }
         };
 
         // Validate the generated content
@@ -204,9 +314,17 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate foundation level content (Tier 1-2, Levels 1-20)
-    fn generate_foundation_content(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_foundation_content(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut content = String::with_capacity(difficulty.content_length + 100);
-        let mut current_lang = if rng.gen_bool(0.5) { Language::English } else { Language::Indonesian };
+        let mut current_lang = if rng.gen_bool(0.5) {
+            Language::English
+        } else {
+            Language::Indonesian
+        };
         let mut chars_written = 0;
 
         while chars_written < difficulty.content_length {
@@ -240,7 +358,8 @@ impl CentotypeContentGenerator {
 
             // Inject numbers based on number_ratio
             if rng.gen_bool(difficulty.number_ratio) {
-                let number = &self.corpus_data.common_numbers[rng.gen_range(0..self.corpus_data.common_numbers.len())];
+                let number = &self.corpus_data.common_numbers
+                    [rng.gen_range(0..self.corpus_data.common_numbers.len())];
                 content.push(' ');
                 content.push_str(number);
                 chars_written += number.len() + 1;
@@ -256,7 +375,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate programming basics content (Tier 3-4, Levels 21-40)
-    fn generate_programming_basics_content(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_programming_basics_content(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut content = String::with_capacity(difficulty.content_length + 100);
         let mut chars_written = 0;
 
@@ -283,7 +406,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate intermediate complexity content (Tier 5-6, Levels 41-60)
-    fn generate_intermediate_content(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_intermediate_content(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut content = String::with_capacity(difficulty.content_length + 100);
         let mut chars_written = 0;
 
@@ -308,7 +435,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate advanced programming content (Tier 7-8, Levels 61-80)
-    fn generate_advanced_content(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_advanced_content(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut content = String::with_capacity(difficulty.content_length + 100);
         let mut chars_written = 0;
 
@@ -326,7 +457,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate expert mastery content (Tier 9-10, Levels 81-100)
-    fn generate_expert_content(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_expert_content(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut content = String::with_capacity(difficulty.content_length + 100);
         let mut chars_written = 0;
 
@@ -344,7 +479,12 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate basic sentence with common words
-    fn generate_basic_sentence(&self, rng: &mut ChaCha8Rng, lang: Language, _difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_basic_sentence(
+        &self,
+        rng: &mut ChaCha8Rng,
+        lang: Language,
+        _difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let words = &self.corpus_data.basic_words[&lang];
         let sentence_len = rng.gen_range(4..8);
         let mut sentence = Vec::with_capacity(sentence_len);
@@ -358,29 +498,42 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate basic code snippet for programming basics tiers
-    fn generate_basic_code_snippet(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_basic_code_snippet(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let patterns = &self.corpus_data.programming_patterns;
         let pattern = &patterns[rng.gen_range(0..patterns.len())];
 
         // Simple variable names and basic symbols
         let var_name = format!("var{}", rng.gen_range(1..10));
         let value = if rng.gen_bool(difficulty.number_ratio) {
-            self.corpus_data.common_numbers[rng.gen_range(0..self.corpus_data.common_numbers.len())].clone()
+            self.corpus_data.common_numbers[rng.gen_range(0..self.corpus_data.common_numbers.len())]
+                .clone()
         } else {
-            format!("\"{}\"", self.generate_basic_sentence(rng, Language::English, difficulty)?)
+            format!(
+                "\"{}\"",
+                self.generate_basic_sentence(rng, Language::English, difficulty)?
+            )
         };
 
         Ok(pattern.replace("{}", &var_name).replace("{}", &value))
     }
 
     /// Generate complex code snippet for intermediate tiers
-    fn generate_complex_code_snippet(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_complex_code_snippet(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut code = String::new();
 
         // Add symbols based on symbol_ratio
         for _ in 0..(difficulty.symbol_ratio * 20.0) as usize {
             if rng.gen_bool(0.5) {
-                let symbol = self.corpus_data.symbols[rng.gen_range(0..self.corpus_data.symbols.len())];
+                let symbol =
+                    self.corpus_data.symbols[rng.gen_range(0..self.corpus_data.symbols.len())];
                 code.push(symbol);
             }
         }
@@ -399,7 +552,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate mixed content for intermediate levels
-    fn generate_mixed_content(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_mixed_content(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut content = String::new();
 
         // Mix of prose and symbols
@@ -410,7 +567,8 @@ impl CentotypeContentGenerator {
         if rng.gen_bool(difficulty.symbol_ratio) {
             content.push(' ');
             for _ in 0..3 {
-                let symbol = self.corpus_data.symbols[rng.gen_range(0..self.corpus_data.symbols.len())];
+                let symbol =
+                    self.corpus_data.symbols[rng.gen_range(0..self.corpus_data.symbols.len())];
                 content.push(symbol);
             }
         }
@@ -419,7 +577,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate advanced code patterns for high tiers
-    fn generate_advanced_code_pattern(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_advanced_code_pattern(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let mut pattern = String::new();
 
         // Complex symbol combinations
@@ -439,7 +601,11 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate expert-level patterns for mastery tiers
-    fn generate_expert_pattern(&self, rng: &mut ChaCha8Rng, _difficulty: &DifficultyParams) -> Result<String> {
+    fn generate_expert_pattern(
+        &self,
+        rng: &mut ChaCha8Rng,
+        _difficulty: &DifficultyParams,
+    ) -> Result<String> {
         let patterns = vec![
             "async fn process<T: Send + Sync + 'static>() -> Result<impl Iterator<Item=T>, Box<dyn Error>>",
             "0x1F3F4E40 | (mask << 8) ^ ~(flags & 0xFF) >> 2",
@@ -452,8 +618,16 @@ impl CentotypeContentGenerator {
     }
 
     /// Generate technical prose with domain terminology
-    fn generate_technical_prose(&self, rng: &mut ChaCha8Rng, difficulty: &DifficultyParams) -> Result<String> {
-        let lang = if rng.gen_bool(0.6) { Language::English } else { Language::Indonesian };
+    fn generate_technical_prose(
+        &self,
+        rng: &mut ChaCha8Rng,
+        difficulty: &DifficultyParams,
+    ) -> Result<String> {
+        let lang = if rng.gen_bool(0.6) {
+            Language::English
+        } else {
+            Language::Indonesian
+        };
         let tech_words = &self.corpus_data.tech_terms[&lang];
         let basic_words = &self.corpus_data.basic_words[&lang];
 
@@ -500,7 +674,9 @@ impl ContentGenerator for CentotypeContentGenerator {
                 level: Some(level_id),
                 category: params.category,
                 language: params.language,
-                difficulty_score: difficulty_score.symbol_ratio + difficulty_score.number_ratio + difficulty_score.tech_ratio,
+                difficulty_score: difficulty_score.symbol_ratio
+                    + difficulty_score.number_ratio
+                    + difficulty_score.tech_ratio,
                 char_classes,
                 estimated_duration_secs: (params.length_chars / 50).max(30) as u32, // Assume 50 CPM baseline
             },
@@ -596,7 +772,10 @@ mod tests {
         let content1 = generator.generate_level_content(level, seed).unwrap();
         let content2 = generator.generate_level_content(level, seed).unwrap();
 
-        assert_eq!(content1, content2, "Content should be deterministic for same seed");
+        assert_eq!(
+            content1, content2,
+            "Content should be deterministic for same seed"
+        );
     }
 
     #[test]

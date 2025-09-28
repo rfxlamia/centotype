@@ -1,292 +1,303 @@
 # Centotype Quick Start Guide
 
-> **Goal**: Get from zero to your first typing session in under 2 minutes
+> **Development Status**: Centotype is currently in active development. Core architecture and performance framework are complete (Grade A - 22ms P99 latency), but the interactive TUI typing interface is under construction. This guide reflects the current working implementation.
 
-This guide gets you up and running with Centotype, the precision CLI typing trainer, as quickly as possible. Follow these steps to start improving your typing speed and accuracy immediately.
+> **Current State**: Foundation complete with 7-crate architecture, content generation system, and performance monitoring. User interface implementation is in progress.
+
+This guide helps you build and explore the current state of Centotype, the precision CLI typing trainer designed with professional-grade performance targets.
 
 ## Prerequisites
 
 - **Operating System**: Linux, macOS 10.14+, or Windows 10+
 - **Terminal**: Modern terminal emulator with UTF-8 support
-- **Rust** (Optional): Version 1.75+ if building from source
+- **Rust**: Version 1.75+ (required for building from source)
 
-## Installation Options
+## Building from Source (2 minutes)
 
-### Option 1: Cargo Install (Recommended - 30 seconds)
-
-If you have Rust installed:
+Clone and build the project:
 
 ```bash
-cargo install centotype
+# Clone the repository
+git clone https://github.com/rfxlamia/centotype.git
+cd centotype
+
+# Build in release mode
+cargo build --release
+
+# Verify build succeeded
+./target/release/centotype --help
 ```
 
-**Verification**:
-```bash
-centotype --version
-# Should output: centotype 1.0.0
+**Expected Output**:
+```
+CLI-based typing trainer with 100 progressive difficulty levels
+
+Usage: centotype <COMMAND>
+
+Commands:
+  play       Start arcade mode training
+  drill      Practice specific skills
+  endurance  Endurance training session
+  stats      View statistics and progress
+  config     Configure application settings
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
 ```
 
-### Option 2: Pre-built Binary (45 seconds)
+## Current Functionality
 
-**Linux/macOS**:
-```bash
-# Download and install
-curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotype-linux-x64.tar.gz
-tar -xzf centotype-linux-x64.tar.gz
-sudo mv centotype /usr/local/bin/
+### Available Commands
 
-# Verify installation
-centotype --version
-```
-
-**Windows**:
-```powershell
-# Download from GitHub releases
-# Extract to a directory in your PATH
-# Verify with: centotype --version
-```
-
-### Option 3: npm Wrapper (Quick alternative)
-
-```bash
-npm install -g centotype-cli
-centotype --version
-```
-
-## Your First Typing Session (30 seconds)
-
-### 1. Basic Level Practice
-
-Start with Level 1 (basic words):
+The CLI currently supports command parsing and basic execution:
 
 ```bash
-centotype play --level 1
+# Start arcade mode (prints confirmation message)
+./target/release/centotype play --level 1
+# Output: Starting arcade mode, level: Some(1)
+
+# Start drill mode (prints configuration)
+./target/release/centotype drill --category symbols --duration 5
+# Output: Starting drill: symbols for 5 minutes
+
+# Start endurance mode (prints configuration)
+./target/release/centotype endurance --duration 15
+# Output: Starting endurance mode for 15 minutes
+
+# View statistics (prints placeholder)
+./target/release/centotype stats
+# Output: Displaying statistics
+
+# Configure settings (prints placeholder)
+./target/release/centotype config
+# Output: Opening configuration
 ```
 
-**What you'll see**:
-- Target text at the top
-- Your typed text highlighted in real-time
-- Live WPM and accuracy metrics
-- Progress indicator
+### What's Currently Working
 
-**Controls**:
-- `Ctrl+C`: Exit session
-- `Backspace`: Correct mistakes
-- `Tab`: Pause/resume
+**Architecture & Foundation** (✅ Complete):
+- 7-crate Rust workspace architecture
+- `centotype-core`: State management, scoring engine, level progression
+- `centotype-engine`: Performance-optimized render and input framework
+- `centotype-content`: Dynamic content generation with 100-level system
+- `centotype-analytics`: Performance analysis framework
+- `centotype-cli`: Command parsing and interface definitions
+- `centotype-persistence`: Profile storage infrastructure
+- `centotype-platform`: OS-specific optimizations
 
-### 2. Find Your Starting Level
+**Performance Framework** (✅ Grade A):
+- Input latency: 22ms P99 (target: <25ms) ✅
+- Cache hit rate: 94% (target: >90%) ✅
+- Memory usage: 46MB (target: <50MB) ✅
+- Comprehensive benchmarking suite
+- Real-time performance monitoring
 
-Take the placement test to determine your ideal starting level:
+**Content System** (✅ Complete):
+- Deterministic 100-level corpus generation
+- Mathematical difficulty progression (5%→30% symbols, 3%→20% numbers)
+- LRU caching with Moka (94% hit rate, <25ms target)
+- Security validation with escape sequence filtering
+
+### What's Under Development
+
+**Interactive TUI** (🚧 In Progress):
+- Real-time typing interface with crossterm + ratatui
+- Live WPM and accuracy feedback
+- Error highlighting and visual feedback
+- Help overlay and interactive controls
+- Session state management
+
+**Known Limitations**:
+- Commands currently print confirmation messages only
+- No actual typing sessions yet
+- UI renders are placeholder implementations
+- Profile persistence stub (saves but not used)
+- Configuration options not functional yet
+
+## Testing the Architecture
+
+### Run Unit Tests
 
 ```bash
-centotype placement
+# Test all workspace crates
+cargo test --workspace
+
+# Test specific components
+cargo test --package centotype-core
+cargo test --package centotype-content
+cargo test --package centotype-engine
 ```
 
-This 2-minute assessment will recommend your optimal starting level based on your current typing ability.
-
-### 3. Practice Specific Skills
-
-Focus on areas that need improvement:
+### Run Performance Benchmarks
 
 ```bash
-# Practice symbols and punctuation
-centotype drill --category symbols
+# Input latency validation
+cargo bench --bench input_latency_benchmark
 
-# Practice numbers
-centotype drill --category numbers
+# Content system performance
+cargo bench --bench content_performance_benchmark
 
-# Practice your weakest keys
-centotype drill --weak-keys
+# Render performance
+cargo bench --bench render_performance_benchmark
 ```
 
-## Understanding Your Results
+**Expected Performance**:
+- Input processing P99: <25ms
+- Content generation: <25ms (with cache)
+- Memory footprint: <50MB
 
-After completing a session, you'll see:
-
-```
-Session Complete!
-╭─────────────────────────────────────╮
-│ Level 5 - Mixed Content            │
-│ ─────────────────────────────────── │
-│ WPM (Raw):        72.4             │
-│ WPM (Effective):  68.1             │
-│ Accuracy:         94.2%            │
-│ Consistency:      87.6%            │
-│ Skill Index:      682              │
-│ Grade:            B+               │
-│ Stars:            ★★★☆☆           │
-╰─────────────────────────────────────╯
-```
-
-**Key Metrics**:
-- **Effective WPM**: Speed adjusted for accuracy (most important)
-- **Skill Index**: 0-1000 rating of overall proficiency
-- **Grade**: A-F letter grade for the session
-- **Stars**: 1-5 star rating for level performance
-
-## Quick Configuration
-
-### Essential Settings
+### Quick Validation Script
 
 ```bash
-# View current configuration
-centotype config --show
+# Run the comprehensive validation suite
+./scripts/validate_local.sh --quick
 
-# Set dark theme (recommended for extended practice)
-centotype config --set theme dark
-
-# Enable audio feedback
-centotype config --set sound enabled
-
-# Set your keyboard layout
-centotype config --set layout qwerty  # or qwertz, azerty
+# Full validation (includes security and performance tests)
+./scripts/validate_local.sh
 ```
 
-### Performance Optimization
+## Understanding the Architecture
 
-For best experience on slower systems:
+### Data Flow (Current Implementation)
+
+```
+User Input → CLI Parser → CliManager
+                              ↓ (prints confirmation)
+                          Command Handler (stub)
+```
+
+**Planned Flow** (Under Development):
+```
+User Input → CLI Parser → CliManager → Engine
+                                        ↓
+                                    Input Processor (22ms P99)
+                                        ↓
+                                    Core State Manager
+                                        ↓
+                                    Render System (ratatui TUI)
+                                        ↓
+                                    Live Typing Interface
+```
+
+### Performance Characteristics
+
+The foundation achieves production-grade performance targets:
+
+```rust
+// Measured Performance Metrics (All Met)
+Input Latency P99: 22ms    ✅ (target: <25ms)
+Content Load Time: <25ms   ✅ (94% cache hit rate)
+Memory Usage: 46MB         ✅ (target: <50MB)
+Startup Time P95: 180ms    ✅ (target: <200ms)
+```
+
+## Development Status & Roadmap
+
+### Completed (Session 3 - September 28, 2025)
+
+- ✅ Full 7-crate workspace architecture
+- ✅ Content generation system with 100 levels
+- ✅ Performance optimization (Grade A achieved)
+- ✅ Security validation framework
+- ✅ Comprehensive test suite
+- ✅ Command-line argument parsing
+- ✅ Platform detection and optimization
+
+### In Progress
+
+- 🚧 Interactive TUI implementation (crossterm + ratatui)
+- 🚧 Real-time typing session interface
+- 🚧 Live feedback and error highlighting
+- 🚧 Session result display and statistics
+
+### Upcoming
+
+- ⏳ Profile management and progress tracking
+- ⏳ Configuration system
+- ⏳ Advanced training modes (placement, drills)
+- ⏳ Analytics and performance insights
+
+### Production Blockers
+
+**Critical** (Must fix before 1.0):
+- ⚠️ 27+ panic safety violations identified in error handling
+- ⚠️ TUI typing interface not yet functional
+- ⚠️ Session state persistence not integrated
+
+**Non-Critical**:
+- Profile export functionality
+- Audio feedback system
+- Online competition features
+
+## For Developers
+
+### Exploring the Codebase
 
 ```bash
-# Reduce visual effects
-centotype config --set effects minimal
+# View architecture documentation
+cat /home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md
 
-# Optimize for performance
-centotype config --set render-rate 30fps
+# Check performance validation report
+cat /home/v/project/centotype/docs/performance/PERFORMANCE_VALIDATION_REPORT.md
+
+# Review content system design
+cat /home/v/project/centotype/docs/design/CONTENT_SYSTEM.md
 ```
 
-## Quick Tips for Success
-
-### Accuracy First
-- **Always prioritize accuracy over speed**
-- Centotype penalizes corrections heavily
-- Clean typing beats fast corrections
-
-### Practice Consistency
-```bash
-# Short, focused sessions work best
-centotype play --level 10 --duration 5min  # 5-minute sessions
-```
-
-### Track Progress
-```bash
-# View your improvement over time
-centotype stats --detailed
-
-# Export data for analysis
-centotype export --format csv --days 7
-```
-
-### Progressive Training
-- Start at your placement level
-- Achieve 95%+ accuracy before advancing
-- Use drill mode to target weak areas
-
-## Troubleshooting Common Issues
-
-### Terminal Compatibility
-If you see rendering issues:
+### Running Development Checks
 
 ```bash
-# Check terminal capabilities
-centotype check
+# Linting and formatting
+cargo clippy -- -D warnings
+cargo fmt --check
 
-# Use compatibility mode if needed
-centotype play --level 1 --compat-mode
+# Build optimization check
+cargo build --release --quiet
+
+# Memory profile
+cargo run --bin memory-profiler  # (if available)
 ```
 
-### Performance Issues
-If input feels laggy:
+### Understanding Performance Targets
 
-```bash
-# Run performance test
-centotype benchmark
+All components are designed to meet these targets:
 
-# Check system requirements
-centotype sysinfo
-```
-
-### Audio Not Working
-```bash
-# Verify audio settings
-centotype config --show | grep sound
-
-# Test audio
-centotype test-audio
-```
-
-## Next Steps
-
-### Level Progression Path
-
-1. **Start**: Complete placement test
-2. **Foundation**: Master Levels 1-25 (Bronze tier)
-3. **Proficiency**: Progress through Levels 26-50 (Silver tier)
-4. **Advanced**: Tackle Levels 51-75 (Gold tier)
-5. **Expert**: Challenge Levels 76-90 (Platinum tier)
-6. **Master**: Conquer Levels 91-100 (Diamond tier)
-
-### Advanced Features
-
-Once comfortable with basics:
-
-```bash
-# Endurance training
-centotype endurance --duration 15
-
-# Custom content practice
-centotype custom --file my-code.rs
-
-# Competition mode
-centotype race --online
-```
-
-### Performance Targets
-
-**Bronze Tier Goals** (Levels 1-25):
-- 40+ WPM effective speed
-- 95%+ accuracy
-- Consistent performance
-
-**Silver Tier Goals** (Levels 26-50):
-- 60+ WPM effective speed
-- 97%+ accuracy
-- Reduced error severity
-
-**Gold+ Tier Goals** (Levels 51+):
-- 80+ WPM effective speed
-- 98%+ accuracy
-- Expert-level consistency
+| Metric | Target | Current | Status |
+|--------|--------|---------|--------|
+| Input Latency P99 | <25ms | 22ms | ✅ |
+| Render Time P95 | <33ms | TBD | 🚧 |
+| Cache Hit Rate | >90% | 94% | ✅ |
+| Memory Usage | <50MB | 46MB | ✅ |
+| Startup Time P95 | <200ms | 180ms | ✅ |
 
 ## Getting Help
 
-### Built-in Help
-```bash
-# General help
-centotype help
-
-# Command-specific help
-centotype play --help
-centotype config --help
-```
-
 ### Documentation
-- **Complete Guide**: `/docs/USER_GUIDE.md`
-- **Technical Details**: `/docs/ARCHITECTURE.md`
-- **Performance Tuning**: `/docs/PERFORMANCE_GUIDE.md`
+
+- **Architecture**: `/home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md`
+- **Performance**: `/home/v/project/centotype/docs/performance/PERFORMANCE_VALIDATION_REPORT.md`
+- **Developer Guide**: `/home/v/project/centotype/docs/guides/DEVELOPER_GUIDE.md`
+- **User Guide**: `/home/v/project/centotype/docs/guides/USER_GUIDE.md` (reflects future state)
+- **Troubleshooting**: `/home/v/project/centotype/docs/guides/TROUBLESHOOTING.md`
 
 ### Community Support
+
 - **GitHub Issues**: [Report bugs and request features](https://github.com/rfxlamia/centotype/issues)
-- **Discussions**: [Get help and share tips](https://github.com/rfxlamia/centotype/discussions)
+- **Discussions**: [Development updates and questions](https://github.com/rfxlamia/centotype/discussions)
 
 ---
 
-## Summary: Your 2-Minute Start
+## Summary: Getting Started with Current Build
 
-1. **Install** (30s): `cargo install centotype` or download binary
-2. **Test** (30s): `centotype placement` to find your level
-3. **Practice** (60s): `centotype play --level X` where X is your recommended level
-4. **Success!** You're now on the path to typing mastery
+1. **Clone & Build** (2min): Clone repo and run `cargo build --release`
+2. **Test CLI** (30s): Run `./target/release/centotype --help` to verify build
+3. **Explore Architecture** (5min): Review `/home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md`
+4. **Run Tests** (2min): Execute `cargo test --workspace` to validate components
+5. **Check Performance** (1min): Run `cargo bench` to see Grade A performance
 
-**Pro Tip**: Practice in short, focused 5-10 minute sessions rather than long marathon sessions. Consistency beats intensity for skill development.
+**Next Phase**: TUI implementation will provide interactive typing sessions with real-time feedback. Foundation architecture is production-ready (pending panic safety fixes).
 
-Happy typing! 🚀
+**Note for Contributors**: The architecture is designed for parallel development. See `DEVELOPER_GUIDE.md` for contribution guidelines and development workflows.
+
+Happy exploring! 🚀

@@ -80,11 +80,11 @@ pub struct DifficultyConfig {
 impl Default for DifficultyConfig {
     fn default() -> Self {
         Self {
-            symbol_weight: 3.0,      // Symbols are hardest to type
-            number_weight: 1.5,      // Numbers require reaching to top row
-            technical_weight: 2.0,   // Technical terms are challenging
-            variety_weight: 1.2,     // Character variety adds complexity
-            length_weight: 0.8,      // Length affects sustained difficulty
+            symbol_weight: 3.0,    // Symbols are hardest to type
+            number_weight: 1.5,    // Numbers require reaching to top row
+            technical_weight: 2.0, // Technical terms are challenging
+            variety_weight: 1.2,   // Character variety adds complexity
+            length_weight: 0.8,    // Length affects sustained difficulty
             min_length_for_analysis: 50,
         }
     }
@@ -180,9 +180,7 @@ impl DifficultyAnalyzer {
             if !current_score.is_appropriate_for_level(*level_id) {
                 return Err(CentotypeError::Content(format!(
                     "Level {} difficulty mismatch: expected {:.1}, got {:.1}",
-                    level_id.0,
-                    expected_score.overall,
-                    current_score.overall
+                    level_id.0, expected_score.overall, current_score.overall
                 )));
             }
 
@@ -194,10 +192,7 @@ impl DifficultyAnalyzer {
                 if progression < -5.0 {
                     return Err(CentotypeError::Content(format!(
                         "Level {} difficulty regression: {:.1} -> {:.1} (change: {:.1})",
-                        level_id.0,
-                        prev_score.overall,
-                        current_score.overall,
-                        progression
+                        level_id.0, prev_score.overall, current_score.overall, progression
                     )));
                 }
 
@@ -205,19 +200,13 @@ impl DifficultyAnalyzer {
                 if progression > 15.0 {
                     return Err(CentotypeError::Content(format!(
                         "Level {} difficulty spike too steep: {:.1} -> {:.1} (change: {:.1})",
-                        level_id.0,
-                        prev_score.overall,
-                        current_score.overall,
-                        progression
+                        level_id.0, prev_score.overall, current_score.overall, progression
                     )));
                 }
 
                 debug!(
                     "Level {} progression: {:.1} -> {:.1} (+{:.1})",
-                    level_id.0,
-                    prev_score.overall,
-                    current_score.overall,
-                    progression
+                    level_id.0, prev_score.overall, current_score.overall, progression
                 );
             }
 
@@ -246,7 +235,11 @@ impl DifficultyAnalyzer {
     }
 
     /// Calculate symbol contribution to difficulty
-    fn calculate_symbol_contribution(&self, histogram: &CharacterClassHistogram, total_chars: f64) -> f64 {
+    fn calculate_symbol_contribution(
+        &self,
+        histogram: &CharacterClassHistogram,
+        total_chars: f64,
+    ) -> f64 {
         if total_chars == 0.0 {
             return 0.0;
         }
@@ -256,7 +249,11 @@ impl DifficultyAnalyzer {
     }
 
     /// Calculate number contribution to difficulty
-    fn calculate_number_contribution(&self, histogram: &CharacterClassHistogram, total_chars: f64) -> f64 {
+    fn calculate_number_contribution(
+        &self,
+        histogram: &CharacterClassHistogram,
+        total_chars: f64,
+    ) -> f64 {
         if total_chars == 0.0 {
             return 0.0;
         }
@@ -269,13 +266,50 @@ impl DifficultyAnalyzer {
     fn calculate_technical_contribution(&self, content: &str) -> f64 {
         // Define technical patterns to search for
         let technical_patterns = [
-            "function", "class", "interface", "struct", "enum", "trait", "impl",
-            "async", "await", "Result", "Option", "HashMap", "Vector", "String",
-            "iterator", "closure", "lifetime", "borrowing", "ownership",
-            "camelCase", "snake_case", "PascalCase",
-            "fn", "let", "mut", "const", "static", "pub", "use", "mod",
-            "match", "if", "else", "for", "while", "loop", "break", "continue",
-            "return", "yield", "where", "Self", "super", "crate",
+            "function",
+            "class",
+            "interface",
+            "struct",
+            "enum",
+            "trait",
+            "impl",
+            "async",
+            "await",
+            "Result",
+            "Option",
+            "HashMap",
+            "Vector",
+            "String",
+            "iterator",
+            "closure",
+            "lifetime",
+            "borrowing",
+            "ownership",
+            "camelCase",
+            "snake_case",
+            "PascalCase",
+            "fn",
+            "let",
+            "mut",
+            "const",
+            "static",
+            "pub",
+            "use",
+            "mod",
+            "match",
+            "if",
+            "else",
+            "for",
+            "while",
+            "loop",
+            "break",
+            "continue",
+            "return",
+            "yield",
+            "where",
+            "Self",
+            "super",
+            "crate",
         ];
 
         let mut technical_count = 0;
@@ -302,26 +336,40 @@ impl DifficultyAnalyzer {
     }
 
     /// Calculate character variety contribution to difficulty
-    fn calculate_variety_contribution(&self, histogram: &CharacterClassHistogram, total_chars: f64) -> f64 {
+    fn calculate_variety_contribution(
+        &self,
+        histogram: &CharacterClassHistogram,
+        total_chars: f64,
+    ) -> f64 {
         if total_chars == 0.0 {
             return 0.0;
         }
 
         // Count how many different character classes are present
         let mut class_count = 0;
-        if histogram.lowercase > 0 { class_count += 1; }
-        if histogram.uppercase > 0 { class_count += 1; }
-        if histogram.digits > 0 { class_count += 1; }
-        if histogram.punctuation > 0 { class_count += 1; }
-        if histogram.symbols > 0 { class_count += 1; }
+        if histogram.lowercase > 0 {
+            class_count += 1;
+        }
+        if histogram.uppercase > 0 {
+            class_count += 1;
+        }
+        if histogram.digits > 0 {
+            class_count += 1;
+        }
+        if histogram.punctuation > 0 {
+            class_count += 1;
+        }
+        if histogram.symbols > 0 {
+            class_count += 1;
+        }
 
         // More character classes = higher variety = higher difficulty
         let variety_score = match class_count {
-            0..=1 => 0.0,   // Very low variety
-            2 => 2.0,       // Basic variety
-            3 => 5.0,       // Good variety
-            4 => 8.0,       // High variety
-            5 => 12.0,      // Maximum variety
+            0..=1 => 0.0, // Very low variety
+            2 => 2.0,     // Basic variety
+            3 => 5.0,     // Good variety
+            4 => 8.0,     // High variety
+            5 => 12.0,    // Maximum variety
             _ => 12.0,
         };
 
@@ -380,7 +428,11 @@ impl DifficultyAnalyzer {
                 max_symbol_ratio: 0.30,
                 min_number_ratio: 0.15,
                 max_number_ratio: 0.20,
-                required_features: vec!["unicode_characters", "complex_generics", "expert_patterns"],
+                required_features: vec![
+                    "unicode_characters",
+                    "complex_generics",
+                    "expert_patterns",
+                ],
                 forbidden_features: vec![],
             },
             _ => TierRequirements {
@@ -469,7 +521,10 @@ impl DifficultyAnalyzer {
 
             // Collect tier data
             let tier = level_id.tier().0;
-            tier_data.entry(tier).or_insert_with(Vec::new).push(score.overall);
+            tier_data
+                .entry(tier)
+                .or_insert_with(Vec::new)
+                .push(score.overall);
         }
 
         // Calculate averages
@@ -481,13 +536,16 @@ impl DifficultyAnalyzer {
         for (tier, difficulties) in tier_data {
             let avg_difficulty = difficulties.iter().sum::<f64>() / difficulties.len() as f64;
 
-            report.tier_breakdown.insert(tier, TierStats {
-                avg_difficulty,
-                avg_symbol_ratio: 0.0, // Would need more detailed analysis
-                avg_number_ratio: 0.0, // Would need more detailed analysis
-                avg_technical_ratio: 0.0, // Would need more detailed analysis
-                level_count: difficulties.len() as u32,
-            });
+            report.tier_breakdown.insert(
+                tier,
+                TierStats {
+                    avg_difficulty,
+                    avg_symbol_ratio: 0.0, // Would need more detailed analysis
+                    avg_number_ratio: 0.0, // Would need more detailed analysis
+                    avg_technical_ratio: 0.0, // Would need more detailed analysis
+                    level_count: difficulties.len() as u32,
+                },
+            );
         }
 
         report
@@ -505,25 +563,42 @@ mod tests {
         // Simple text should have low difficulty
         let simple_text = "This is a simple sentence with basic words and punctuation.";
         let simple_score = analyzer.analyze_content(simple_text);
-        assert!(simple_score.overall < 20.0, "Simple text should have low difficulty");
+        assert!(
+            simple_score.overall < 20.0,
+            "Simple text should have low difficulty"
+        );
 
         // Complex code should have higher difficulty
-        let complex_text = "&mut HashMap<String, Vec<Option<Box<dyn Iterator<Item=u32>>>>> | 0xFF & mask";
+        let complex_text =
+            "&mut HashMap<String, Vec<Option<Box<dyn Iterator<Item=u32>>>>> | 0xFF & mask";
         let complex_score = analyzer.analyze_content(complex_text);
-        assert!(complex_score.overall > simple_score.overall, "Complex text should be more difficult");
+        assert!(
+            complex_score.overall > simple_score.overall,
+            "Complex text should be more difficult"
+        );
     }
 
     #[test]
     fn test_expected_difficulty_progression() {
         let level_1 = DifficultyAnalyzer::expected_difficulty_for_level(LevelId::new(1).unwrap());
         let level_50 = DifficultyAnalyzer::expected_difficulty_for_level(LevelId::new(50).unwrap());
-        let level_100 = DifficultyAnalyzer::expected_difficulty_for_level(LevelId::new(100).unwrap());
+        let level_100 =
+            DifficultyAnalyzer::expected_difficulty_for_level(LevelId::new(100).unwrap());
 
-        assert!(level_1.overall < level_50.overall, "Level 50 should be harder than level 1");
-        assert!(level_50.overall < level_100.overall, "Level 100 should be harder than level 50");
+        assert!(
+            level_1.overall < level_50.overall,
+            "Level 50 should be harder than level 1"
+        );
+        assert!(
+            level_50.overall < level_100.overall,
+            "Level 100 should be harder than level 50"
+        );
 
         // Check that progression is reasonable
-        assert!(level_100.overall < 150.0, "Level 100 difficulty should be reasonable");
+        assert!(
+            level_100.overall < 150.0,
+            "Level 100 difficulty should be reasonable"
+        );
     }
 
     #[test]
@@ -541,9 +616,18 @@ mod tests {
         let analyzer = DifficultyAnalyzer::new();
 
         let contents = vec![
-            (LevelId::new(1).unwrap(), "Simple text for beginners.".to_string()),
-            (LevelId::new(2).unwrap(), "Slightly more complex text with numbers 123.".to_string()),
-            (LevelId::new(3).unwrap(), "Programming basics: function test() { return 42; }".to_string()),
+            (
+                LevelId::new(1).unwrap(),
+                "Simple text for beginners.".to_string(),
+            ),
+            (
+                LevelId::new(2).unwrap(),
+                "Slightly more complex text with numbers 123.".to_string(),
+            ),
+            (
+                LevelId::new(3).unwrap(),
+                "Programming basics: function test() { return 42; }".to_string(),
+            ),
         ];
 
         assert!(analyzer.validate_progression(&contents).is_ok());

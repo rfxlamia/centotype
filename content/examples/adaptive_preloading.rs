@@ -20,7 +20,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::{RwLock, Semaphore};
 use tokio::time::{interval, sleep};
-use tracing::{debug, info, warn, instrument};
+use tracing::{debug, info, instrument, warn};
 
 /// Intelligent preloading orchestrator that adapts to user behavior
 pub struct AdaptivePreloadManager {
@@ -147,7 +147,9 @@ impl PreloadMetrics {
         if self.user_behavior_predictions_total == 0 {
             0.0
         } else {
-            (self.user_behavior_predictions_correct as f64 / self.user_behavior_predictions_total as f64) * 100.0
+            (self.user_behavior_predictions_correct as f64
+                / self.user_behavior_predictions_total as f64)
+                * 100.0
         }
     }
 }
@@ -207,7 +209,8 @@ impl PreloadStrategy for SequentialPreloadStrategy {
             let next_level_num = current_level.0 + i;
             if next_level_num <= LevelId::MAX {
                 if let Ok(next_level) = LevelId::new(next_level_num) {
-                    let priority = self.priority_weight * (1.0 - (i as f64 / self.preload_distance as f64));
+                    let priority =
+                        self.priority_weight * (1.0 - (i as f64 / self.preload_distance as f64));
                     candidates.push(PreloadCandidate {
                         level_id: next_level,
                         priority_score: priority,
@@ -255,13 +258,17 @@ impl PreloadStrategy for AdaptivePreloadStrategy {
         if let Some(access_pattern) = behavior_tracker.access_patterns.get(&current_level) {
             // Predict based on typical next levels
             for (next_level, probability) in &access_pattern.typical_next_levels {
-                if *probability > 0.1 { // Only consider levels with >10% probability
+                if *probability > 0.1 {
+                    // Only consider levels with >10% probability
                     let priority = self.priority_weight * probability;
                     candidates.push(PreloadCandidate {
                         level_id: *next_level,
                         priority_score: priority,
                         predicted_access_time: Some(access_pattern.avg_session_duration / 2),
-                        reason: format!("Adaptive: {:.1}% probability based on history", probability * 100.0),
+                        reason: format!(
+                            "Adaptive: {:.1}% probability based on history",
+                            probability * 100.0
+                        ),
                     });
                 }
             }
@@ -282,7 +289,8 @@ impl PreloadStrategy for AdaptivePreloadStrategy {
 
         // Limit to max preload distance
         candidates.retain(|c| {
-            (c.level_id.0 as i16 - current_level.0 as i16).abs() <= config.max_preload_distance as i16
+            (c.level_id.0 as i16 - current_level.0 as i16).abs()
+                <= config.max_preload_distance as i16
         });
 
         candidates
@@ -341,14 +349,19 @@ impl PreloadStrategy for DifficultyBasedPreloadStrategy {
             // Also check previous levels for retry patterns
             if current_level.0 >= i {
                 if let Ok(check_level) = LevelId::new(current_level.0 - i) {
-                    if let Some(error_pattern) = behavior_tracker.error_recovery_patterns.get(&current_level) {
+                    if let Some(error_pattern) =
+                        behavior_tracker.error_recovery_patterns.get(&current_level)
+                    {
                         if error_pattern.contains(&check_level) {
                             let priority = self.priority_weight * 0.5; // Lower priority for retries
                             candidates.push(PreloadCandidate {
                                 level_id: check_level,
                                 priority_score: priority,
                                 predicted_access_time: Some(Duration::from_secs(120)), // Users may go back
-                                reason: format!("Error recovery pattern for level {}", check_level.0),
+                                reason: format!(
+                                    "Error recovery pattern for level {}",
+                                    check_level.0
+                                ),
                             });
                         }
                     }
@@ -406,7 +419,10 @@ impl BackgroundPreloader {
             *running = true;
         }
 
-        info!("Starting background cache warming for {} popular levels", popular_levels.len());
+        info!(
+            "Starting background cache warming for {} popular levels",
+            popular_levels.len()
+        );
 
         let content_manager = self.content_manager.clone();
         let semaphore = self.semaphore.clone();
@@ -451,7 +467,11 @@ impl BackgroundPreloader {
                         let start_time = Instant::now();
 
                         // Check if already cached
-                        if content_manager.get_cached_content(level_id, None).await.is_some() {
+                        if content_manager
+                            .get_cached_content(level_id, None)
+                            .await
+                            .is_some()
+                        {
                             return; // Already cached, skip
                         }
 
@@ -469,13 +489,17 @@ impl BackgroundPreloader {
                                     if m.avg_preload_latency == Duration::ZERO {
                                         m.avg_preload_latency = preload_time;
                                     } else {
-                                        m.avg_preload_latency = (m.avg_preload_latency + preload_time) / 2;
+                                        m.avg_preload_latency =
+                                            (m.avg_preload_latency + preload_time) / 2;
                                     }
                                 }
 
-                                debug!("Background warmed cache for level {} in {}ms",
-                                      level_id.0, preload_time.as_millis());
-                            },
+                                debug!(
+                                    "Background warmed cache for level {} in {}ms",
+                                    level_id.0,
+                                    preload_time.as_millis()
+                                );
+                            }
                             Err(e) => {
                                 {
                                     let mut m = metrics.write().await;
@@ -539,21 +563,29 @@ impl AdaptivePreloadManager {
 
     /// Execute intelligent preloading for a given level
     #[instrument(skip(self))]
-    pub async fn execute_intelligent_preload(&self, current_level: LevelId) -> Result<PreloadResult> {
-        debug!("Executing intelligent preload for level {}", current_level.0);
+    pub async fn execute_intelligent_preload(
+        &self,
+        current_level: LevelId,
+    ) -> Result<PreloadResult> {
+        debug!(
+            "Executing intelligent preload for level {}",
+            current_level.0
+        );
 
         let behavior_tracker = self.user_behavior_tracker.read().await;
         let mut all_candidates = Vec::new();
 
         // Gather candidates from all strategies
         for strategy in &self.preload_strategies {
-            let candidates = strategy.predict_preload_candidates(
-                current_level,
-                &behavior_tracker,
-                &self.config,
-            ).await;
+            let candidates = strategy
+                .predict_preload_candidates(current_level, &behavior_tracker, &self.config)
+                .await;
 
-            debug!("Strategy '{}' generated {} candidates", strategy.name(), candidates.len());
+            debug!(
+                "Strategy '{}' generated {} candidates",
+                strategy.name(),
+                candidates.len()
+            );
             all_candidates.extend(candidates);
         }
 
@@ -568,7 +600,10 @@ impl AdaptivePreloadManager {
             .take(self.config.max_concurrent_preloads)
             .collect();
 
-        debug!("Selected {} candidates for preloading", selected_candidates.len());
+        debug!(
+            "Selected {} candidates for preloading",
+            selected_candidates.len()
+        );
 
         // Execute preloading for selected candidates
         let mut preload_tasks = Vec::new();
@@ -581,7 +616,10 @@ impl AdaptivePreloadManager {
             let task = tokio::spawn(async move {
                 let start_time = Instant::now();
 
-                match content_manager.get_level_content(candidate.level_id, None).await {
+                match content_manager
+                    .get_level_content(candidate.level_id, None)
+                    .await
+                {
                     Ok(_) => {
                         let preload_time = start_time.elapsed();
                         {
@@ -590,15 +628,19 @@ impl AdaptivePreloadManager {
                             m.total_preloads_triggered += 1;
                         }
 
-                        debug!("Successfully preloaded level {} ({}ms): {}",
-                              candidate.level_id.0, preload_time.as_millis(), candidate.reason);
+                        debug!(
+                            "Successfully preloaded level {} ({}ms): {}",
+                            candidate.level_id.0,
+                            preload_time.as_millis(),
+                            candidate.reason
+                        );
 
                         PreloadTaskResult::Success {
                             level_id: candidate.level_id,
                             preload_time,
                             reason: candidate.reason,
                         }
-                    },
+                    }
                     Err(e) => {
                         {
                             let mut m = metrics.write().await;
@@ -628,13 +670,17 @@ impl AdaptivePreloadManager {
             }
         }
 
-        let successful_preloads = preload_results.iter()
+        let successful_preloads = preload_results
+            .iter()
             .filter(|r| matches!(r, PreloadTaskResult::Success { .. }))
             .count();
 
         let total_preloads = preload_results.len();
 
-        info!("Preload execution completed: {}/{} successful", successful_preloads, total_preloads);
+        info!(
+            "Preload execution completed: {}/{} successful",
+            successful_preloads, total_preloads
+        );
 
         Ok(PreloadResult {
             total_attempted: total_preloads,
@@ -649,9 +695,14 @@ impl AdaptivePreloadManager {
         let mut behavior_tracker = self.user_behavior_tracker.write().await;
 
         match action {
-            UserAction::LevelAccess { level_id, session_id, cache_hit } => {
+            UserAction::LevelAccess {
+                level_id,
+                session_id,
+                cache_hit,
+            } => {
                 // Update access patterns
-                let access_pattern = behavior_tracker.access_patterns
+                let access_pattern = behavior_tracker
+                    .access_patterns
                     .entry(level_id)
                     .or_insert_with(|| AccessPattern {
                         total_accesses: 0,
@@ -688,16 +739,22 @@ impl AdaptivePreloadManager {
                         last_action_time: Instant::now(),
                     });
                 }
-            },
+            }
 
-            UserAction::SessionComplete { session_id, levels_attempted, success_rate } => {
+            UserAction::SessionComplete {
+                session_id,
+                levels_attempted,
+                success_rate,
+            } => {
                 // Record progression pattern
                 if let Some(session) = behavior_tracker.current_session.take() {
                     if session.session_id == session_id {
                         let pattern = ProgressionPattern {
                             session_id,
                             levels_attempted,
-                            total_duration: session.last_action_time.duration_since(session.start_time),
+                            total_duration: session
+                                .last_action_time
+                                .duration_since(session.start_time),
                             success_rate,
                             retry_patterns: HashMap::new(),
                             timestamp: Instant::now(),
@@ -706,20 +763,26 @@ impl AdaptivePreloadManager {
                         behavior_tracker.progression_patterns.push_back(pattern);
 
                         // Keep only recent patterns
-                        while behavior_tracker.progression_patterns.len() > self.config.behavior_learning_window {
+                        while behavior_tracker.progression_patterns.len()
+                            > self.config.behavior_learning_window
+                        {
                             behavior_tracker.progression_patterns.pop_front();
                         }
                     }
                 }
-            },
+            }
 
-            UserAction::LevelRetry { level_id, from_level } => {
+            UserAction::LevelRetry {
+                level_id,
+                from_level,
+            } => {
                 // Record error recovery pattern
-                behavior_tracker.error_recovery_patterns
+                behavior_tracker
+                    .error_recovery_patterns
                     .entry(from_level)
                     .or_insert_with(Vec::new)
                     .push(level_id);
-            },
+            }
         }
 
         debug!("Recorded user action for behavioral learning");
@@ -729,14 +792,16 @@ impl AdaptivePreloadManager {
     pub async fn start_background_warming(&self) -> Result<()> {
         // Determine popular levels based on access patterns
         let behavior_tracker = self.user_behavior_tracker.read().await;
-        let mut popular_levels: Vec<_> = behavior_tracker.access_patterns
+        let mut popular_levels: Vec<_> = behavior_tracker
+            .access_patterns
             .iter()
             .filter(|(_, pattern)| pattern.total_accesses >= 5) // Levels accessed 5+ times
             .map(|(level_id, pattern)| (*level_id, pattern.total_accesses))
             .collect();
 
         popular_levels.sort_by(|a, b| b.1.cmp(&a.1)); // Sort by access count
-        let popular_levels: Vec<_> = popular_levels.into_iter()
+        let popular_levels: Vec<_> = popular_levels
+            .into_iter()
             .take(20) // Top 20 popular levels
             .map(|(level_id, _)| level_id)
             .collect();
@@ -745,12 +810,14 @@ impl AdaptivePreloadManager {
 
         if popular_levels.is_empty() {
             // Default popular levels if no data available
-            let default_popular: Vec<_> = (1..=10)
-                .filter_map(|i| LevelId::new(i).ok())
-                .collect();
-            self.background_preloader.start_background_warming(default_popular).await;
+            let default_popular: Vec<_> = (1..=10).filter_map(|i| LevelId::new(i).ok()).collect();
+            self.background_preloader
+                .start_background_warming(default_popular)
+                .await;
         } else {
-            self.background_preloader.start_background_warming(popular_levels).await;
+            self.background_preloader
+                .start_background_warming(popular_levels)
+                .await;
         }
 
         info!("Background cache warming started");
@@ -773,21 +840,32 @@ impl AdaptivePreloadManager {
 
         BehaviorInsights {
             total_levels_accessed: behavior_tracker.access_patterns.len(),
-            most_popular_level: behavior_tracker.access_patterns
+            most_popular_level: behavior_tracker
+                .access_patterns
                 .iter()
                 .max_by_key(|(_, pattern)| pattern.total_accesses)
                 .map(|(level_id, _)| *level_id),
             avg_session_length: if behavior_tracker.progression_patterns.is_empty() {
                 Duration::ZERO
             } else {
-                behavior_tracker.progression_patterns
+                behavior_tracker
+                    .progression_patterns
                     .iter()
                     .map(|p| p.total_duration)
-                    .sum::<Duration>() / behavior_tracker.progression_patterns.len() as u32
+                    .sum::<Duration>()
+                    / behavior_tracker.progression_patterns.len() as u32
             },
             cache_hit_rate: {
-                let total_hits: u64 = behavior_tracker.access_patterns.values().map(|p| p.cache_hits).sum();
-                let total_accesses: u64 = behavior_tracker.access_patterns.values().map(|p| p.total_accesses).sum();
+                let total_hits: u64 = behavior_tracker
+                    .access_patterns
+                    .values()
+                    .map(|p| p.cache_hits)
+                    .sum();
+                let total_accesses: u64 = behavior_tracker
+                    .access_patterns
+                    .values()
+                    .map(|p| p.total_accesses)
+                    .sum();
                 if total_accesses > 0 {
                     (total_hits as f64 / total_accesses as f64) * 100.0
                 } else {
@@ -795,7 +873,8 @@ impl AdaptivePreloadManager {
                 }
             },
             learning_window_utilization: (behavior_tracker.progression_patterns.len() as f64
-                / self.config.behavior_learning_window as f64) * 100.0,
+                / self.config.behavior_learning_window as f64)
+                * 100.0,
         }
     }
 }
@@ -865,7 +944,9 @@ mod tests {
         let config = PreloadConfig::default();
         let current_level = LevelId::new(5).unwrap();
 
-        let candidates = strategy.predict_preload_candidates(current_level, &behavior_tracker, &config).await;
+        let candidates = strategy
+            .predict_preload_candidates(current_level, &behavior_tracker, &config)
+            .await;
 
         assert_eq!(candidates.len(), 3);
         assert_eq!(candidates[0].level_id, LevelId::new(6).unwrap());
@@ -892,11 +973,13 @@ mod tests {
         let session_id = uuid::Uuid::new_v4();
         let level_id = LevelId::new(1).unwrap();
 
-        manager.record_user_action(UserAction::LevelAccess {
-            level_id,
-            session_id,
-            cache_hit: true,
-        }).await;
+        manager
+            .record_user_action(UserAction::LevelAccess {
+                level_id,
+                session_id,
+                cache_hit: true,
+            })
+            .await;
 
         let insights = manager.get_behavior_insights().await;
         assert_eq!(insights.total_levels_accessed, 1);
@@ -912,7 +995,10 @@ mod tests {
         let manager = AdaptivePreloadManager::new(content_manager, config).await;
 
         let current_level = LevelId::new(1).unwrap();
-        let result = manager.execute_intelligent_preload(current_level).await.unwrap();
+        let result = manager
+            .execute_intelligent_preload(current_level)
+            .await
+            .unwrap();
 
         assert!(result.total_attempted > 0);
     }

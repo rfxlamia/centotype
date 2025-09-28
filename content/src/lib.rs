@@ -14,18 +14,23 @@
 pub mod cache;
 pub mod corpus;
 pub mod difficulty;
+// pub mod fs_security; // TODO: Add dirs dependency and fix error types
 pub mod generator;
 pub mod validation;
 
 // Re-export main types for public API
 pub use cache::{CacheConfig, CacheManager, CacheMetrics, ContentCache, PreloadStrategy};
-pub use difficulty::{DifficultyAnalyzer, DifficultyConfig, DifficultyScore, ProgressionReport, TierRequirements};
-pub use generator::{CentotypeContentGenerator, DifficultyParams, LevelGenerationParams, generate_cache_key};
-pub use validation::{ContentValidator, ValidationResult, verify_difficulty_progression};
+pub use difficulty::{
+    DifficultyAnalyzer, DifficultyConfig, DifficultyScore, ProgressionReport, TierRequirements,
+};
+pub use generator::{
+    generate_cache_key, CentotypeContentGenerator, DifficultyParams, LevelGenerationParams,
+};
+pub use validation::{verify_difficulty_progression, ContentValidator, ValidationResult};
 
 use centotype_core::types::*;
-use std::sync::Arc;
 use parking_lot::RwLock;
+use std::sync::Arc;
 use tracing::{debug, info, warn};
 
 /// Main content management system integrating all components
@@ -83,8 +88,10 @@ impl ContentManager {
         info!("Initializing Centotype content management system");
 
         // Initialize validation system
-        let validator = Arc::new(validation::ContentValidator::new()
-            .map_err(|e| CentotypeError::Content(format!("Failed to create validator: {}", e)))?);
+        let validator =
+            Arc::new(validation::ContentValidator::new().map_err(|e| {
+                CentotypeError::Content(format!("Failed to create validator: {}", e))
+            })?);
 
         // Initialize content generator
         let generator = Arc::new(generator::CentotypeContentGenerator::new(validator));
@@ -100,7 +107,7 @@ impl ContentManager {
 
         // Initialize difficulty analyzer
         let difficulty_analyzer = Arc::new(DifficultyAnalyzer::with_config(
-            config.difficulty_config.clone()
+            config.difficulty_config.clone(),
         ));
 
         info!("Content management system initialized successfully");
@@ -125,14 +132,18 @@ impl ContentManager {
             hasher.finish()
         });
 
-        debug!("Requesting content for level {} with seed {}", level_id.0, effective_seed);
+        debug!(
+            "Requesting content for level {} with seed {}",
+            level_id.0, effective_seed
+        );
 
         // Get content from cache (with generation on miss)
         let content = self.cache.get_content(level_id, effective_seed).await?;
 
         // Validate content if enabled
         if config.enable_validation {
-            self.generator.validate_content_difficulty(&content, level_id);
+            self.generator
+                .validate_content_difficulty(&content, level_id);
         }
 
         // Trigger preloading for upcoming levels if enabled
@@ -143,7 +154,11 @@ impl ContentManager {
             }
         }
 
-        debug!("Successfully retrieved content for level {} ({} chars)", level_id.0, content.len());
+        debug!(
+            "Successfully retrieved content for level {} ({} chars)",
+            level_id.0,
+            content.len()
+        );
         Ok(content)
     }
 
@@ -158,12 +173,17 @@ impl ContentManager {
             hasher.finish()
         });
 
-        self.cache.get_cached_content(level_id, effective_seed).await
+        self.cache
+            .get_cached_content(level_id, effective_seed)
+            .await
     }
 
     /// Preload content for upcoming levels
     pub async fn preload_upcoming_levels(&self, current_level: LevelId) -> Result<()> {
-        debug!("Preloading content for upcoming levels from level {}", current_level.0);
+        debug!(
+            "Preloading content for upcoming levels from level {}",
+            current_level.0
+        );
         self.cache.preload_upcoming_levels(current_level).await
     }
 
@@ -226,7 +246,10 @@ impl ContentManager {
     }
 
     /// Generate difficulty progression report
-    pub async fn generate_progression_report(&self, level_range: std::ops::Range<u8>) -> Result<ProgressionReport> {
+    pub async fn generate_progression_report(
+        &self,
+        level_range: std::ops::Range<u8>,
+    ) -> Result<ProgressionReport> {
         let mut contents = Vec::new();
 
         for level_num in level_range {
@@ -239,7 +262,9 @@ impl ContentManager {
             contents.push((level_id, content));
         }
 
-        Ok(self.difficulty_analyzer.generate_progression_report(&contents))
+        Ok(self
+            .difficulty_analyzer
+            .generate_progression_report(&contents))
     }
 
     /// Update content configuration
@@ -262,7 +287,11 @@ impl ContentManager {
     }
 
     /// Generate deterministic content for testing
-    pub async fn generate_deterministic_content(&self, level_id: LevelId, seed: u64) -> Result<String> {
+    pub async fn generate_deterministic_content(
+        &self,
+        level_id: LevelId,
+        seed: u64,
+    ) -> Result<String> {
         self.generator.generate_level_content(level_id, seed)
     }
 
@@ -284,7 +313,8 @@ impl ContentManager {
 
     /// Check if content meets difficulty requirements for a level
     pub fn validate_content_difficulty(&self, content: &str, level_id: LevelId) -> bool {
-        self.generator.validate_content_difficulty(content, level_id)
+        self.generator
+            .validate_content_difficulty(content, level_id)
     }
 }
 
@@ -326,7 +356,9 @@ pub async fn validate_deterministic_generation(
     let mut previous_content: Option<String> = None;
 
     for i in 0..iterations {
-        let content = manager.generate_deterministic_content(level_id, seed).await?;
+        let content = manager
+            .generate_deterministic_content(level_id, seed)
+            .await?;
 
         if let Some(prev) = &previous_content {
             if *prev != content {
@@ -390,7 +422,10 @@ mod tests {
         let content1 = manager.get_level_content(level, Some(12345)).await.unwrap();
         let content2 = manager.get_level_content(level, Some(12345)).await.unwrap();
 
-        assert_eq!(content1, content2, "Content should be deterministic with same seed");
+        assert_eq!(
+            content1, content2,
+            "Content should be deterministic with same seed"
+        );
         assert!(!content1.is_empty(), "Content should not be empty");
     }
 
@@ -420,8 +455,10 @@ mod tests {
         let simple_score = manager.analyze_difficulty(simple_text);
         let complex_score = manager.analyze_difficulty(complex_text);
 
-        assert!(simple_score.overall < complex_score.overall,
-               "Complex text should have higher difficulty score");
+        assert!(
+            simple_score.overall < complex_score.overall,
+            "Complex text should have higher difficulty score"
+        );
     }
 
     #[tokio::test]
@@ -446,7 +483,10 @@ mod tests {
             .await
             .unwrap();
 
-        assert!(is_deterministic, "Content generation should be deterministic");
+        assert!(
+            is_deterministic,
+            "Content generation should be deterministic"
+        );
     }
 
     #[tokio::test]
@@ -458,11 +498,16 @@ mod tests {
         let _content = manager.get_level_content(level, None).await.unwrap();
 
         // Benchmark loading time
-        let avg_duration = benchmark_content_loading(&manager, level, 10).await.unwrap();
+        let avg_duration = benchmark_content_loading(&manager, level, 10)
+            .await
+            .unwrap();
 
         // Should meet P99 target of <25ms (being generous with test environment)
-        assert!(avg_duration.as_millis() < 50,
-               "Content loading should be fast: {}ms", avg_duration.as_millis());
+        assert!(
+            avg_duration.as_millis() < 50,
+            "Content loading should be fast: {}ms",
+            avg_duration.as_millis()
+        );
     }
 
     #[tokio::test]
@@ -473,11 +518,17 @@ mod tests {
 
         // Generate and cache content
         let _content1 = manager.get_level_content(level, Some(seed)).await.unwrap();
-        assert!(manager.get_cached_content(level, Some(seed)).await.is_some());
+        assert!(manager
+            .get_cached_content(level, Some(seed))
+            .await
+            .is_some());
 
         // Invalidate cache
         manager.invalidate_level(level, Some(seed)).await;
-        assert!(manager.get_cached_content(level, Some(seed)).await.is_none());
+        assert!(manager
+            .get_cached_content(level, Some(seed))
+            .await
+            .is_none());
     }
 
     #[tokio::test]
@@ -486,6 +537,9 @@ mod tests {
 
         // Test progression for first few levels
         let validation_result = manager.validate_progression(1..6).await;
-        assert!(validation_result.is_ok(), "Progression validation should pass");
+        assert!(
+            validation_result.is_ok(),
+            "Progression validation should pass"
+        );
     }
 }

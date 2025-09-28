@@ -659,6 +659,7 @@ fn create_tier_10_level(id: LevelId, level_in_tier: u8) -> LevelDefinition {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::Duration;
 
     #[test]
     fn test_level_creation() {

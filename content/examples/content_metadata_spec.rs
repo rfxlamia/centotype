@@ -318,9 +318,9 @@ pub struct ContentCharacteristics {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SentenceComplexity {
-    Simple,      // Single clause
-    Compound,    // Multiple independent clauses
-    Complex,     // Dependent clauses
+    Simple,          // Single clause
+    Compound,        // Multiple independent clauses
+    Complex,         // Dependent clauses
     CompoundComplex, // Both compound and complex elements
 }
 
@@ -425,11 +425,11 @@ pub struct DifficultyScaling {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ScalingFunction {
-    Linear(f64),           // slope
-    Exponential(f64),      // base
-    Logarithmic(f64),      // coefficient
-    Polynomial(Vec<f64>),  // coefficients
-    Custom(String),        // formula
+    Linear(f64),          // slope
+    Exponential(f64),     // base
+    Logarithmic(f64),     // coefficient
+    Polynomial(Vec<f64>), // coefficients
+    Custom(String),       // formula
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -529,77 +529,83 @@ impl Default for ContentMetadata {
         let mut tier_definitions = HashMap::new();
 
         // Tier 1: Letters
-        tier_definitions.insert("tier_1".to_string(), TierDefinition {
-            name: "Letters".to_string(),
-            level_range: (1, 40),
-            description: "Basic letter combinations and common words".to_string(),
-            character_sets: vec!["a-z".to_string(), "A-Z".to_string()],
-            progression_type: ProgressionType::Linear,
-            learning_objectives: vec![
-                "Master home row keys".to_string(),
-                "Develop finger independence".to_string(),
-                "Build muscle memory for all letters".to_string(),
-                "Achieve consistent rhythm".to_string(),
-            ],
-            difficulty_curve: DifficultyParameters {
-                base_score: 1.0,
-                tier_multiplier: 1.0,
-                max_level_increment: 0.2,
-                complexity_factors: vec![
-                    ComplexityWeight {
-                        factor_type: "finger_distance".to_string(),
-                        weight: 0.4,
-                        tier_scaling: 1.0,
-                    },
-                    ComplexityWeight {
-                        factor_type: "character_frequency".to_string(),
-                        weight: 0.6,
-                        tier_scaling: 1.0,
-                    },
+        tier_definitions.insert(
+            "tier_1".to_string(),
+            TierDefinition {
+                name: "Letters".to_string(),
+                level_range: (1, 40),
+                description: "Basic letter combinations and common words".to_string(),
+                character_sets: vec!["a-z".to_string(), "A-Z".to_string()],
+                progression_type: ProgressionType::Linear,
+                learning_objectives: vec![
+                    "Master home row keys".to_string(),
+                    "Develop finger independence".to_string(),
+                    "Build muscle memory for all letters".to_string(),
+                    "Achieve consistent rhythm".to_string(),
                 ],
+                difficulty_curve: DifficultyParameters {
+                    base_score: 1.0,
+                    tier_multiplier: 1.0,
+                    max_level_increment: 0.2,
+                    complexity_factors: vec![
+                        ComplexityWeight {
+                            factor_type: "finger_distance".to_string(),
+                            weight: 0.4,
+                            tier_scaling: 1.0,
+                        },
+                        ComplexityWeight {
+                            factor_type: "character_frequency".to_string(),
+                            weight: 0.6,
+                            tier_scaling: 1.0,
+                        },
+                    ],
+                },
             },
-        });
+        );
 
         // Tier 2: Punctuation
-        tier_definitions.insert("tier_2".to_string(), TierDefinition {
-            name: "Punctuation".to_string(),
-            level_range: (41, 60),
-            description: "Progressive punctuation introduction".to_string(),
-            character_sets: vec![
-                "a-z".to_string(),
-                "A-Z".to_string(),
-                ".,!?;:\"'()".to_string()
-            ],
-            progression_type: ProgressionType::Exponential,
-            learning_objectives: vec![
-                "Master basic punctuation marks".to_string(),
-                "Develop sentence structure awareness".to_string(),
-                "Handle complex punctuation combinations".to_string(),
-                "Maintain accuracy with increased cognitive load".to_string(),
-            ],
-            difficulty_curve: DifficultyParameters {
-                base_score: 5.0,
-                tier_multiplier: 1.2,
-                max_level_increment: 0.3,
-                complexity_factors: vec![
-                    ComplexityWeight {
-                        factor_type: "punctuation_density".to_string(),
-                        weight: 0.5,
-                        tier_scaling: 1.2,
-                    },
-                    ComplexityWeight {
-                        factor_type: "sentence_complexity".to_string(),
-                        weight: 0.3,
-                        tier_scaling: 1.1,
-                    },
-                    ComplexityWeight {
-                        factor_type: "cognitive_load".to_string(),
-                        weight: 0.2,
-                        tier_scaling: 1.3,
-                    },
+        tier_definitions.insert(
+            "tier_2".to_string(),
+            TierDefinition {
+                name: "Punctuation".to_string(),
+                level_range: (41, 60),
+                description: "Progressive punctuation introduction".to_string(),
+                character_sets: vec![
+                    "a-z".to_string(),
+                    "A-Z".to_string(),
+                    ".,!?;:\"'()".to_string(),
                 ],
+                progression_type: ProgressionType::Exponential,
+                learning_objectives: vec![
+                    "Master basic punctuation marks".to_string(),
+                    "Develop sentence structure awareness".to_string(),
+                    "Handle complex punctuation combinations".to_string(),
+                    "Maintain accuracy with increased cognitive load".to_string(),
+                ],
+                difficulty_curve: DifficultyParameters {
+                    base_score: 5.0,
+                    tier_multiplier: 1.2,
+                    max_level_increment: 0.3,
+                    complexity_factors: vec![
+                        ComplexityWeight {
+                            factor_type: "punctuation_density".to_string(),
+                            weight: 0.5,
+                            tier_scaling: 1.2,
+                        },
+                        ComplexityWeight {
+                            factor_type: "sentence_complexity".to_string(),
+                            weight: 0.3,
+                            tier_scaling: 1.1,
+                        },
+                        ComplexityWeight {
+                            factor_type: "cognitive_load".to_string(),
+                            weight: 0.2,
+                            tier_scaling: 1.3,
+                        },
+                    ],
+                },
             },
-        });
+        );
 
         // Continue with other tiers...
 
@@ -707,22 +713,18 @@ impl Default for ContentMetadata {
                             precision: 0,
                         },
                     ],
-                    difficulty_indicators: vec![
-                        DifficultyIndicator {
-                            indicator_name: "character_complexity".to_string(),
-                            weight_in_total_score: 0.4,
-                            calculation_formula: "weighted_sum(char_frequencies)".to_string(),
-                            tier_specific_adjustments: HashMap::new(),
-                        },
-                    ],
-                    learning_analytics: vec![
-                        AnalyticsField {
-                            field_name: "completion_time".to_string(),
-                            purpose: AnalyticsPurpose::PerformanceTracking,
-                            data_retention_days: 90,
-                            privacy_level: PrivacyLevel::Anonymous,
-                        },
-                    ],
+                    difficulty_indicators: vec![DifficultyIndicator {
+                        indicator_name: "character_complexity".to_string(),
+                        weight_in_total_score: 0.4,
+                        calculation_formula: "weighted_sum(char_frequencies)".to_string(),
+                        tier_specific_adjustments: HashMap::new(),
+                    }],
+                    learning_analytics: vec![AnalyticsField {
+                        field_name: "completion_time".to_string(),
+                        purpose: AnalyticsPurpose::PerformanceTracking,
+                        data_retention_days: 90,
+                        privacy_level: PrivacyLevel::Anonymous,
+                    }],
                     content_classification: ClassificationSchema {
                         primary_categories: vec![
                             "letters".to_string(),
@@ -735,76 +737,60 @@ impl Default for ContentMetadata {
                             "technical".to_string(),
                             "general".to_string(),
                         ],
-                        skill_focus_areas: vec![
-                            SkillArea {
-                                name: "finger_independence".to_string(),
-                                description: "Ability to move fingers independently".to_string(),
-                                associated_tiers: vec![1, 2],
-                                progression_indicators: vec![
-                                    "reduced_adjacent_finger_errors".to_string(),
-                                ],
-                            },
-                        ],
-                        content_themes: vec![
-                            ContentTheme {
-                                theme_name: "software_development".to_string(),
-                                description: "Programming and technical content".to_string(),
-                                target_audience: TargetAudience::Technical,
-                                vocabulary_complexity: VocabularyComplexity::Advanced,
-                            },
-                        ],
+                        skill_focus_areas: vec![SkillArea {
+                            name: "finger_independence".to_string(),
+                            description: "Ability to move fingers independently".to_string(),
+                            associated_tiers: vec![1, 2],
+                            progression_indicators: vec![
+                                "reduced_adjacent_finger_errors".to_string()
+                            ],
+                        }],
+                        content_themes: vec![ContentTheme {
+                            theme_name: "software_development".to_string(),
+                            description: "Programming and technical content".to_string(),
+                            target_audience: TargetAudience::Technical,
+                            vocabulary_complexity: VocabularyComplexity::Advanced,
+                        }],
                     },
                 },
                 language_support: LanguageSupport {
-                    primary_languages: vec![
-                        LanguageConfig {
-                            language_code: "en".to_string(),
-                            language_name: "English".to_string(),
-                            character_set: "a-zA-Z".to_string(),
-                            typing_difficulty_modifier: 1.0,
-                            frequency_patterns: FrequencyPatterns {
-                                letter_frequencies: HashMap::new(),
-                                bigram_frequencies: HashMap::new(),
-                                common_words: vec![
-                                    "the".to_string(),
-                                    "and".to_string(),
-                                    "for".to_string(),
-                                ],
-                                difficult_combinations: vec![
-                                    "ght".to_string(),
-                                    "tch".to_string(),
-                                ],
-                            },
+                    primary_languages: vec![LanguageConfig {
+                        language_code: "en".to_string(),
+                        language_name: "English".to_string(),
+                        character_set: "a-zA-Z".to_string(),
+                        typing_difficulty_modifier: 1.0,
+                        frequency_patterns: FrequencyPatterns {
+                            letter_frequencies: HashMap::new(),
+                            bigram_frequencies: HashMap::new(),
+                            common_words: vec![
+                                "the".to_string(),
+                                "and".to_string(),
+                                "for".to_string(),
+                            ],
+                            difficult_combinations: vec!["ght".to_string(), "tch".to_string()],
                         },
-                    ],
-                    secondary_languages: vec![
-                        LanguageConfig {
-                            language_code: "id".to_string(),
-                            language_name: "Indonesian".to_string(),
-                            character_set: "a-zA-Z".to_string(),
-                            typing_difficulty_modifier: 1.1,
-                            frequency_patterns: FrequencyPatterns {
-                                letter_frequencies: HashMap::new(),
-                                bigram_frequencies: HashMap::new(),
-                                common_words: vec![
-                                    "yang".to_string(),
-                                    "dan".to_string(),
-                                    "untuk".to_string(),
-                                ],
-                                difficult_combinations: vec![
-                                    "ng".to_string(),
-                                    "ny".to_string(),
-                                ],
-                            },
+                    }],
+                    secondary_languages: vec![LanguageConfig {
+                        language_code: "id".to_string(),
+                        language_name: "Indonesian".to_string(),
+                        character_set: "a-zA-Z".to_string(),
+                        typing_difficulty_modifier: 1.1,
+                        frequency_patterns: FrequencyPatterns {
+                            letter_frequencies: HashMap::new(),
+                            bigram_frequencies: HashMap::new(),
+                            common_words: vec![
+                                "yang".to_string(),
+                                "dan".to_string(),
+                                "untuk".to_string(),
+                            ],
+                            difficult_combinations: vec!["ng".to_string(), "ny".to_string()],
                         },
-                    ],
+                    }],
                     mixed_content_rules: MixedContentRules {
                         max_language_switches_per_100_chars: 2,
                         min_segment_length_chars: 20,
                         transition_smoothness_requirement: 0.8,
-                        context_preservation_rules: vec![
-                            "maintain_sentence_coherence".to_string(),
-                        ],
+                        context_preservation_rules: vec!["maintain_sentence_coherence".to_string()],
                     },
                     localization_requirements: LocalizationRequirements {
                         number_format_localization: false,
@@ -813,134 +799,118 @@ impl Default for ContentMetadata {
                         cultural_context_adaptation: true,
                     },
                 },
-                content_categories: vec![
-                    ContentCategory {
-                        category_name: "programming".to_string(),
-                        description: "Code snippets and technical content".to_string(),
-                        tier_availability: vec![3, 4],
-                        content_characteristics: ContentCharacteristics {
-                            average_word_length: 8.5,
-                            sentence_complexity: SentenceComplexity::Complex,
-                            technical_terminology_ratio: 0.4,
-                            punctuation_density: 0.12,
-                            symbol_usage_patterns: vec![
-                                SymbolPattern {
-                                    symbol_class: "brackets".to_string(),
-                                    usage_frequency: 0.08,
-                                    context_rules: vec!["balanced_pairs".to_string()],
-                                    difficulty_contribution: 1.5,
-                                },
-                            ],
-                        },
-                        generation_parameters: GenerationParameters {
-                            seed_algorithms: vec![
-                                SeedAlgorithm {
-                                    algorithm_name: "deterministic_pattern".to_string(),
-                                    deterministic: true,
-                                    parameter_ranges: HashMap::new(),
-                                    output_consistency_target: 0.95,
-                                },
-                            ],
-                            content_templates: vec![
-                                ContentTemplate {
-                                    template_id: "code_function".to_string(),
-                                    pattern_description: "Function definition pattern".to_string(),
-                                    variable_slots: vec![
-                                        VariableSlot {
-                                            slot_name: "function_name".to_string(),
-                                            content_type: SlotContentType::TechnicalTerm,
-                                            generation_rules: vec![
-                                                GenerationRule {
-                                                    rule_type: RuleType::LengthConstraint,
-                                                    parameters: HashMap::new(),
-                                                    priority: 1,
-                                                },
-                                            ],
-                                            validation_constraints: vec![
-                                                ValidationConstraint {
-                                                    constraint_type: ConstraintType::MinLength,
-                                                    threshold_value: 3.0,
-                                                    error_severity: ErrorSeverity::Error,
-                                                },
-                                            ],
+                content_categories: vec![ContentCategory {
+                    category_name: "programming".to_string(),
+                    description: "Code snippets and technical content".to_string(),
+                    tier_availability: vec![3, 4],
+                    content_characteristics: ContentCharacteristics {
+                        average_word_length: 8.5,
+                        sentence_complexity: SentenceComplexity::Complex,
+                        technical_terminology_ratio: 0.4,
+                        punctuation_density: 0.12,
+                        symbol_usage_patterns: vec![SymbolPattern {
+                            symbol_class: "brackets".to_string(),
+                            usage_frequency: 0.08,
+                            context_rules: vec!["balanced_pairs".to_string()],
+                            difficulty_contribution: 1.5,
+                        }],
+                    },
+                    generation_parameters: GenerationParameters {
+                        seed_algorithms: vec![SeedAlgorithm {
+                            algorithm_name: "deterministic_pattern".to_string(),
+                            deterministic: true,
+                            parameter_ranges: HashMap::new(),
+                            output_consistency_target: 0.95,
+                        }],
+                        content_templates: vec![ContentTemplate {
+                            template_id: "code_function".to_string(),
+                            pattern_description: "Function definition pattern".to_string(),
+                            variable_slots: vec![VariableSlot {
+                                slot_name: "function_name".to_string(),
+                                content_type: SlotContentType::TechnicalTerm,
+                                generation_rules: vec![GenerationRule {
+                                    rule_type: RuleType::LengthConstraint,
+                                    parameters: HashMap::new(),
+                                    priority: 1,
+                                }],
+                                validation_constraints: vec![ValidationConstraint {
+                                    constraint_type: ConstraintType::MinLength,
+                                    threshold_value: 3.0,
+                                    error_severity: ErrorSeverity::Error,
+                                }],
+                            }],
+                            difficulty_scaling: DifficultyScaling {
+                                base_difficulty: 8.0,
+                                scaling_function: ScalingFunction::Linear(0.2),
+                                tier_adjustments: HashMap::new(),
+                                level_progressions: vec![LevelProgression {
+                                    level: 90,
+                                    target_difficulty: 14.0,
+                                    expected_wpm: 35,
+                                    mastery_criteria: MasteryCriteria {
+                                        min_accuracy: 0.985,
+                                        max_error_severity: 4.0,
+                                        consistency_requirement: 0.9,
+                                        time_constraints: TimeConstraints {
+                                            max_completion_time_seconds: 180,
+                                            min_sustained_wpm: 30,
+                                            fatigue_resistance_factor: 0.85,
                                         },
-                                    ],
-                                    difficulty_scaling: DifficultyScaling {
-                                        base_difficulty: 8.0,
-                                        scaling_function: ScalingFunction::Linear(0.2),
-                                        tier_adjustments: HashMap::new(),
-                                        level_progressions: vec![
-                                            LevelProgression {
-                                                level: 90,
-                                                target_difficulty: 14.0,
-                                                expected_wpm: 35,
-                                                mastery_criteria: MasteryCriteria {
-                                                    min_accuracy: 0.985,
-                                                    max_error_severity: 4.0,
-                                                    consistency_requirement: 0.9,
-                                                    time_constraints: TimeConstraints {
-                                                        max_completion_time_seconds: 180,
-                                                        min_sustained_wpm: 30,
-                                                        fatigue_resistance_factor: 0.85,
-                                                    },
-                                                },
-                                            },
-                                        ],
                                     },
-                                },
-                            ],
-                            variability_factors: VariabilityFactors {
-                                content_randomization: 0.3,
-                                difficulty_variance: 0.1,
-                                pattern_prevention: PatternPrevention {
-                                    max_repetition_frequency: 0.2,
-                                    pattern_detection_window: 50,
-                                    variation_enforcement: true,
-                                    anti_memorization_measures: vec![
-                                        "rotate_vocabulary".to_string(),
-                                        "shuffle_sentence_structures".to_string(),
-                                    ],
-                                },
-                                freshness_maintenance: FreshnessMaintenance {
-                                    content_rotation_period_days: 30,
-                                    new_content_introduction_rate: 0.1,
-                                    obsolete_content_retirement: true,
-                                    seasonal_content_updates: false,
-                                },
+                                }],
                             },
-                            quality_assurance: QualityAssurance {
-                                automated_validation: AutomatedValidation {
-                                    difficulty_scoring: true,
-                                    readability_analysis: true,
-                                    character_distribution_check: true,
-                                    progression_validation: true,
-                                    performance_impact_assessment: true,
-                                },
-                                human_review_requirements: HumanReviewRequirements {
-                                    new_content_review: true,
-                                    tier_transition_approval: true,
-                                    cultural_sensitivity_check: true,
-                                    technical_accuracy_verification: true,
-                                    accessibility_compliance_audit: true,
-                                },
-                                continuous_monitoring: ContinuousMonitoring {
-                                    user_performance_tracking: true,
-                                    content_effectiveness_measurement: true,
-                                    difficulty_curve_optimization: true,
-                                    error_pattern_analysis: true,
-                                    real_time_adjustments: false,
-                                },
-                                feedback_integration: FeedbackIntegration {
-                                    user_feedback_collection: true,
-                                    automated_improvement_suggestions: true,
-                                    a_b_testing_framework: false,
-                                    community_content_contributions: false,
-                                    expert_review_incorporation: true,
-                                },
+                        }],
+                        variability_factors: VariabilityFactors {
+                            content_randomization: 0.3,
+                            difficulty_variance: 0.1,
+                            pattern_prevention: PatternPrevention {
+                                max_repetition_frequency: 0.2,
+                                pattern_detection_window: 50,
+                                variation_enforcement: true,
+                                anti_memorization_measures: vec![
+                                    "rotate_vocabulary".to_string(),
+                                    "shuffle_sentence_structures".to_string(),
+                                ],
+                            },
+                            freshness_maintenance: FreshnessMaintenance {
+                                content_rotation_period_days: 30,
+                                new_content_introduction_rate: 0.1,
+                                obsolete_content_retirement: true,
+                                seasonal_content_updates: false,
+                            },
+                        },
+                        quality_assurance: QualityAssurance {
+                            automated_validation: AutomatedValidation {
+                                difficulty_scoring: true,
+                                readability_analysis: true,
+                                character_distribution_check: true,
+                                progression_validation: true,
+                                performance_impact_assessment: true,
+                            },
+                            human_review_requirements: HumanReviewRequirements {
+                                new_content_review: true,
+                                tier_transition_approval: true,
+                                cultural_sensitivity_check: true,
+                                technical_accuracy_verification: true,
+                                accessibility_compliance_audit: true,
+                            },
+                            continuous_monitoring: ContinuousMonitoring {
+                                user_performance_tracking: true,
+                                content_effectiveness_measurement: true,
+                                difficulty_curve_optimization: true,
+                                error_pattern_analysis: true,
+                                real_time_adjustments: false,
+                            },
+                            feedback_integration: FeedbackIntegration {
+                                user_feedback_collection: true,
+                                automated_improvement_suggestions: true,
+                                a_b_testing_framework: false,
+                                community_content_contributions: false,
+                                expert_review_incorporation: true,
                             },
                         },
                     },
-                ],
+                }],
             },
         }
     }
@@ -960,7 +930,19 @@ mod tests {
     #[test]
     fn test_validation_rules() {
         let metadata = ContentMetadata::default();
-        assert!(metadata.validation_rules.content_quality.min_unique_characters >= 4);
-        assert!(metadata.validation_rules.content_quality.max_repetition_ratio <= 0.5);
+        assert!(
+            metadata
+                .validation_rules
+                .content_quality
+                .min_unique_characters
+                >= 4
+        );
+        assert!(
+            metadata
+                .validation_rules
+                .content_quality
+                .max_repetition_ratio
+                <= 0.5
+        );
     }
 }

@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Difficulty progression algorithm and validation metrics for Centotype content
 ///
@@ -18,15 +18,15 @@ pub struct DifficultyMetrics {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Hash, Eq, PartialEq)]
 pub enum CharacterClass {
-    CommonLetters,     // E, T, A, O, I, N, S, H, R
-    UncommonLetters,   // D, L, U, C, M, W, F, G, Y, P, B
-    RareLetters,       // V, K, J, X, Q, Z
-    BasicPunctuation,  // . , ! ?
-    ComplexPunctuation,// ; : " ' ( )
-    Digits,            // 0-9
-    MathOperators,     // + - * / =
-    ProgrammingSymbols,// [ ] { } < > | & ^ ~
-    RareSymbols,       // % $ # @ \ _ `
+    CommonLetters,      // E, T, A, O, I, N, S, H, R
+    UncommonLetters,    // D, L, U, C, M, W, F, G, Y, P, B
+    RareLetters,        // V, K, J, X, Q, Z
+    BasicPunctuation,   // . , ! ?
+    ComplexPunctuation, // ; : " ' ( )
+    Digits,             // 0-9
+    MathOperators,      // + - * / =
+    ProgrammingSymbols, // [ ] { } < > | & ^ ~
+    RareSymbols,        // % $ # @ \ _ `
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Hash, Eq, PartialEq)]
@@ -40,9 +40,9 @@ pub enum ComplexityType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProgressionConstraints {
-    pub max_difficulty_jump: f64,    // Maximum increase between adjacent levels
+    pub max_difficulty_jump: f64, // Maximum increase between adjacent levels
     pub min_difficulty_increment: f64, // Minimum increase to ensure progression
-    pub smoothness_factor: f64,      // Exponential smoothing for curve fitting
+    pub smoothness_factor: f64,   // Exponential smoothing for curve fitting
     pub tier_transition_buffer: f64, // Extra validation at tier boundaries
 }
 
@@ -58,14 +58,39 @@ pub struct ContentValidation {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ValidationError {
-    DifficultyTooHigh { expected: f64, actual: f64 },
-    DifficultyTooLow { expected: f64, actual: f64 },
-    InsufficientProgression { previous: f64, current: f64 },
-    ExcessiveJump { previous: f64, current: f64, max_allowed: f64 },
-    CharacterSetViolation { expected: String, found: String },
-    ContentTooShort { min_length: usize, actual: usize },
-    ContentTooLong { max_length: usize, actual: usize },
-    RepetitionTooHigh { ratio: f64, max_allowed: f64 },
+    DifficultyTooHigh {
+        expected: f64,
+        actual: f64,
+    },
+    DifficultyTooLow {
+        expected: f64,
+        actual: f64,
+    },
+    InsufficientProgression {
+        previous: f64,
+        current: f64,
+    },
+    ExcessiveJump {
+        previous: f64,
+        current: f64,
+        max_allowed: f64,
+    },
+    CharacterSetViolation {
+        expected: String,
+        found: String,
+    },
+    ContentTooShort {
+        min_length: usize,
+        actual: usize,
+    },
+    ContentTooLong {
+        max_length: usize,
+        actual: usize,
+    },
+    RepetitionTooHigh {
+        ratio: f64,
+        max_allowed: f64,
+    },
 }
 
 impl Default for DifficultyMetrics {
@@ -155,14 +180,15 @@ fn analyze_character_distribution(content: &str) -> HashMap<CharacterClass, f64>
 /// Classify a character into its difficulty class
 fn classify_character(ch: char) -> CharacterClass {
     match ch {
-        'e' | 't' | 'a' | 'o' | 'i' | 'n' | 's' | 'h' | 'r' |
-        'E' | 'T' | 'A' | 'O' | 'I' | 'N' | 'S' | 'H' | 'R' => CharacterClass::CommonLetters,
+        'e' | 't' | 'a' | 'o' | 'i' | 'n' | 's' | 'h' | 'r' | 'E' | 'T' | 'A' | 'O' | 'I' | 'N'
+        | 'S' | 'H' | 'R' => CharacterClass::CommonLetters,
 
-        'd' | 'l' | 'u' | 'c' | 'm' | 'w' | 'f' | 'g' | 'y' | 'p' | 'b' |
-        'D' | 'L' | 'U' | 'C' | 'M' | 'W' | 'F' | 'G' | 'Y' | 'P' | 'B' => CharacterClass::UncommonLetters,
+        'd' | 'l' | 'u' | 'c' | 'm' | 'w' | 'f' | 'g' | 'y' | 'p' | 'b' | 'D' | 'L' | 'U' | 'C'
+        | 'M' | 'W' | 'F' | 'G' | 'Y' | 'P' | 'B' => CharacterClass::UncommonLetters,
 
-        'v' | 'k' | 'j' | 'x' | 'q' | 'z' |
-        'V' | 'K' | 'J' | 'X' | 'Q' | 'Z' => CharacterClass::RareLetters,
+        'v' | 'k' | 'j' | 'x' | 'q' | 'z' | 'V' | 'K' | 'J' | 'X' | 'Q' | 'Z' => {
+            CharacterClass::RareLetters
+        }
 
         '.' | ',' | '!' | '?' => CharacterClass::BasicPunctuation,
         ';' | ':' | '"' | '\'' | '(' | ')' => CharacterClass::ComplexPunctuation,
@@ -170,7 +196,9 @@ fn classify_character(ch: char) -> CharacterClass {
         '0'..='9' => CharacterClass::Digits,
         '+' | '-' | '*' | '/' | '=' => CharacterClass::MathOperators,
 
-        '[' | ']' | '{' | '}' | '<' | '>' | '|' | '&' | '^' | '~' => CharacterClass::ProgrammingSymbols,
+        '[' | ']' | '{' | '}' | '<' | '>' | '|' | '&' | '^' | '~' => {
+            CharacterClass::ProgrammingSymbols
+        }
         '%' | '$' | '#' | '@' | '\\' | '_' | '`' => CharacterClass::RareSymbols,
 
         _ => CharacterClass::CommonLetters, // Default for spaces and other chars
@@ -181,11 +209,26 @@ fn classify_character(ch: char) -> CharacterClass {
 fn analyze_complexity_factors(content: &str) -> HashMap<ComplexityType, f64> {
     let mut factors = HashMap::new();
 
-    factors.insert(ComplexityType::BigramRarity, calculate_bigram_rarity(content));
-    factors.insert(ComplexityType::CaseSwitching, calculate_case_switching(content));
-    factors.insert(ComplexityType::FingerDistance, calculate_finger_distance(content));
-    factors.insert(ComplexityType::SymbolDensity, calculate_symbol_density(content));
-    factors.insert(ComplexityType::LanguageSwitching, detect_language_switching(content));
+    factors.insert(
+        ComplexityType::BigramRarity,
+        calculate_bigram_rarity(content),
+    );
+    factors.insert(
+        ComplexityType::CaseSwitching,
+        calculate_case_switching(content),
+    );
+    factors.insert(
+        ComplexityType::FingerDistance,
+        calculate_finger_distance(content),
+    );
+    factors.insert(
+        ComplexityType::SymbolDensity,
+        calculate_symbol_density(content),
+    );
+    factors.insert(
+        ComplexityType::LanguageSwitching,
+        detect_language_switching(content),
+    );
 
     factors
 }
@@ -193,8 +236,8 @@ fn analyze_complexity_factors(content: &str) -> HashMap<ComplexityType, f64> {
 /// Calculate bigram rarity score based on English frequency patterns
 fn calculate_bigram_rarity(content: &str) -> f64 {
     let common_bigrams = [
-        "th", "er", "on", "an", "re", "he", "in", "ed", "nd", "ha",
-        "at", "en", "es", "of", "or", "nt", "ea", "ti", "to", "it"
+        "th", "er", "on", "an", "re", "he", "in", "ed", "nd", "ha", "at", "en", "es", "of", "or",
+        "nt", "ea", "ti", "to", "it",
     ];
 
     let chars: Vec<char> = content.chars().collect();
@@ -254,7 +297,9 @@ fn calculate_finger_distance(content: &str) -> f64 {
     let mut valid_transitions = 0;
 
     for window in chars.windows(2) {
-        if let (Some(pos1), Some(pos2)) = (key_positions.get(&window[0]), key_positions.get(&window[1])) {
+        if let (Some(pos1), Some(pos2)) =
+            (key_positions.get(&window[0]), key_positions.get(&window[1]))
+        {
             let distance = ((pos1.0 - pos2.0).pow(2) + (pos1.1 - pos2.1).pow(2)).sqrt();
             total_distance += distance;
             valid_transitions += 1;
@@ -309,9 +354,10 @@ fn calculate_symbol_density(content: &str) -> f64 {
         return 0.0;
     }
 
-    let symbol_count = content.chars().filter(|c| {
-        !c.is_alphanumeric() && !c.is_whitespace() && *c != '.' && *c != ','
-    }).count();
+    let symbol_count = content
+        .chars()
+        .filter(|c| !c.is_alphanumeric() && !c.is_whitespace() && *c != '.' && *c != ',')
+        .count();
 
     symbol_count as f64 / total_chars as f64
 }
@@ -326,7 +372,9 @@ fn detect_language_switching(content: &str) -> f64 {
     }
 
     // Heuristic: look for patterns indicating Indonesian vs English
-    let indonesian_indicators = ["yang", "dan", "ini", "itu", "dengan", "untuk", "dari", "pada"];
+    let indonesian_indicators = [
+        "yang", "dan", "ini", "itu", "dengan", "untuk", "dari", "pada",
+    ];
     let english_indicators = ["the", "and", "this", "that", "with", "for", "from", "on"];
 
     let mut indonesian_words = 0;
@@ -368,42 +416,52 @@ pub fn validate_content(
     // Check difficulty score against expected value
     let difficulty_tolerance = 0.3;
     if validation.difficulty_score > expected_difficulty + difficulty_tolerance {
-        validation.validation_errors.push(ValidationError::DifficultyTooHigh {
-            expected: expected_difficulty,
-            actual: validation.difficulty_score,
-        });
+        validation
+            .validation_errors
+            .push(ValidationError::DifficultyTooHigh {
+                expected: expected_difficulty,
+                actual: validation.difficulty_score,
+            });
         validation.validation_passed = false;
     } else if validation.difficulty_score < expected_difficulty - difficulty_tolerance {
-        validation.validation_errors.push(ValidationError::DifficultyTooLow {
-            expected: expected_difficulty,
-            actual: validation.difficulty_score,
-        });
+        validation
+            .validation_errors
+            .push(ValidationError::DifficultyTooLow {
+                expected: expected_difficulty,
+                actual: validation.difficulty_score,
+            });
         validation.validation_passed = false;
     }
 
     // Check content length constraints
     let (min_length, max_length) = get_length_constraints_for_level(level);
     if content.len() < min_length {
-        validation.validation_errors.push(ValidationError::ContentTooShort {
-            min_length,
-            actual: content.len(),
-        });
+        validation
+            .validation_errors
+            .push(ValidationError::ContentTooShort {
+                min_length,
+                actual: content.len(),
+            });
         validation.validation_passed = false;
     } else if content.len() > max_length {
-        validation.validation_errors.push(ValidationError::ContentTooLong {
-            max_length,
-            actual: content.len(),
-        });
+        validation
+            .validation_errors
+            .push(ValidationError::ContentTooLong {
+                max_length,
+                actual: content.len(),
+            });
         validation.validation_passed = false;
     }
 
     // Check for excessive repetition
     let repetition_ratio = calculate_repetition_ratio(content);
     if repetition_ratio > 0.3 {
-        validation.validation_errors.push(ValidationError::RepetitionTooHigh {
-            ratio: repetition_ratio,
-            max_allowed: 0.3,
-        });
+        validation
+            .validation_errors
+            .push(ValidationError::RepetitionTooHigh {
+                ratio: repetition_ratio,
+                max_allowed: 0.3,
+            });
         validation.validation_passed = false;
     }
 
@@ -459,10 +517,10 @@ pub fn generate_difficulty_curve() -> Vec<f64> {
         // Exponential curve with tier-based acceleration
         let tier = ((level - 1) / 20) + 1;
         let tier_factor = match tier {
-            1 => 1.0,  // Letters: gentle start
-            2 => 1.2,  // Punctuation: moderate increase
-            3 => 1.5,  // Numbers: steeper curve
-            4 => 2.0,  // Symbols: rapid acceleration
+            1 => 1.0, // Letters: gentle start
+            2 => 1.2, // Punctuation: moderate increase
+            3 => 1.5, // Numbers: steeper curve
+            4 => 2.0, // Symbols: rapid acceleration
             _ => 2.0,
         };
 
@@ -504,7 +562,7 @@ mod tests {
 
         // Ensure curve is strictly increasing
         for i in 1..curve.len() {
-            assert!(curve[i] > curve[i-1]);
+            assert!(curve[i] > curve[i - 1]);
         }
 
         // Ensure reasonable range

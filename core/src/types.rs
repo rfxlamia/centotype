@@ -135,7 +135,7 @@ pub struct LiveMetrics {
 }
 
 /// Error statistics and classification
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct ErrorStats {
     pub substitution: u32,
     pub insertion: u32,
@@ -160,7 +160,7 @@ impl ErrorStats {
 // ============================================================================
 
 /// Complete session results with final scoring
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SessionResult {
     pub session_id: uuid::Uuid,
     pub mode: TrainingMode,
@@ -173,7 +173,7 @@ pub struct SessionResult {
 }
 
 /// Final calculated metrics for a completed session
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FinalMetrics {
     pub raw_wpm: f64,
     pub effective_wpm: f64,

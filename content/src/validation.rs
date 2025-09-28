@@ -83,33 +83,43 @@ impl SecurityValidator {
         // Test 1: Check for escape sequences
         if self.patterns.escape_sequences.is_match(content) {
             warn!("Content contains terminal escape sequences");
-            return ValidationResult::Invalid("Content contains terminal escape sequences".to_string());
+            return ValidationResult::Invalid(
+                "Content contains terminal escape sequences".to_string(),
+            );
         }
 
         // Test 2: Check for shell injection patterns
         if self.patterns.shell_injection.is_match(content) {
             warn!("Content contains potential shell injection patterns");
-            return ValidationResult::Invalid("Content contains shell injection patterns".to_string());
+            return ValidationResult::Invalid(
+                "Content contains shell injection patterns".to_string(),
+            );
         }
 
         // Test 3: Check for absolute file paths
         for line in content.lines() {
             if self.patterns.file_paths.is_match(line.trim()) {
                 warn!("Content contains absolute file paths");
-                return ValidationResult::Invalid("Content contains absolute file paths".to_string());
+                return ValidationResult::Invalid(
+                    "Content contains absolute file paths".to_string(),
+                );
             }
         }
 
         // Test 4: Check for dangerous Unicode characters
         if self.patterns.dangerous_unicode.is_match(content) {
             warn!("Content contains dangerous Unicode characters");
-            return ValidationResult::Invalid("Content contains unsafe Unicode characters".to_string());
+            return ValidationResult::Invalid(
+                "Content contains unsafe Unicode characters".to_string(),
+            );
         }
 
         // Test 5: Check Unicode normalization
         if !is_nfc(content) {
             warn!("Content is not in Unicode NFC form");
-            return ValidationResult::Invalid("Content not in Unicode NFC normalization".to_string());
+            return ValidationResult::Invalid(
+                "Content not in Unicode NFC normalization".to_string(),
+            );
         }
 
         // Test 6: Check for null bytes
@@ -119,7 +129,8 @@ impl SecurityValidator {
         }
 
         // Test 7: Check for excessive control characters
-        let control_char_count = content.chars()
+        let control_char_count = content
+            .chars()
             .filter(|&c| c.is_control() && c != '\n' && c != '\r' && c != '\t')
             .count();
 
@@ -136,13 +147,18 @@ impl SecurityValidator {
         let mut sanitized = content.to_string();
 
         // Remove escape sequences
-        sanitized = self.patterns.escape_sequences.replace_all(&sanitized, "").to_string();
+        sanitized = self
+            .patterns
+            .escape_sequences
+            .replace_all(&sanitized, "")
+            .to_string();
 
         // Normalize Unicode
         sanitized = sanitized.nfc().collect();
 
         // Remove control characters except allowed ones
-        sanitized = sanitized.chars()
+        sanitized = sanitized
+            .chars()
             .filter(|&c| !c.is_control() || c == '\n' || c == '\r' || c == '\t')
             .collect();
 
@@ -163,8 +179,8 @@ pub struct DifficultyValidator {
 impl DifficultyValidator {
     pub fn new() -> Self {
         Self {
-            min_length: 50,    // Minimum content length
-            max_length: 5000,  // Maximum content length
+            min_length: 50,   // Minimum content length
+            max_length: 5000, // Maximum content length
         }
     }
 
@@ -190,14 +206,14 @@ impl DifficultyValidator {
         // Validate character composition
         if !self.validate_character_composition(content, level_id) {
             return ValidationResult::Invalid(
-                "Content character composition doesn't match level requirements".to_string()
+                "Content character composition doesn't match level requirements".to_string(),
             );
         }
 
         // Validate progression (each level should be harder than previous)
         if !self.validate_progression_requirements(content, level_id) {
             return ValidationResult::Invalid(
-                "Content doesn't meet progression requirements".to_string()
+                "Content doesn't meet progression requirements".to_string(),
             );
         }
 
@@ -217,8 +233,10 @@ impl DifficultyValidator {
         let tier = level_id.tier().0 as f64;
         let tier_progress = (((level_id.0 - 1) % 10) + 1) as f64;
 
-        let expected_symbol_ratio = (5.0 + (tier - 1.0) * 2.5 + (tier_progress - 1.0) * 0.3) / 100.0;
-        let expected_number_ratio = (3.0 + (tier - 1.0) * 1.7 + (tier_progress - 1.0) * 0.2) / 100.0;
+        let expected_symbol_ratio =
+            (5.0 + (tier - 1.0) * 2.5 + (tier_progress - 1.0) * 0.3) / 100.0;
+        let expected_number_ratio =
+            (3.0 + (tier - 1.0) * 1.7 + (tier_progress - 1.0) * 0.2) / 100.0;
 
         // Calculate actual ratios
         let actual_symbol_ratio = histogram.symbols as f64 / total_chars;
@@ -287,11 +305,12 @@ impl DifficultyValidator {
         let punctuation_weight = 1.2;
         let lowercase_weight = 1.0;
 
-        let score = (histogram.symbols as f64 * symbol_weight +
-                    histogram.uppercase as f64 * uppercase_weight +
-                    histogram.digits as f64 * digit_weight +
-                    histogram.punctuation as f64 * punctuation_weight +
-                    histogram.lowercase as f64 * lowercase_weight) / total_chars;
+        let score = (histogram.symbols as f64 * symbol_weight
+            + histogram.uppercase as f64 * uppercase_weight
+            + histogram.digits as f64 * digit_weight
+            + histogram.punctuation as f64 * punctuation_weight
+            + histogram.lowercase as f64 * lowercase_weight)
+            / total_chars;
 
         score
     }
@@ -307,8 +326,8 @@ pub struct PerformanceValidator {
 impl PerformanceValidator {
     pub fn new() -> Self {
         Self {
-            max_generation_time_ms: 10,  // 10ms max generation time
-            max_validation_time_ms: 5,   // 5ms max validation time
+            max_generation_time_ms: 10, // 10ms max generation time
+            max_validation_time_ms: 5,  // 5ms max validation time
         }
     }
 
@@ -376,7 +395,9 @@ impl ContentValidator {
         if !performance_result.is_valid() {
             return Err(CentotypeError::Content(format!(
                 "Performance validation failed: {}",
-                performance_result.error_message().unwrap_or("Unknown error")
+                performance_result
+                    .error_message()
+                    .unwrap_or("Unknown error")
             )));
         }
 
@@ -467,7 +488,9 @@ mod tests {
         assert!(!validator.validate("\\033[1mBold\\033[0m").is_valid());
 
         // Test valid content
-        assert!(validator.validate("normal text with symbols: {}[]()").is_valid());
+        assert!(validator
+            .validate("normal text with symbols: {}[]()")
+            .is_valid());
     }
 
     #[test]
@@ -480,7 +503,9 @@ mod tests {
         assert!(!validator.validate("command && rm file").is_valid());
 
         // Test valid content with programming symbols
-        assert!(validator.validate("function test() { return 42; }").is_valid());
+        assert!(validator
+            .validate("function test() { return 42; }")
+            .is_valid());
     }
 
     #[test]

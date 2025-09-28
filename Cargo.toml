@@ -87,3 +87,36 @@ inherits = "release"
 debug = true
 strip = false
 
+# Clippy lints for panic safety and code quality
+[workspace.lints.clippy]
+# CRITICAL: Block panic-prone patterns
+unwrap_used = "deny"                    # Block all .unwrap() usage
+expect_used = "warn"                    # Require justification for .expect()
+panic = "deny"                          # Block panic! in production
+indexing_slicing = "warn"               # Require bounds checking
+unnecessary_unwrap = "deny"             # Block redundant unwraps
+
+# HIGH PRIORITY: Error handling
+missing_errors_doc = "warn"             # Document error conditions
+missing_panics_doc = "warn"             # Document panic conditions
+result_large_err = "warn"               # Optimize error types
+
+# PERFORMANCE: Critical path optimizations
+needless_collect = "warn"               # Avoid unnecessary collections
+single_char_pattern = "warn"            # Use char instead of string
+inefficient_to_string = "warn"          # Use more efficient conversions
+
+# SECURITY: Input validation
+suspicious_else_formatting = "deny"     # Prevent logic errors
+float_cmp = "warn"                      # Safe float comparisons
+
+# CODE QUALITY: Maintainability
+too_many_arguments = "warn"             # Limit function complexity
+cognitive_complexity = "warn"           # Limit cognitive load
+missing_const_for_fn = "warn"           # Performance optimization
+
+[workspace.lints.rust]
+unsafe_code = "forbid"                  # No unsafe code in this project
+missing_docs = "warn"                   # Require documentation
+dead_code = "warn"                      # Remove unused code
+

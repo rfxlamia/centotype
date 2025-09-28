@@ -1,8 +1,8 @@
+use lru::LruCache;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
-use serde::{Deserialize, Serialize};
-use lru::LruCache;
 
 /// Content loading and caching strategy for Centotype
 ///
@@ -43,10 +43,10 @@ pub struct CacheConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PreloadStrategy {
     None,
-    Adjacent(u32),           // Preload N levels before/after current
-    Progressive(Vec<u32>),   // Preload specific levels
-    Tier(u32),              // Preload entire tier
-    Adaptive,               // Based on user progress patterns
+    Adjacent(u32),         // Preload N levels before/after current
+    Progressive(Vec<u32>), // Preload specific levels
+    Tier(u32),             // Preload entire tier
+    Adaptive,              // Based on user progress patterns
 }
 
 #[derive(Debug, Clone)]
@@ -243,7 +243,7 @@ impl ContentManager {
             cache: Arc::new(RwLock::new(LevelCache {
                 content_cache: LruCache::new(cache_capacity),
                 metadata_cache: LruCache::new(cache_capacity * 2), // Metadata is smaller
-                validation_cache: LruCache::new(1000), // Validation results
+                validation_cache: LruCache::new(1000),             // Validation results
                 preload_queue: Vec::new(),
             })),
             config,
@@ -301,14 +301,14 @@ impl ContentManager {
                         let _ = self.load_level_content(level).await;
                     }
                 }
-            },
+            }
             PreloadStrategy::Progressive(levels) => {
                 for &level in levels {
                     if !self.is_cached(level) {
                         let _ = self.load_level_content(level).await;
                     }
                 }
-            },
+            }
             PreloadStrategy::Tier(tier_id) => {
                 let tier_range = self.get_tier_range(*tier_id);
                 for level in tier_range.0..=tier_range.1 {
@@ -316,11 +316,11 @@ impl ContentManager {
                         let _ = self.load_level_content(level).await;
                     }
                 }
-            },
+            }
             PreloadStrategy::Adaptive => {
                 // Implement adaptive preloading based on user patterns
                 self.adaptive_preload(current_level).await;
-            },
+            }
         }
     }
 
@@ -372,7 +372,7 @@ impl ContentManager {
     async fn validate_and_process(
         &self,
         content: Vec<TextContent>,
-        level: u32
+        level: u32,
     ) -> Result<Vec<TextContent>, ContentError> {
         let mut validated_content = Vec::new();
 
@@ -433,7 +433,8 @@ impl ContentManager {
     /// Check memory pressure and trigger cleanup if needed
     fn check_memory_pressure(&self) -> bool {
         let current_usage = self.get_current_memory_usage_mb();
-        let threshold = self.config.max_cache_size_mb as f64 * self.config.memory_pressure_threshold;
+        let threshold =
+            self.config.max_cache_size_mb as f64 * self.config.memory_pressure_threshold;
         current_usage > threshold
     }
 
@@ -528,17 +529,44 @@ impl ContentManager {
     fn get_deterministic_seed(&self, level: u32) -> u64 {
         // Create deterministic seed based on level for reproducible content
         let base_seed = 0x1A2B3C4D5E6F7890u64;
-        base_seed.wrapping_mul(level as u64).wrapping_add(level as u64 * 31)
+        base_seed
+            .wrapping_mul(level as u64)
+            .wrapping_add(level as u64 * 31)
     }
 
     fn select_generation_algorithm(&self, tier: u32, level: u32) -> &dyn SeedAlgorithm {
         // Select appropriate algorithm based on tier and level
         match tier {
-            1 => self.generator.seed_algorithms.get("letter_progression").unwrap().as_ref(),
-            2 => self.generator.seed_algorithms.get("punctuation_integration").unwrap().as_ref(),
-            3 => self.generator.seed_algorithms.get("number_patterns").unwrap().as_ref(),
-            4 => self.generator.seed_algorithms.get("symbol_mastery").unwrap().as_ref(),
-            _ => self.generator.seed_algorithms.get("default").unwrap().as_ref(),
+            1 => self
+                .generator
+                .seed_algorithms
+                .get("letter_progression")
+                .unwrap()
+                .as_ref(),
+            2 => self
+                .generator
+                .seed_algorithms
+                .get("punctuation_integration")
+                .unwrap()
+                .as_ref(),
+            3 => self
+                .generator
+                .seed_algorithms
+                .get("number_patterns")
+                .unwrap()
+                .as_ref(),
+            4 => self
+                .generator
+                .seed_algorithms
+                .get("symbol_mastery")
+                .unwrap()
+                .as_ref(),
+            _ => self
+                .generator
+                .seed_algorithms
+                .get("default")
+                .unwrap()
+                .as_ref(),
         }
     }
 
@@ -568,7 +596,11 @@ impl ContentManager {
         }
 
         // Check character diversity
-        let unique_chars = content.content.chars().collect::<std::collections::HashSet<_>>().len();
+        let unique_chars = content
+            .content
+            .chars()
+            .collect::<std::collections::HashSet<_>>()
+            .len();
         if unique_chars < 4 {
             return false;
         }
@@ -709,7 +741,7 @@ impl Default for CacheConfig {
     fn default() -> Self {
         Self {
             max_cache_size_mb: 25, // Half of 50MB memory constraint
-            max_cached_levels: 15,  // Balance between memory and performance
+            max_cached_levels: 15, // Balance between memory and performance
             preload_strategy: PreloadStrategy::Adjacent(2),
             cache_invalidation_ttl: Duration::from_secs(3600), // 1 hour
             compression_enabled: true,

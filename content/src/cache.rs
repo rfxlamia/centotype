@@ -11,7 +11,7 @@ use parking_lot::RwLock;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
-use tracing::{debug, warn, instrument};
+use tracing::{debug, instrument, warn};
 
 /// Cache configuration parameters
 #[derive(Debug, Clone)]
@@ -29,10 +29,10 @@ pub struct CacheConfig {
 impl Default for CacheConfig {
     fn default() -> Self {
         Self {
-            max_capacity: 1000,                    // Cache up to 1000 levels of content
-            ttl: Duration::from_secs(3600),        // 1 hour TTL
-            tti: Duration::from_secs(1800),        // 30 minute TTI
-            max_preload_concurrent: 3,             // Preload max 3 levels concurrently
+            max_capacity: 1000,             // Cache up to 1000 levels of content
+            ttl: Duration::from_secs(3600), // 1 hour TTL
+            tti: Duration::from_secs(1800), // 30 minute TTI
+            max_preload_concurrent: 3,      // Preload max 3 levels concurrently
         }
     }
 }
@@ -127,10 +127,7 @@ pub struct ContentCache {
 
 impl ContentCache {
     /// Create new content cache with specified configuration
-    pub fn new(
-        generator: Arc<CentotypeContentGenerator>,
-        config: CacheConfig,
-    ) -> Self {
+    pub fn new(generator: Arc<CentotypeContentGenerator>, config: CacheConfig) -> Self {
         let cache = Cache::builder()
             .max_capacity(config.max_capacity)
             .time_to_live(config.ttl)
@@ -178,7 +175,9 @@ impl ContentCache {
         // Cache miss - generate content
         debug!("Cache miss for level {}, generating content", level_id.0);
 
-        let content = self.generator.generate_level_content(level_id, seed)
+        let content = self
+            .generator
+            .generate_level_content(level_id, seed)
             .map_err(|e| {
                 self.update_metrics_error();
                 e
@@ -213,11 +212,9 @@ impl ContentCache {
 
             PreloadStrategy::Sequential(count) => {
                 self.preload_sequential(current_level, *count).await
-            },
+            }
 
-            PreloadStrategy::Adaptive(levels) => {
-                self.preload_adaptive(levels.clone()).await
-            },
+            PreloadStrategy::Adaptive(levels) => self.preload_adaptive(levels.clone()).await,
         }
     }
 
@@ -241,7 +238,11 @@ impl ContentCache {
             }
 
             // Acquire semaphore permit for concurrent limit
-            let permit = self.preload_semaphore.clone().acquire_owned().await
+            let permit = self
+                .preload_semaphore
+                .clone()
+                .acquire_owned()
+                .await
                 .map_err(|e| CentotypeError::Content(format!("Preload semaphore error: {}", e)))?;
 
             let generator = self.generator.clone();
@@ -262,7 +263,7 @@ impl ContentCache {
                         }
 
                         debug!("Preloaded content for level {}", level_id.0);
-                    },
+                    }
                     Err(e) => {
                         warn!("Failed to preload level {}: {}", level_id.0, e);
 
@@ -300,7 +301,11 @@ impl ContentCache {
             }
 
             // Acquire semaphore permit
-            let permit = self.preload_semaphore.clone().acquire_owned().await
+            let permit = self
+                .preload_semaphore
+                .clone()
+                .acquire_owned()
+                .await
                 .map_err(|e| CentotypeError::Content(format!("Preload semaphore error: {}", e)))?;
 
             let generator = self.generator.clone();
@@ -320,7 +325,7 @@ impl ContentCache {
                         }
 
                         debug!("Preloaded content for level {}", level_id.0);
-                    },
+                    }
                     Err(e) => {
                         warn!("Failed to preload level {}: {}", level_id.0, e);
 

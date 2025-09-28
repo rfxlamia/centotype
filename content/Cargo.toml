@@ -32,4 +32,5 @@ anyhow.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true
+insta = "1.43.2"
 proptest.workspace = true

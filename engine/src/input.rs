@@ -1,32 +1,280 @@
-//! Input handler with security sanitization and escape sequence filtering
+//! High-performance input handling with security validation and event batching
 use centotype_core::types::*;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{Event as CrosstermEvent, KeyCode, KeyEvent, KeyModifiers};
 use regex::Regex;
+use std::collections::VecDeque;
 use std::time::{Duration, Instant};
 use tracing::{debug, warn};
 use unicode_segmentation::UnicodeSegmentation;
 
-/// Secure input processor with sanitization and validation
+/// Enhanced input statistics with performance metrics
+#[derive(Debug, Clone)]
+pub struct EnhancedInputStatistics {
+    // Legacy statistics
+    pub total_processed: u64,
+    pub filtered_sequences: u64,
+    pub rate_limited_inputs: u64,
+    pub rate_limiter_stats: RateLimiterStats,
+
+    // Performance metrics
+    pub performance_stats: InputPerformanceStats,
+    pub batch_stats: BatchStats,
+
+    // Overall assessment
+    pub performance_grade: char,
+}
+
+/// Input performance statistics
+#[derive(Debug, Clone)]
+pub struct InputPerformanceStats {
+    pub avg_processing_time: Duration,
+    pub p95_processing_time: Duration,
+    pub p99_processing_time: Duration,
+    pub total_events: u64,
+}
+
+/// High-performance input processor with batching and security validation
 pub struct Input {
+    /// Character allowlist configuration
     allowed_characters: AllowedCharacters,
+    /// Escape sequence filter
     escape_filter: EscapeSequenceFilter,
+    /// Rate limiter
     rate_limiter: RateLimiter,
+    /// Security policy
     security_policy: SecurityPolicy,
+    /// Event batch processor for reducing system calls
+    event_batcher: EventBatcher,
+    /// Performance monitoring
+    performance_monitor: InputPerformanceMonitor,
+}
+
+/// Event batching system for reducing system call overhead
+#[derive(Debug)]
+pub struct EventBatcher {
+    /// Pending events to be processed
+    event_queue: VecDeque<CrosstermEvent>,
+    /// Maximum events to batch per cycle
+    max_batch_size: usize,
+    /// Timeout for batching (to ensure responsiveness)
+    batch_timeout: Duration,
+    /// Last batch processing time
+    last_batch_time: Instant,
+    /// Batch statistics
+    batch_stats: BatchStats,
+}
+
+/// Batch processing statistics
+#[derive(Debug, Default, Clone)]
+pub struct BatchStats {
+    pub total_batches: u64,
+    pub total_events: u64,
+    pub avg_batch_size: f64,
+    pub max_batch_size: usize,
+    pub system_calls_saved: u64,
+    pub batch_efficiency: f64,
+}
+
+/// Input performance monitoring for hot-path optimization
+#[derive(Debug)]
+pub struct InputPerformanceMonitor {
+    /// Event processing times
+    processing_times: VecDeque<Duration>,
+    /// Security validation times
+    validation_times: VecDeque<Duration>,
+    /// Batch processing times
+    batch_times: VecDeque<Duration>,
+    /// Total processed events
+    total_events: u64,
+    /// Performance targets
+    targets: InputPerformanceTargets,
+}
+
+/// Performance targets for input processing
+#[derive(Debug, Clone)]
+pub struct InputPerformanceTargets {
+    pub max_processing_time: Duration,
+    pub max_validation_time: Duration,
+    pub max_batch_time: Duration,
+    pub target_batch_efficiency: f64,
+}
+
+impl Default for InputPerformanceTargets {
+    fn default() -> Self {
+        Self {
+            max_processing_time: Duration::from_millis(5),
+            max_validation_time: Duration::from_millis(1),
+            max_batch_time: Duration::from_millis(2),
+            target_batch_efficiency: 0.8,
+        }
+    }
+}
+
+impl EventBatcher {
+    pub fn new() -> Self {
+        Self {
+            event_queue: VecDeque::with_capacity(32),
+            max_batch_size: 8, // Process up to 8 events per batch
+            batch_timeout: Duration::from_millis(5), // 5ms timeout for responsiveness
+            last_batch_time: Instant::now(),
+            batch_stats: BatchStats::default(),
+        }
+    }
+
+    /// Poll events in batches for optimal performance
+    pub fn poll_events_batch(&mut self, timeout: Duration) -> Result<Vec<CrosstermEvent>> {
+        let batch_start = Instant::now();
+        let mut events = Vec::with_capacity(self.max_batch_size);
+        let deadline = Instant::now() + timeout;
+
+        // Collect events from the queue first
+        while !self.event_queue.is_empty() && events.len() < self.max_batch_size {
+            if let Some(event) = self.event_queue.pop_front() {
+                events.push(event);
+            }
+        }
+
+        // Poll for new events if we haven't reached batch size
+        while events.len() < self.max_batch_size && Instant::now() < deadline {
+            match crossterm::event::poll(Duration::from_millis(1)) {
+                Ok(true) => {
+                    match crossterm::event::read() {
+                        Ok(event) => {
+                            events.push(event);
+                        }
+                        Err(e) => {
+                            warn!("Failed to read event: {}", e);
+                            break;
+                        }
+                    }
+                }
+                Ok(false) => {
+                    // No events available, check timeout
+                    if events.is_empty() && self.last_batch_time.elapsed() < self.batch_timeout {
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    warn!("Event polling error: {}", e);
+                    break;
+                }
+            }
+        }
+
+        // Update statistics
+        if !events.is_empty() {
+            self.update_batch_stats(&events, batch_start.elapsed());
+            self.last_batch_time = Instant::now();
+        }
+
+        Ok(events)
+    }
+
+    /// Update batch processing statistics
+    fn update_batch_stats(&mut self, events: &[CrosstermEvent], processing_time: Duration) {
+        self.batch_stats.total_batches += 1;
+        self.batch_stats.total_events += events.len() as u64;
+        self.batch_stats.max_batch_size = self.batch_stats.max_batch_size.max(events.len());
+
+        // Calculate average batch size
+        self.batch_stats.avg_batch_size = self.batch_stats.total_events as f64 / self.batch_stats.total_batches as f64;
+
+        // Estimate system calls saved (assuming we would have made one call per event)
+        if events.len() > 1 {
+            self.batch_stats.system_calls_saved += (events.len() - 1) as u64;
+        }
+
+        // Calculate batch efficiency (events per millisecond)
+        let processing_ms = processing_time.as_secs_f64() * 1000.0;
+        if processing_ms > 0.0 {
+            self.batch_stats.batch_efficiency = events.len() as f64 / processing_ms;
+        }
+
+        debug!("Processed batch of {} events in {:?}", events.len(), processing_time);
+    }
+
+    /// Get batch statistics
+    pub fn get_stats(&self) -> &BatchStats {
+        &self.batch_stats
+    }
+}
+
+impl InputPerformanceMonitor {
+    pub fn new() -> Self {
+        Self {
+            processing_times: VecDeque::with_capacity(1000),
+            validation_times: VecDeque::with_capacity(1000),
+            batch_times: VecDeque::with_capacity(1000),
+            total_events: 0,
+            targets: InputPerformanceTargets::default(),
+        }
+    }
+
+    /// Record event processing time
+    pub fn record_processing_time(&mut self, duration: Duration) {
+        self.processing_times.push_back(duration);
+        if self.processing_times.len() > 1000 {
+            self.processing_times.pop_front();
+        }
+
+        if duration > self.targets.max_processing_time {
+            warn!("Input processing time {:?} exceeds target {:?}",
+                  duration, self.targets.max_processing_time);
+        }
+
+        self.total_events += 1;
+    }
+
+    /// Get performance statistics
+    pub fn get_performance_stats(&self) -> InputPerformanceStats {
+        InputPerformanceStats {
+            avg_processing_time: self.calculate_average(&self.processing_times),
+            p95_processing_time: self.calculate_percentile(&self.processing_times, 0.95),
+            p99_processing_time: self.calculate_percentile(&self.processing_times, 0.99),
+            total_events: self.total_events,
+        }
+    }
+
+    /// Calculate average duration
+    fn calculate_average(&self, durations: &VecDeque<Duration>) -> Duration {
+        if durations.is_empty() {
+            return Duration::ZERO;
+        }
+        durations.iter().sum::<Duration>() / durations.len() as u32
+    }
+
+    /// Calculate percentile
+    fn calculate_percentile(&self, durations: &VecDeque<Duration>, percentile: f64) -> Duration {
+        if durations.is_empty() {
+            return Duration::ZERO;
+        }
+
+        let mut sorted: Vec<Duration> = durations.iter().cloned().collect();
+        sorted.sort();
+
+        let index = ((sorted.len() as f64 - 1.0) * percentile) as usize;
+        sorted[index.min(sorted.len() - 1)]
+    }
 }
 
 impl Input {
+    /// Create new input processor with batching and performance monitoring
     pub fn new() -> Self {
         Self {
             allowed_characters: AllowedCharacters::new(),
             escape_filter: EscapeSequenceFilter::new(),
             rate_limiter: RateLimiter::new(),
             security_policy: SecurityPolicy::default(),
+            event_batcher: EventBatcher::new(),
+            performance_monitor: InputPerformanceMonitor::new(),
         }
     }
 
-    /// Process and sanitize keyboard input with security validation
+    /// Process key event with enhanced performance monitoring
     pub fn process_key_event(&mut self, key_event: KeyEvent) -> Result<ProcessedInput> {
-        let start_time = Instant::now();
+        let processing_start = Instant::now();
 
         // Rate limiting check
         if !self.rate_limiter.allow_input() {
@@ -38,7 +286,9 @@ impl Input {
         let processed = self.sanitize_and_validate(key_event)?;
 
         // Record processing time for monitoring
-        let processing_time = start_time.elapsed();
+        let processing_time = processing_start.elapsed();
+        self.performance_monitor.record_processing_time(processing_time);
+
         debug!(
             duration_ms = %processing_time.as_millis(),
             input_type = ?processed.input_type,
@@ -46,6 +296,82 @@ impl Input {
         );
 
         Ok(processed)
+    }
+
+    /// Process batch of events for optimal performance
+    pub fn process_event_batch(&mut self, timeout: Duration) -> Result<Vec<ProcessedInput>> {
+        let batch_start = Instant::now();
+
+        // Get batched events
+        let events = self.event_batcher.poll_events_batch(timeout)?;
+        let mut processed_events = Vec::with_capacity(events.len());
+
+        // Process each event in the batch
+        for event in events {
+            match event {
+                CrosstermEvent::Key(key_event) => {
+                    let processed = self.process_key_event(key_event)?;
+                    processed_events.push(processed);
+                }
+                _ => {
+                    // Handle other event types if needed
+                    debug!("Ignoring non-key event: {:?}", event);
+                }
+            }
+        }
+
+        let _batch_time = batch_start.elapsed();
+
+        Ok(processed_events)
+    }
+
+    /// Get comprehensive input statistics including performance metrics
+    pub fn get_statistics(&self) -> EnhancedInputStatistics {
+        let performance_stats = self.performance_monitor.get_performance_stats();
+        let batch_stats = self.event_batcher.get_stats();
+
+        EnhancedInputStatistics {
+            // Legacy statistics
+            total_processed: self.rate_limiter.get_total_processed(),
+            filtered_sequences: self.escape_filter.get_filtered_count(),
+            rate_limited_inputs: 0, // Would need to track this
+            rate_limiter_stats: self.rate_limiter.get_stats(),
+
+            // Performance metrics
+            performance_stats: performance_stats.clone(),
+            batch_stats: batch_stats.clone(),
+
+            // Overall performance assessment
+            performance_grade: self.calculate_performance_grade(&performance_stats, batch_stats),
+        }
+    }
+
+    /// Calculate overall performance grade
+    fn calculate_performance_grade(&self, perf_stats: &InputPerformanceStats, batch_stats: &BatchStats) -> char {
+        let mut score = 100.0;
+
+        // Deduct points for slow processing
+        if perf_stats.p99_processing_time > Duration::from_millis(5) {
+            score -= 20.0;
+        }
+
+        // Deduct points for poor batch efficiency
+        if batch_stats.batch_efficiency < 5.0 { // Less than 5 events per ms
+            score -= 15.0;
+        }
+
+        // Award points for good batching
+        if batch_stats.avg_batch_size > 2.0 {
+            score += 10.0;
+        }
+
+        match score as i32 {
+            90..=100 => 'A',
+            80..=89 => 'B',
+            70..=79 => 'C',
+            60..=69 => 'D',
+            _ => 'F',
+        }
     }
 
     /// Sanitize text input against injection attacks
@@ -104,16 +430,21 @@ impl Input {
         self.allowed_characters.set_mode(mode);
         debug!("Updated allowed characters for mode: {:?}", mode);
     }
+}
 
-    /// Get input processing statistics
-    pub fn get_statistics(&self) -> InputStatistics {
-        InputStatistics {
-            rate_limiter_stats: self.rate_limiter.get_stats(),
-            filtered_sequences: self.escape_filter.get_filtered_count(),
-            total_processed: self.rate_limiter.get_total_processed(),
-        }
+impl Default for EventBatcher {
+    fn default() -> Self {
+        Self::new()
     }
+}
 
+impl Default for InputPerformanceMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Input {
     // Private methods
 
     fn sanitize_and_validate(&mut self, key_event: KeyEvent) -> Result<ProcessedInput> {
@@ -687,6 +1018,8 @@ mod tests {
         let key_event = KeyEvent {
             code: KeyCode::Char('a'),
             modifiers: KeyModifiers::NONE,
+            kind: crossterm::event::KeyEventKind::Press,
+            state: crossterm::event::KeyEventState::NONE,
         };
 
         let result = input_handler.process_key_event(key_event).unwrap();
@@ -749,7 +1082,7 @@ mod tests {
 
     #[test]
     fn test_text_sanitization() {
-        let input_handler = Input::new();
+        let mut input_handler = Input::new();
 
         let result = input_handler
             .sanitize_text("hello\x00world\x1b[31m")

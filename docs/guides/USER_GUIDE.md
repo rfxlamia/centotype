@@ -1,1327 +1,474 @@
 # Centotype User Guide
 
-> **Complete user manual for mastering the Centotype CLI typing trainer**
+> **Development Status Notice**: This user guide reflects the current implementation state of Centotype (September 28, 2025). The project has a complete foundation architecture achieving Grade A performance (22ms P99 latency), but the interactive TUI typing interface is under active development.
 
-Welcome to Centotype, the precision-focused CLI typing trainer designed for developers, technical writers, and anyone serious about improving their typing skills. This comprehensive guide will take you from installation to mastery of all 100 difficulty levels.
+> **Current State**: Foundation complete - CLI command parsing works, but typing sessions currently show placeholder messages only. Full TUI implementation in progress.
+
+Welcome to Centotype, the precision-focused CLI typing trainer designed for developers and technical typists. This guide documents the current functionality and upcoming features.
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Training Modes](#training-modes)
-3. [Level Progression System](#level-progression-system)
-4. [Performance Tracking](#performance-tracking)
-5. [Configuration and Customization](#configuration-and-customization)
-6. [Advanced Features](#advanced-features)
-7. [Tips for Success](#tips-for-success)
-8. [Keyboard Shortcuts](#keyboard-shortcuts)
-9. [Understanding Your Results](#understanding-your-results)
-10. [Troubleshooting](#troubleshooting)
+1. [Current Implementation Status](#current-implementation-status)
+2. [Building and Installation](#building-and-installation)
+3. [Available Commands](#available-commands)
+4. [Architecture Overview](#architecture-overview)
+5. [Performance Characteristics](#performance-characteristics)
+6. [Testing and Validation](#testing-and-validation)
+7. [Developer Information](#developer-information)
+8. [Upcoming Features](#upcoming-features)
+9. [Contributing](#contributing)
 
 ---
 
-## Getting Started
+## Current Implementation Status
 
-### What is Centotype?
+### What Works Now ✅
 
-Centotype is a CLI-based typing trainer that focuses on:
+**Complete Foundation Architecture**:
+- Full 7-crate Rust workspace with modular design
+- Command-line argument parsing with clap
+- Platform detection and optimization
+- Content generation system with 100-level difficulty progression
+- Performance monitoring achieving Grade A targets
+- Comprehensive test suite and benchmarking
+- Security validation and error handling framework
 
-- **Precision over Speed**: Clean typing beats fast corrections
-- **Progressive Difficulty**: 100 carefully calibrated levels from basic words to advanced code
-- **Deterministic Scoring**: Reproducible results without random variance
-- **Developer Focus**: Code snippets, symbols, technical content
-- **Performance Optimized**: <25ms input latency for responsive experience
+**Performance Achievements** (Production-Ready):
+- Input latency: 22ms P99 (target: <25ms) ✅
+- Cache hit rate: 94% (target: >90%) ✅
+- Memory usage: 46MB (target: <50MB) ✅
+- Startup time: 180ms P95 (target: <200ms) ✅
 
-### Quick Installation
+### What's Under Development 🚧
 
-Choose your preferred installation method:
+**Interactive Typing Interface**:
+- Real-time TUI with crossterm + ratatui
+- Live WPM and accuracy feedback
+- Error highlighting and visual feedback
+- Session state management and progress tracking
+- Interactive help overlay and controls
 
-#### Option 1: Cargo (Recommended)
-```bash
-cargo install centotype
-centotype --version
-```
+**Known Current Limitations**:
+- Commands print confirmation messages only (no actual typing sessions yet)
+- UI render functions are placeholder implementations
+- Configuration system not functional
+- Profile management stub implementation
 
-#### Option 2: Pre-built Binary
-```bash
-# Linux/macOS
-curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotype-linux-x64.tar.gz
-tar -xzf centotype-linux-x64.tar.gz
-sudo mv centotype /usr/local/bin/
+### Production Blockers ⚠️
 
-# Windows
-# Download from GitHub releases and add to PATH
-```
-
-#### Option 3: npm Wrapper
-```bash
-npm install -g centotype-cli
-```
-
-### Your First Session
-
-Start typing immediately:
-
-```bash
-# Begin at Level 1
-centotype play --level 1
-
-# Or take the placement test
-centotype placement
-```
-
-**What you'll see**:
-```
-┌─ Level 1: Basic Words ─────────────────────────────┐
-│ Target: the quick brown fox jumps over the lazy dog │
-│ Typed:  the quick                                   │
-│         ^^^^^^^^^^                                  │
-│                                                     │
-│ WPM: 45.2 │ Accuracy: 100% │ Time: 0:23           │
-└─────────────────────────────────────────────────────┘
-```
-
-**Controls**:
-- Type normally to match the target text
-- `Backspace` to correct mistakes
-- `Ctrl+C` to exit
-- `Tab` to pause/resume
+- 27+ panic safety violations need resolution
+- TUI typing interface implementation incomplete
+- Session persistence not fully integrated
 
 ---
 
-## Training Modes
+## Building and Installation
 
-### Arcade Mode
+### Prerequisites
 
-Progressive training through 100 carefully designed levels.
+- **Rust 1.75+** (required for building from source)
+- **Terminal**: Modern terminal emulator with UTF-8 support
+- **OS**: Linux, macOS 10.14+, or Windows 10+
 
-```bash
-# Start at specific level
-centotype play --level 15
-
-# Continue from where you left off
-centotype play --continue
-
-# Practice a range of levels
-centotype play --level 10-15
-```
-
-#### Level Categories
-
-**Bronze Tier (Levels 1-20): Foundation**
-- Basic vocabulary and common words
-- Simple punctuation (periods, commas)
-- Target: 40+ WPM, 95%+ accuracy
-
-**Silver Tier (Levels 21-40): Proficiency**
-- Mixed content with punctuation
-- Numbers and basic symbols
-- Target: 60+ WPM, 97%+ accuracy
-
-**Gold Tier (Levels 41-60): Advanced**
-- Complex symbols and technical terms
-- Programming concepts
-- Target: 80+ WPM, 98%+ accuracy
-
-**Platinum Tier (Levels 61-80): Expert**
-- Code snippets and patterns
-- Advanced symbol combinations
-- Target: 100+ WPM, 99%+ accuracy
-
-**Diamond Tier (Levels 81-100): Mastery**
-- Complex programming constructs
-- Advanced patterns and edge cases
-- Target: 130+ WPM, 99.5%+ accuracy
-
-#### Example Level Progression
+### Build from Source
 
 ```bash
-# Level 1: Basic words
-"the quick brown fox jumps over the lazy dog and runs fast"
+# Clone the repository
+git clone https://github.com/rfxlamia/centotype.git
+cd centotype
 
-# Level 25: Mixed content
-"The user's account (ID: 12345) has $67.89 remaining. Contact support@company.com for help."
+# Build in release mode
+cargo build --release
 
-# Level 50: Technical content
-"function calculateTotal(items) { return items.reduce((sum, item) => sum + item.price, 0); }"
-
-# Level 75: Advanced patterns
-"const config: Config = { api: { timeout: 5000, retries: 3 }, db: { host: 'localhost' } };"
-
-# Level 100: Complex constructs
-"impl<T: Clone + Send + Sync> AsyncProcessor<T> for DataPipeline where T: Serialize + DeserializeOwned"
+# Verify the build
+./target/release/centotype --help
 ```
 
-### Drill Mode
+**Expected Output**:
+```
+CLI-based typing trainer with 100 progressive difficulty levels
 
-Focused practice on specific skill areas.
+Usage: centotype <COMMAND>
 
-```bash
-# Practice symbols
-centotype drill --category symbols
+Commands:
+  play       Start arcade mode training
+  drill      Practice specific skills
+  endurance  Endurance training session
+  stats      View statistics and progress
+  config     Configure application settings
+  help       Print this message or the help of the given subcommand(s)
 
-# Practice numbers
-centotype drill --category numbers
-
-# Practice code patterns
-centotype drill --category code
-
-# Practice bracket matching
-centotype drill --category brackets
-
-# Work on your weakest keys
-centotype drill --weak-keys
+Options:
+  -h, --help  Print help
 ```
 
-#### Drill Categories
+### Installation Options
 
-**Symbols Drill**
-- Focus: `!@#$%^&*(){}[]<>?/\|~`
-- Content: Symbol-heavy sequences and combinations
-- Goal: Develop muscle memory for special characters
+**Currently Available**:
+- Build from source (above method)
+- Development builds from CI/CD pipeline
 
-**Numbers Drill**
-- Focus: `0123456789`
-- Content: Number sequences, dates, IDs, calculations
-- Goal: Improve number typing accuracy and speed
-
-**Code Drill**
-- Focus: Programming patterns and syntax
-- Content: Function calls, variable declarations, operators
-- Goal: Master common coding constructs
-
-**Brackets Drill**
-- Focus: `(){}[]<>`
-- Content: Nested structures and matching pairs
-- Goal: Accurate bracket typing and pairing
-
-**Weak Keys Drill**
-- Focus: Your personally difficult keys
-- Content: Adaptive based on your error patterns
-- Goal: Eliminate personal typing weaknesses
-
-#### Drill Examples
-
-```bash
-# Symbols drill content
-"!@#$%^&*() {}[]<>?/\|~ += -= *= /= %= <<= >>="
-
-# Numbers drill content
-"2024-09-27 14:30:15 UTC | ID: 789012 | Amount: $1,234.56"
-
-# Code drill content
-"if (condition && array.length > 0) { return obj.method(param1, param2); }"
-```
-
-### Endurance Mode
-
-Build stamina and maintain accuracy over longer sessions.
-
-```bash
-# 15-minute endurance session
-centotype endurance --duration 15
-
-# 500-word target
-centotype endurance --words 500
-
-# Adaptive difficulty based on your performance
-centotype endurance --adaptive
-```
-
-#### Endurance Features
-
-**Progressive Fatigue Testing**
-- Tracks performance degradation over time
-- Identifies optimal practice session length
-- Helps build typing stamina
-
-**Consistency Metrics**
-- Measures speed variance throughout session
-- Tracks accuracy stability over time
-- Provides fatigue analysis
-
-**Adaptive Difficulty**
-- Adjusts content difficulty based on real-time performance
-- Maintains optimal challenge level
-- Prevents overwhelming or boring content
-
-### Placement Mode
-
-Determines your optimal starting level.
-
-```bash
-centotype placement
-```
-
-The placement test:
-1. Starts with Level 25 (mid-range assessment)
-2. Adapts based on your performance
-3. Tests accuracy, speed, and consistency
-4. Recommends your ideal starting level
-
-**Placement Algorithm**:
-- **High Performance**: Moves to harder levels
-- **Struggling**: Drops to easier levels
-- **Consistent**: Fine-tunes around current level
-- **Final Result**: Recommends level where you can achieve 95%+ accuracy
+**Coming Soon**:
+- `cargo install centotype` (when published to crates.io)
+- Pre-built binaries for major platforms
+- Package manager distributions
 
 ---
 
-## Level Progression System
+## Available Commands
 
-### Understanding the 100-Level System
+### Current Command Interface
 
-Centotype's progression is mathematically designed for consistent difficulty increases:
+All commands currently parse arguments correctly and show confirmation messages:
 
-#### Difficulty Scaling Formulas
+#### Play Command
+```bash
+# Arcade mode with level selection
+./target/release/centotype play --level 1
+# Output: Starting arcade mode, level: Some(1)
 
-**Symbol Density**: 5% → 30% (Level 1 → 100)
-```
-symbol_ratio = 5% + (tier - 1) × 2.5% + (tier_progress - 1) × 0.3%
-```
+./target/release/centotype play --level 50
+# Output: Starting arcade mode, level: Some(50)
 
-**Number Density**: 3% → 20% (Level 1 → 100)
-```
-number_ratio = 3% + (tier - 1) × 1.7% + (tier_progress - 1) × 0.2%
-```
-
-**Content Length**: 300 → 3000 characters (Level 1 → 100)
-```
-content_length = 300 + (tier - 1) × 270 + (tier_progress - 1) × 30
+# Default level (if no level specified)
+./target/release/centotype play
+# Output: Starting arcade mode, level: None
 ```
 
-### Tier System
+#### Drill Command
+```bash
+# Practice specific categories
+./target/release/centotype drill --category symbols --duration 5
+# Output: Starting drill: symbols for 5 minutes
 
-#### Bronze Tier (Levels 1-20)
-**Goal**: Foundation Building
-- **Requirements**: 40+ WPM, 95%+ accuracy
-- **Content**: Basic vocabulary, simple punctuation
-- **Focus**: Establish proper typing habits
-- **Typical Practice Time**: 2-4 weeks
-
-**Level Milestones**:
-- Level 5: Comfortable with common words
-- Level 10: Basic punctuation mastery
-- Level 15: Consistent 35+ WPM
-- Level 20: Ready for mixed content
-
-#### Silver Tier (Levels 21-40)
-**Goal**: Proficiency Development
-- **Requirements**: 60+ WPM, 97%+ accuracy
-- **Content**: Mixed content, numbers, basic symbols
-- **Focus**: Speed development with accuracy
-- **Typical Practice Time**: 3-6 weeks
-
-**Level Milestones**:
-- Level 25: Comfortable with numbers
-- Level 30: Basic symbols integration
-- Level 35: Consistent 50+ WPM
-- Level 40: Ready for technical content
-
-#### Gold Tier (Levels 41-60)
-**Goal**: Advanced Skills
-- **Requirements**: 80+ WPM, 98%+ accuracy
-- **Content**: Technical terms, complex symbols
-- **Focus**: Professional typing competency
-- **Typical Practice Time**: 4-8 weeks
-
-**Level Milestones**:
-- Level 45: Technical vocabulary comfort
-- Level 50: Complex symbol proficiency
-- Level 55: Code-like content adaptation
-- Level 60: Ready for expert challenges
-
-#### Platinum Tier (Levels 61-80)
-**Goal**: Expert Performance
-- **Requirements**: 100+ WPM, 99%+ accuracy
-- **Content**: Code snippets, advanced patterns
-- **Focus**: Developer-level typing skills
-- **Typical Practice Time**: 6-12 weeks
-
-**Level Milestones**:
-- Level 65: Comfortable with code syntax
-- Level 70: Advanced pattern recognition
-- Level 75: Consistent 90+ WPM
-- Level 80: Ready for mastery challenges
-
-#### Diamond Tier (Levels 81-100)
-**Goal**: Mastery Achievement
-- **Requirements**: 130+ WPM, 99.5%+ accuracy
-- **Content**: Complex programming constructs
-- **Focus**: Elite typing performance
-- **Typical Practice Time**: 3-6 months
-
-**Level Milestones**:
-- Level 85: Advanced language constructs
-- Level 90: Complex nested patterns
-- Level 95: Near-perfect accuracy
-- Level 100: Typing mastery achieved
-
-### Advancement Criteria
-
-To advance to the next level, you must achieve:
-
-**Minimum Requirements**:
-- Complete the level within time limit
-- Meet accuracy threshold for current tier
-- Demonstrate consistency (low speed variance)
-
-**Recommended Advancement**:
-- Exceed tier accuracy requirements by 1%
-- Complete level with 10% speed buffer
-- Show improvement from previous attempts
-
-**Example Advancement Decision**:
+./target/release/centotype drill --category numbers --duration 10
+# Output: Starting drill: numbers for 10 minutes
 ```
-Level 35 Requirements:
-- Minimum: 50 WPM, 97% accuracy
-- Recommended: 55 WPM, 98% accuracy
-- Your Performance: 53 WPM, 97.8% accuracy
-- Decision: ✅ Advanced to Level 36
+
+#### Endurance Command
+```bash
+# Extended practice sessions
+./target/release/centotype endurance --duration 15
+# Output: Starting endurance mode for 15 minutes
+
+./target/release/centotype endurance --duration 30
+# Output: Starting endurance mode for 30 minutes
+```
+
+#### Statistics Command
+```bash
+# View performance statistics
+./target/release/centotype stats
+# Output: Displaying statistics
+```
+
+#### Configuration Command
+```bash
+# Access configuration options
+./target/release/centotype config
+# Output: Opening configuration
+```
+
+### Command Validation
+
+All command arguments are properly validated:
+
+```bash
+# Level validation (1-100 range enforced)
+./target/release/centotype play --level 101
+# Error: error: 101 is not in 1..=100
+
+# Help for specific commands
+./target/release/centotype play --help
+./target/release/centotype drill --help
 ```
 
 ---
 
-## Performance Tracking
+## Architecture Overview
 
-### Core Metrics
+### 7-Crate Workspace Structure
 
-#### Words Per Minute (WPM)
-
-**Raw WPM**: Pure typing speed without accuracy adjustment
 ```
-Raw WPM = (Characters Typed ÷ 5) ÷ (Time in Minutes)
-```
-
-**Effective WPM**: Accuracy-adjusted speed (most important metric)
-```
-Effective WPM = Raw WPM × (Accuracy ÷ 100)
-```
-
-**Example**:
-- Raw WPM: 60
-- Accuracy: 95%
-- Effective WPM: 60 × 0.95 = 57 WPM
-
-#### Accuracy
-
-**Character Accuracy**: Percentage of correctly typed characters
-```
-Accuracy = (Correct Characters ÷ Total Characters) × 100
+centotype/
+├── core/           # State management, scoring engine, types
+├── engine/         # Input processing, render system, TTY
+├── content/        # Text generation, caching, difficulty analysis
+├── analytics/      # Performance tracking, metrics collection
+├── cli/            # Command parsing, interface definitions
+├── persistence/    # Profile storage, configuration management
+├── platform/       # OS detection, terminal optimization
+└── centotype-bin/  # Main binary application
 ```
 
-**Error Types Tracked**:
-- **Substitutions**: Wrong character typed
-- **Insertions**: Extra character added
-- **Deletions**: Character skipped
-- **Transpositions**: Characters swapped
+### Data Flow Architecture
 
-#### Consistency
-
-**Speed Consistency**: Measures typing rhythm stability
+**Current Implementation**:
 ```
-Consistency = 100 - (Speed Variance ÷ Average Speed) × 100
+User Input → CLI Parser → CliManager → Print Confirmation
 ```
 
-**High Consistency (90%+)**: Steady, even typing rhythm
-**Low Consistency (<70%)**: Erratic, bursts and pauses
-
-#### Skill Index
-
-**Overall Proficiency Rating**: 0-1000 scale combining all metrics
+**Target Implementation** (In Development):
 ```
-Skill Index = (Effective WPM × 5) + (Accuracy × 2) + (Consistency × 3)
-```
-
-**Skill Index Ranges**:
-- **0-200**: Beginner
-- **201-400**: Novice
-- **401-600**: Intermediate
-- **601-800**: Advanced
-- **801-1000**: Expert
-
-### Viewing Your Statistics
-
-#### Basic Statistics
-```bash
-centotype stats
+User Input → CLI Parser → CliManager
+                            ↓
+                         Engine Initialization
+                            ↓
+                         TUI Session Manager
+                            ↓
+                         Input Processor (22ms P99)
+                            ↓
+                         Core State Manager
+                            ↓
+                         Render System (ratatui)
+                            ↓
+                         Live Typing Interface
 ```
 
-**Output Example**:
-```
-╭─ Centotype Statistics ──────────────────────────────╮
-│ Sessions Completed: 156                             │
-│ Total Practice Time: 23h 45m                        │
-│ Current Level: 42 (Gold Tier)                       │
-│                                                     │
-│ Best Performance:                                   │
-│   WPM (Effective): 78.4                            │
-│   Accuracy: 98.7%                                  │
-│   Skill Index: 745                                 │
-│                                                     │
-│ Recent Trend (7 days):                             │
-│   Average WPM: 72.1 (+3.2)                        │
-│   Average Accuracy: 97.9% (+0.8%)                 │
-│   Sessions: 12                                      │
-╰─────────────────────────────────────────────────────╯
-```
+### Inter-Crate Communication
 
-#### Detailed Statistics
-```bash
-centotype stats --detailed
-```
-
-**Additional Information**:
-- Per-key accuracy breakdown
-- Error pattern analysis
-- Time-of-day performance trends
-- Level progression history
-- Weak character identification
-
-#### Level-Specific Statistics
-```bash
-centotype stats --level 25
-```
-
-**Level Analysis**:
-- Attempts on this level
-- Best performance achieved
-- Improvement trend
-- Time to master
-- Comparison to tier average
-
-### Performance Graphs
-
-#### Progress Tracking
-```bash
-centotype stats --graph wpm
-```
-
-**Available Graphs**:
-- WPM progression over time
-- Accuracy trend analysis
-- Consistency improvement
-- Error rate reduction
-- Session duration patterns
-
-#### Export Data
-```bash
-# Export to CSV for analysis
-centotype export --format csv --days 30
-
-# Export detailed session data
-centotype export --format json --sessions 100
-```
-
-**Use Cases**:
-- Track long-term improvement
-- Analyze practice patterns
-- Identify optimal practice times
-- Monitor fatigue effects
+- **Async-first design** with optimized Arc boundaries
+- **Shared context patterns** for efficient data flow
+- **Performance-critical paths** optimized for <25ms latency
+- **Error propagation** using consistent Result patterns
 
 ---
 
-## Configuration and Customization
+## Performance Characteristics
 
-### Viewing Current Configuration
+### Measured Metrics (Grade A Achievement)
 
-```bash
-centotype config --show
-```
+| Component | Metric | Target | Achieved | Status |
+|-----------|--------|--------|----------|--------|
+| Input Processing | P99 Latency | <25ms | 22ms | ✅ |
+| Content System | Cache Hit Rate | >90% | 94% | ✅ |
+| Memory Usage | RSS Peak | <50MB | 46MB | ✅ |
+| Startup Time | P95 Duration | <200ms | 180ms | ✅ |
+| Content Loading | P95 Time | <25ms | <25ms | ✅ |
 
-**Output Example**:
-```
-╭─ Centotype Configuration ───────────────────────────╮
-│ Theme: dark                                         │
-│ Keyboard Layout: qwerty                             │
-│ Sound Effects: enabled                              │
-│ Animations: enabled                                 │
-│ Auto-advance: true                                  │
-│ Strict Mode: false                                  │
-│                                                     │
-│ Performance:                                        │
-│   High Performance Mode: false                     │
-│   Input Latency Optimization: true                 │
-│   Memory Limit: 50MB                               │
-╰─────────────────────────────────────────────────────╯
-```
-
-### Visual Customization
-
-#### Theme Selection
-```bash
-# Dark theme (recommended for extended practice)
-centotype config --set theme dark
-
-# Light theme
-centotype config --set theme light
-
-# Auto theme (follows system)
-centotype config --set theme auto
-```
-
-#### Color Customization
-```bash
-# Text colors
-centotype config --set colors.correct green
-centotype config --set colors.incorrect red
-centotype config --set colors.pending white
-
-# Background colors
-centotype config --set colors.background black
-centotype config --set colors.highlight blue
-```
-
-#### Display Options
-```bash
-# Show/hide elements
-centotype config --set show.wpm true
-centotype config --set show.accuracy true
-centotype config --set show.timer true
-centotype config --set show.progress true
-
-# Progress indicator style
-centotype config --set progress.style bar        # Progress bar
-centotype config --set progress.style percentage # Percentage only
-centotype config --set progress.style both       # Both bar and percentage
-```
-
-### Keyboard and Input
-
-#### Keyboard Layout
-```bash
-# Set your keyboard layout
-centotype config --set layout qwerty    # Standard US
-centotype config --set layout qwertz    # German/Austrian
-centotype config --set layout azerty    # French/Belgian
-centotype config --set layout dvorak    # Dvorak layout
-```
-
-#### Input Behavior
-```bash
-# Correction policy
-centotype config --set correction.policy strict     # No backspace allowed
-centotype config --set correction.policy lenient    # Backspace allowed
-centotype config --set correction.policy adaptive   # Adaptive based on level
-
-# Timing sensitivity
-centotype config --set timing.sensitivity high      # Precise timing
-centotype config --set timing.sensitivity normal    # Standard timing
-centotype config --set timing.sensitivity relaxed   # Generous timing
-```
-
-### Audio Settings
-
-#### Sound Effects
-```bash
-# Enable/disable sounds
-centotype config --set sound.enabled true
-
-# Individual sound controls
-centotype config --set sound.keystroke true     # Key press sounds
-centotype config --set sound.error true         # Error sounds
-centotype config --set sound.completion true    # Level completion
-centotype config --set sound.milestone true     # Achievement sounds
-
-# Volume control
-centotype config --set sound.volume 0.7         # 70% volume
-```
-
-#### Audio Feedback Types
-```bash
-# Keystroke sounds
-centotype config --set sound.keystroke.type click    # Click sound
-centotype config --set sound.keystroke.type typewriter # Typewriter sound
-centotype config --set sound.keystroke.type modern    # Modern sound
-
-# Error sounds
-centotype config --set sound.error.type beep      # Simple beep
-centotype config --set sound.error.type buzz      # Buzz sound
-centotype config --set sound.error.type none      # Visual only
-```
-
-### Performance Settings
-
-#### High Performance Mode
-```bash
-# Enable for slower systems
-centotype config --set performance.high_performance true
-
-# Reduce visual effects
-centotype config --set performance.effects minimal
-
-# Optimize memory usage
-centotype config --set performance.memory_mode efficient
-```
-
-#### Input Latency Optimization
-```bash
-# Platform-specific optimizations
-centotype config --set performance.input_optimization auto
-
-# Manual optimization
-centotype config --set performance.input_optimization aggressive
-centotype config --set performance.render_rate 60fps
-```
-
-### Training Preferences
-
-#### Auto-Advancement
-```bash
-# Automatically advance levels
-centotype config --set training.auto_advance true
-centotype config --set training.advance_threshold 98  # 98% accuracy required
-
-# Retry failed levels
-centotype config --set training.auto_retry true
-centotype config --set training.retry_limit 3
-```
-
-#### Session Settings
-```bash
-# Default session length
-centotype config --set session.default_duration 300  # 5 minutes
-
-# Break reminders
-centotype config --set session.break_reminder true
-centotype config --set session.break_interval 1800   # 30 minutes
-
-# Session goals
-centotype config --set session.daily_goal 30         # 30 minutes daily
-```
-
-### Resetting Configuration
+### Performance Testing
 
 ```bash
-# Reset all settings to defaults
-centotype config --reset
+# Run comprehensive benchmarks
+cargo bench
 
-# Reset specific category
-centotype config --reset ui
-centotype config --reset audio
-centotype config --reset performance
+# Specific performance tests
+cargo bench --bench input_latency_benchmark
+cargo bench --bench content_performance_benchmark
+cargo bench --bench render_performance_benchmark
 
-# Reset specific setting
-centotype config --reset theme
+# Memory profiling
+cargo test --package centotype-engine --test memory_validation
+```
+
+### Performance Monitoring
+
+The framework includes real-time performance monitoring:
+
+- Input latency tracking with P99/P95 percentiles
+- Memory usage monitoring with alerts
+- Cache hit rate optimization
+- Frame rate monitoring for render performance
+- Cross-crate communication overhead analysis
+
+---
+
+## Testing and Validation
+
+### Unit Test Suite
+
+```bash
+# Run all tests
+cargo test --workspace
+
+# Test specific crates
+cargo test --package centotype-core
+cargo test --package centotype-content
+cargo test --package centotype-engine
+
+# Test with features
+cargo test --package centotype-content --all-features
+```
+
+### Security Validation
+
+```bash
+# Run security tests
+cargo test security_validation
+cargo test escape_sequence_filtering
+cargo test content_sanitization
+```
+
+### Performance Validation
+
+```bash
+# Comprehensive validation script
+./scripts/validate_local.sh --quick    # Basic checks
+./scripts/validate_local.sh           # Full validation
+
+# Individual validation
+cargo check --workspace --quiet
+cargo clippy -- -D warnings
+cargo fmt --check
+```
+
+### Integration Testing
+
+```bash
+# Cross-crate integration tests
+cargo test --test integration_tests
+
+# Performance regression tests
+./scripts/check_performance_regression.py
 ```
 
 ---
 
-## Advanced Features
+## Developer Information
 
-### Custom Content
+### Development Workflow
 
-#### Create Custom Lessons
 ```bash
-# Practice with your own text file
-centotype custom --file my-code.rs
+# Setup development environment
+git clone https://github.com/rfxlamia/centotype.git
+cd centotype
 
-# Practice specific text
-centotype custom --text "Your custom content here"
+# Install development dependencies
+cargo install cargo-watch cargo-audit
 
-# Practice from clipboard
-centotype custom --clipboard
+# Development build with watching
+cargo watch -x "build --workspace"
+
+# Pre-commit validation
+cargo fmt && cargo clippy -- -D warnings && cargo test --workspace
 ```
 
-#### Content Filters
-```bash
-# Filter content by type
-centotype play --level 25 --filter code       # Only code content
-centotype play --level 25 --filter prose      # Only prose content
-centotype play --level 25 --filter mixed      # Mixed content
+### Code Quality Standards
 
-# Filter by difficulty
-centotype play --level 25 --min-difficulty 0.6
-centotype play --level 25 --max-difficulty 0.8
-```
+- **Rust Edition 2021** with modern idioms
+- **Zero unsafe code** in application layer
+- **Comprehensive error handling** with typed errors
+- **Performance contracts** enforced by benchmarks
+- **Documentation coverage** for public APIs
 
-### Competition Features
+### Architecture Patterns
 
-#### Online Leaderboards
-```bash
-# Submit scores to leaderboard (optional)
-centotype config --set online.leaderboard true
-
-# View leaderboards
-centotype leaderboard --level 50
-centotype leaderboard --tier gold
-centotype leaderboard --global
-```
-
-#### Race Mode
-```bash
-# Race against your best time
-centotype race --level 25 --target personal
-
-# Race against global average
-centotype race --level 25 --target global
-
-# Race against specific WPM
-centotype race --level 25 --target 75
-```
-
-### Analytics and Insights
-
-#### Detailed Error Analysis
-```bash
-# View error patterns
-centotype analyze --errors
-
-# Character-specific analysis
-centotype analyze --character q  # Analyze 'q' key performance
-
-# Time-based analysis
-centotype analyze --time-of-day
-centotype analyze --day-of-week
-```
-
-#### Improvement Suggestions
-```bash
-# Get personalized recommendations
-centotype recommend
-
-# Specific improvement areas
-centotype recommend --focus speed
-centotype recommend --focus accuracy
-centotype recommend --focus consistency
-```
-
-**Example Recommendations**:
-```
-╭─ Improvement Recommendations ───────────────────────╮
-│ Primary Focus: Accuracy                             │
-│                                                     │
-│ 1. Practice 'q' key (73% accuracy)                 │
-│    Recommended: centotype drill --character q      │
-│                                                     │
-│ 2. Work on symbol combinations                      │
-│    Recommended: centotype drill --category symbols │
-│                                                     │
-│ 3. Slow down for better accuracy                   │
-│    Target: 5 WPM slower, 3% better accuracy       │
-╰─────────────────────────────────────────────────────╯
-```
-
-### Accessibility Features
-
-#### Visual Accessibility
-```bash
-# High contrast mode
-centotype config --set accessibility.high_contrast true
-
-# Large text mode
-centotype config --set accessibility.large_text true
-
-# Color blind support
-centotype config --set accessibility.colorblind deuteranopia
-```
-
-#### Motor Accessibility
-```bash
-# Slower typing accommodation
-centotype config --set accessibility.timing_adjustment 1.5  # 50% more time
-
-# Single-hand mode
-centotype config --set accessibility.single_hand true
-
-# Custom key mapping
-centotype config --set accessibility.key_mapping custom.json
-```
-
-### Data Management
-
-#### Backup and Restore
-```bash
-# Backup your data
-centotype backup --export backup.json
-
-# Restore from backup
-centotype restore --import backup.json
-
-# Sync across devices (cloud storage)
-centotype sync --service dropbox
-```
-
-#### Privacy Controls
-```bash
-# Disable telemetry
-centotype config --set privacy.telemetry false
-
-# Clear personal data
-centotype privacy --clear-data
-
-# Export personal data
-centotype privacy --export-data
-```
+- **RAII patterns** for resource management
+- **Arc-based sharing** for cross-crate communication
+- **Async-first design** with tokio runtime
+- **Zero-copy optimizations** where possible
+- **Graceful degradation** for platform compatibility
 
 ---
 
-## Tips for Success
+## Upcoming Features
 
-### Effective Practice Strategies
+### Next Implementation Phase (TUI Interface)
 
-#### 1. Consistency Over Intensity
-- **Best**: 15-30 minutes daily
-- **Good**: 45 minutes every other day
-- **Avoid**: 2-hour weekend sessions only
+**Priority 1 - Core Typing Experience**:
+- Interactive TUI with crossterm backend
+- Real-time character input processing
+- Live feedback with error highlighting
+- Session completion and results display
 
-#### 2. Accuracy First Philosophy
-- Always prioritize accuracy over speed
-- Centotype heavily penalizes corrections
-- Clean typing builds proper muscle memory
-- Speed naturally follows accuracy
+**Priority 2 - Enhanced Features**:
+- Progress tracking and level advancement
+- Configuration system implementation
+- Profile management and statistics
+- Help system and tutorials
 
-#### 3. Progressive Challenge
-- Master each level before advancing
-- Don't skip levels to reach higher numbers
-- Each level builds on previous skills
-- Steady progression is faster than rushing
+**Priority 3 - Advanced Capabilities**:
+- Drill mode targeting weak areas
+- Endurance training sessions
+- Performance analytics and insights
+- Custom content import
 
-#### 4. Regular Breaks
-- Take 5-minute breaks every 20-30 minutes
-- Stand, stretch, and rest your hands
-- Fatigue leads to bad habits and injuries
-- Fresh practice is more effective
+### Technical Improvements
 
-### Specific Training Tips
+**Safety and Reliability**:
+- Resolve 27+ identified panic safety violations
+- Improve error recovery and graceful failures
+- Enhanced testing coverage
+- Security audit completion
 
-#### For Speed Improvement
-```bash
-# Practice with metronome-like timing
-centotype play --level 20 --pace steady
-
-# Focus on common word patterns
-centotype drill --category common-words
-
-# Use burst training
-centotype drill --short-bursts
-```
-
-#### For Accuracy Improvement
-```bash
-# Slow down deliberately
-centotype play --level 15 --max-wpm 40
-
-# Practice problem characters
-centotype drill --weak-keys
-
-# Use strict mode (no corrections)
-centotype config --set correction.policy strict
-```
-
-#### For Consistency
-```bash
-# Endurance training
-centotype endurance --duration 10
-
-# Focus on rhythm
-centotype drill --category rhythm
-
-# Monitor fatigue patterns
-centotype analyze --fatigue
-```
-
-### Common Mistakes to Avoid
-
-#### 1. Rushing Through Levels
-- **Problem**: Skipping levels or advancing too quickly
-- **Solution**: Master each level with 98%+ accuracy
-- **Why**: Each level builds essential muscle memory
-
-#### 2. Ignoring Error Patterns
-- **Problem**: Not analyzing which keys cause problems
-- **Solution**: Use `centotype analyze --errors` regularly
-- **Why**: Targeted practice is more efficient
-
-#### 3. Practicing When Tired
-- **Problem**: Practicing when mentally or physically fatigued
-- **Solution**: Practice when alert and focused
-- **Why**: Tired practice reinforces bad habits
-
-#### 4. Neglecting Posture
-- **Problem**: Poor typing posture and hand position
-- **Solution**: Maintain proper ergonomic setup
-- **Why**: Good posture enables faster, more accurate typing
-
-### Ergonomic Recommendations
-
-#### Desk Setup
-- Monitor at eye level
-- Keyboard at elbow height
-- Feet flat on floor
-- Back supported
-
-#### Hand Position
-- Wrists straight, not bent
-- Fingers curved over keys
-- Light touch, don't pound keys
-- Hands floating, not resting
-
-#### Finger Placement
-- Home row: ASDF (left), JKL; (right)
-- Each finger responsible for specific keys
-- Use proper fingering even if slower initially
-- Thumb only for spacebar
+**Performance Optimizations**:
+- Further input latency reduction
+- Memory usage optimization
+- Render performance improvements
+- Cross-platform performance tuning
 
 ---
 
-## Keyboard Shortcuts
+## Contributing
 
-### Global Shortcuts
+### Getting Started
 
-| Key | Action | Context |
-|-----|---------|---------|
-| `Ctrl+C` | Exit/Quit | Any screen |
-| `Tab` | Pause/Resume | During typing |
-| `Esc` | Cancel/Back | Menus and prompts |
-| `Enter` | Confirm/Start | Menus and prompts |
+1. **Review Architecture**: Read `/home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md`
+2. **Check Issues**: Look for "good first issue" labels
+3. **Development Setup**: Follow build instructions above
+4. **Testing**: Ensure all tests pass before submitting PRs
 
-### Typing Session Shortcuts
+### Development Guidelines
 
-| Key | Action | Notes |
-|-----|---------|-------|
-| `Backspace` | Correct mistake | If correction policy allows |
-| `Ctrl+R` | Restart level | Start over from beginning |
-| `Ctrl+P` | Pause session | Excludes time from metrics |
-| `Ctrl+Q` | Quick quit | Exit without saving |
-| `Space` | Resume from pause | Continue paused session |
+- Follow existing code style and patterns
+- Maintain performance contracts and benchmarks
+- Add tests for new functionality
+- Update documentation for user-facing changes
+- Ensure cross-platform compatibility
 
-### Navigation Shortcuts
+### Contribution Areas
 
-| Key | Action | Context |
-|-----|---------|---------|
-| `Arrow Keys` | Navigate menus | Menu selection |
-| `Page Up/Down` | Scroll content | Long text or results |
-| `Home/End` | Jump to start/end | Menu or text navigation |
-| `Ctrl+L` | Jump to level | Quick level selection |
+**High Impact**:
+- TUI implementation completion
+- Panic safety violation fixes
+- Performance optimization
+- Security improvements
 
-### Analysis and Stats
+**Medium Impact**:
+- Feature implementation
+- Documentation improvements
+- Test coverage expansion
+- Platform compatibility
 
-| Key | Action | Notes |
-|-----|---------|-------|
-| `Ctrl+S` | Show statistics | Quick stats overlay |
-| `Ctrl+A` | Analyze session | Detailed analysis |
-| `Ctrl+H` | Help screen | Context-sensitive help |
-| `Ctrl+D` | Debug info | Performance metrics |
+### Community
 
-### Configuration Shortcuts
-
-| Key | Action | Effect |
-|-----|---------|--------|
-| `Ctrl+T` | Toggle theme | Switch dark/light |
-| `Ctrl+M` | Toggle sound | Enable/disable audio |
-| `Ctrl+F` | Toggle fullscreen | Immersive mode |
-| `Ctrl+O` | Options menu | Quick settings |
+- **GitHub Issues**: Bug reports and feature requests
+- **GitHub Discussions**: Development questions and proposals
+- **Pull Requests**: Code contributions with thorough review
 
 ---
 
-## Understanding Your Results
+## Support and Documentation
 
-### Session Results Screen
+### Additional Resources
 
-After completing a level, you'll see detailed results:
-
-```
-╭─ Session Complete: Level 25 ────────────────────────╮
-│                                                     │
-│ Performance Summary                                 │
-│ ─────────────────────                              │
-│ WPM (Raw):        72.4                             │
-│ WPM (Effective):  68.1                             │
-│ Accuracy:         94.2%                            │
-│ Consistency:      87.6%                            │
-│ Session Time:     4:23                             │
-│                                                     │
-│ Skill Assessment                                    │
-│ ─────────────────                                  │
-│ Skill Index:      682                              │
-│ Grade:            B+                               │
-│ Stars:            ★★★☆☆                           │
-│ Tier Progress:    Silver (Level 25/40)             │
-│                                                     │
-│ Areas for Improvement                              │
-│ ──────────────────────                             │
-│ • Work on 'q' and 'x' keys (lower accuracy)       │
-│ • Practice symbol combinations                      │
-│ • Focus on maintaining speed consistency            │
-│                                                     │
-│ Next Recommendation                                │
-│ ────────────────────                               │
-│ ✓ Ready for Level 26                               │
-│   Alternative: Practice symbols drill              │
-╰─────────────────────────────────────────────────────╯
-```
-
-### Interpreting Your Metrics
-
-#### WPM Analysis
-- **Raw WPM**: Your actual typing speed
-- **Effective WPM**: Speed adjusted for accuracy (most important)
-- **Target WPM**: Varies by tier level
-- **Improvement**: Compare to your personal best
-
-#### Accuracy Breakdown
-- **Overall Accuracy**: Percentage of correct characters
-- **Character Accuracy**: Per-key performance
-- **Error Types**: Substitution, insertion, deletion patterns
-- **Improvement Areas**: Specific keys or combinations to practice
-
-#### Consistency Rating
-- **90%+ Excellent**: Steady, even typing rhythm
-- **80-89% Good**: Minor speed variations
-- **70-79% Fair**: Noticeable speed inconsistency
-- **<70% Needs Work**: Erratic typing pattern
-
-#### Grade System
-- **A (90-100%)**: Exceptional performance
-- **B (80-89%)**: Good performance
-- **C (70-79%)**: Average performance
-- **D (60-69%)**: Below average
-- **F (<60%)**: Needs significant improvement
-
-### Star Rating System
-
-Stars are awarded based on comprehensive performance:
-
-- ⭐ **1 Star**: Completed level
-- ⭐⭐ **2 Stars**: Met accuracy target
-- ⭐⭐⭐ **3 Stars**: Met speed and accuracy targets
-- ⭐⭐⭐⭐ **4 Stars**: Exceeded targets with good consistency
-- ⭐⭐⭐⭐⭐ **5 Stars**: Outstanding performance across all metrics
-
-### Skill Index Calculation
-
-The Skill Index (0-1000) combines multiple factors:
-
-```
-Skill Index = (Effective WPM × 5) + (Accuracy × 2) + (Consistency × 3) + Bonus Points
-```
-
-**Bonus Points**:
-- +50: Perfect accuracy (100%)
-- +25: High consistency (95%+)
-- +15: Speed improvement from last attempt
-- +10: First attempt success
-- +5: Long session completion
-
-**Skill Index Ranges**:
-- **0-200**: Beginner - Learning basics
-- **201-400**: Novice - Building skills
-- **401-600**: Intermediate - Developing proficiency
-- **601-800**: Advanced - Strong typing skills
-- **801-1000**: Expert - Elite performance
-
-### Improvement Tracking
-
-#### Progress Indicators
-- **Level Advancement**: Ready for next level
-- **Tier Progress**: Position within current tier
-- **Skill Trend**: Improving, stable, or declining
-- **Personal Records**: Best WPM, accuracy, consistency
-
-#### Comparative Analysis
-- **Personal Best**: Your best performance on this level
-- **Tier Average**: Average performance for your tier
-- **Global Average**: Average across all users
-- **Recommended Target**: Next improvement goal
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-#### Installation Problems
-
-**Issue**: `command not found: centotype`
-```bash
-# Solution 1: Check PATH
-echo $PATH
-which centotype
-
-# Solution 2: Reinstall
-cargo install centotype --force
-
-# Solution 3: Manual installation
-# Download binary and add to PATH
-```
-
-**Issue**: Rust/Cargo not installed
-```bash
-# Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.cargo/env
-
-# Verify installation
-rustc --version
-cargo --version
-```
-
-#### Performance Issues
-
-**Issue**: High input latency or sluggish response
-```bash
-# Check performance
-centotype benchmark
-
-# Enable performance mode
-centotype config --set performance.high_performance true
-
-# Reduce visual effects
-centotype config --set performance.effects minimal
-```
-
-**Issue**: Memory usage warnings
-```bash
-# Check memory usage
-centotype sysinfo
-
-# Reduce cache size
-centotype config --set performance.cache_size 25
-
-# Enable memory optimization
-centotype config --set performance.memory_mode efficient
-```
-
-#### Terminal Compatibility
-
-**Issue**: Display rendering problems
-```bash
-# Check terminal capabilities
-centotype check
-
-# Use compatibility mode
-centotype play --level 1 --compat-mode
-
-# Update terminal settings
-export TERM=xterm-256color
-```
-
-**Issue**: Colors not displaying correctly
-```bash
-# Test color support
-centotype test-colors
-
-# Force color mode
-centotype config --set display.force_colors true
-
-# Use monochrome mode
-centotype config --set display.monochrome true
-```
-
-#### Audio Problems
-
-**Issue**: Sound effects not working
-```bash
-# Check audio configuration
-centotype config --show | grep sound
-
-# Test audio
-centotype test-audio
-
-# Verify system audio
-# Linux: Check PulseAudio/ALSA
-# macOS: Check system volume
-# Windows: Check audio drivers
-```
-
-### Performance Optimization
-
-#### For Slower Systems
-```bash
-# Enable high-performance mode
-centotype config --set performance.high_performance true
-
-# Reduce visual effects
-centotype config --set display.animations false
-centotype config --set display.effects minimal
-
-# Optimize memory usage
-centotype config --set performance.memory_mode efficient
-centotype config --set performance.cache_size 15
-```
-
-#### For Better Responsiveness
-```bash
-# Optimize input processing
-centotype config --set performance.input_optimization aggressive
-
-# Increase priority (Linux/macOS)
-sudo nice -n -10 centotype play --level 1
-
-# Use dedicated mode
-centotype config --set performance.dedicated_mode true
-```
+- **Architecture Guide**: `/home/v/project/centotype/docs/development/IMPLEMENTATION_COMPLETE.md`
+- **Performance Report**: `/home/v/project/centotype/docs/performance/PERFORMANCE_VALIDATION_REPORT.md`
+- **Developer Guide**: `/home/v/project/centotype/docs/guides/DEVELOPER_GUIDE.md`
+- **Troubleshooting**: `/home/v/project/centotype/docs/guides/TROUBLESHOOTING.md`
 
 ### Getting Help
 
-#### Built-in Help
-```bash
-# General help
-centotype help
-
-# Command-specific help
-centotype play --help
-centotype config --help
-centotype stats --help
-
-# Version information
-centotype --version
-```
-
-#### System Information
-```bash
-# System compatibility check
-centotype sysinfo
-
-# Performance diagnostics
-centotype benchmark
-
-# Configuration validation
-centotype config --validate
-```
-
-#### Debug Information
-```bash
-# Enable debug logging
-export RUST_LOG=debug
-centotype play --level 1
-
-# Performance profiling
-centotype profile --duration 60
-
-# Export debug data
-centotype debug --export debug-info.json
-```
-
-### Support Resources
-
-- **GitHub Issues**: [Report bugs and request features](https://github.com/rfxlamia/centotype/issues)
-- **Documentation**: Complete guides in `/docs`
-- **Community**: [GitHub Discussions](https://github.com/rfxlamia/centotype/discussions)
-- **Performance**: Reference the Performance Guide for optimization
+1. **Documentation First**: Check relevant guide documents
+2. **GitHub Issues**: Search existing issues or create new ones
+3. **GitHub Discussions**: Community support and questions
+4. **Code Review**: Submit PRs for technical guidance
 
 ---
 
-## Conclusion
+## Summary
 
-Centotype is designed to be your comprehensive typing training companion. Whether you're a beginner looking to improve basic typing skills or an advanced user aiming for competitive performance, the 100-level progression system provides a clear path to mastery.
+Centotype represents a production-quality foundation for a precision typing trainer, with:
 
-### Remember the Key Principles:
+- **Solid Architecture**: 7-crate modular design ready for parallel development
+- **Performance Excellence**: Grade A metrics exceeding targets
+- **Security Framework**: Comprehensive validation and error handling
+- **Developer Focus**: Clean code, comprehensive tests, and clear documentation
 
-1. **Accuracy First**: Clean typing beats fast corrections
-2. **Consistent Practice**: Regular short sessions are more effective than long irregular ones
-3. **Progressive Challenge**: Master each level before advancing
-4. **Ergonomic Awareness**: Maintain proper posture and hand position
-5. **Patient Persistence**: Typing mastery takes time and consistent effort
+**Current State**: Foundation complete, TUI implementation in progress
+**Next Milestone**: Interactive typing sessions with real-time feedback
+**Long-term Vision**: Comprehensive typing mastery platform for technical professionals
 
-### Your Journey Ahead:
+The architecture is designed for reliability, extensibility, and performance - ready for contributors to build the interactive experience on the solid foundation.
 
-- **Bronze Tier**: Build foundational skills
-- **Silver Tier**: Develop speed with accuracy
-- **Gold Tier**: Master technical content
-- **Platinum Tier**: Achieve expert performance
-- **Diamond Tier**: Reach typing mastery
-
-Start your journey today with `centotype play --level 1` and begin building the typing skills that will serve you throughout your career!
-
-**Happy typing!** 🚀
+Happy typing! 🚀
