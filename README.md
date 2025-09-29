@@ -41,29 +41,43 @@ Centotype aims to deliver deterministic measurement, granular feedback, and real
 - **💻 Developer-Focused**: Code snippets, symbols, brackets, and technical content
 - **🏃 Multiple Training Modes**: Arcade progression, focused drills, endurance testing
 
-## 🚧 Installation & Usage (Currently Unavailable)
+## 🔧 Installation & Usage (Professional Skeleton Ready)
 
-**Current Status**: Installation and usage commands below reflect the **planned functionality** once integration issues are resolved. The project currently **does not compile** due to API interface mismatches.
+**Current Status**: Session 4 successfully restored compilation and CLI functionality. Professional command structure operational but typing game mechanics still in development.
 
-### Development Installation Only
+### Development Installation (Currently Available)
 ```bash
-# Clone for development and contribute to fixes
+# Clone and build successfully
 git clone https://github.com/rfxlamia/centotype.git
 cd centotype
 
-# This will currently fail due to integration issues
-cargo build --release  # ❌ FAILS with 18+ compilation errors
+# This now works successfully (Session 4 achievement)
+cargo build --release  # ✅ SUCCESS with warnings only
+
+# Test CLI functionality
+./target/release/centotype --help     # ✅ Professional help system
+./target/release/centotype play --help # ✅ Subcommand structure
 
 # Architecture exploration
 cargo check --workspace --quiet  # ✅ Individual crates check successfully
 cargo doc --open                 # ✅ Documentation builds successfully
 ```
 
-### Planned Installation (When Fixed)
-**The following installation methods will be available once API integration is resolved:**
+### Current CLI Functionality (Session 4)
+**Professional command structure now operational:**
+```bash
+# Available commands (skeleton functional)
+centotype play --level 1    # ⚠️ Executes but exits (placeholder)
+centotype drill --category symbols  # ⚠️ Command parsing works, game logic needed
+centotype stats              # ⚠️ Interface ready, functionality pending
+centotype config --show      # ⚠️ Command structure complete, implementation pending
+```
+
+### Planned Installation (When Game Mechanics Complete)
+**The following installation methods will be available once typing functionality is implemented:**
 
 ```bash
-# Cargo (will be available after fixes)
+# Cargo (will be available after game mechanics)
 cargo install centotype
 
 # Pre-built releases (planned)
@@ -73,33 +87,36 @@ curl -LO https://github.com/rfxlamia/centotype/releases/latest/download/centotyp
 npm install -g centotype-cli
 ```
 
-### Basic Usage
+### Basic Usage (Command Structure Ready)
 
-**Start Your Typing Journey**
+**Start Your Typing Journey (Planned Functionality)**
 ```bash
-# Begin at Level 1 (basic words)
+# Begin at Level 1 (basic words) - CLI ready, game mechanics pending
 centotype play --level 1
 
-# Take the placement test to find your starting level
+# Take the placement test to find your starting level - interface designed
 centotype placement
 
-# Practice specific skills
+# Practice specific skills - command parsing functional
 centotype drill --category symbols
 centotype drill --category numbers
 
-# Test endurance and consistency
+# Test endurance and consistency - architecture complete
 centotype endurance --duration 10    # 10-minute session
 ```
 
+**Current Status**: All commands parse correctly and display appropriate help. Typing game mechanics implementation is the next development phase.
+
 ## 🎮 Training Modes
 
-### Arcade Mode
+### Arcade Mode (Interface Designed)
 Progressive levels from basic text to advanced code patterns:
 ```bash
 centotype play --level 15         # Start at specific level
 centotype play --continue         # Resume from last level
 centotype play --level 1-10       # Practice level range
 ```
+*Note: Command parsing operational, game mechanics in development*
 
 **Level Progression**:
 - **Levels 1-20**: Basic vocabulary and common words
@@ -108,7 +125,7 @@ centotype play --level 1-10       # Practice level range
 - **Levels 61-80**: Code snippets and programming constructs
 - **Levels 81-100**: Advanced patterns and competitive content
 
-### Drill Mode
+### Drill Mode (Architecture Complete)
 Focused practice on specific skill areas:
 ```bash
 centotype drill --category symbols    # (){}[]<>!@#$%
@@ -117,24 +134,27 @@ centotype drill --category code       # Programming patterns
 centotype drill --category brackets   # Bracket matching
 centotype drill --weak-keys          # Your worst-performing keys
 ```
+*Note: CLI interface functional, drill mechanics pending implementation*
 
-### Endurance Mode
+### Endurance Mode (Framework Ready)
 Build stamina and maintain accuracy over longer sessions:
 ```bash
 centotype endurance --duration 15    # 15-minute session
 centotype endurance --words 500      # 500-word target
 centotype endurance --adaptive       # Difficulty adjusts to your speed
 ```
+*Note: Command structure complete, session management implementation needed*
 
-## 📊 Performance Tracking
+## 📊 Performance Tracking (Framework Implemented)
 
-**View Your Progress**
+**View Your Progress (Interface Ready)**
 ```bash
 centotype stats                    # Overall performance summary
 centotype stats --detailed         # Per-key and error analysis
 centotype stats --level 25         # Performance on specific level
 centotype export --format csv      # Export data for analysis
 ```
+*Note: Command parsing operational, analytics integration pending*
 
 **Key Metrics Tracked**:
 - **WPM (Words Per Minute)**: Raw and accuracy-adjusted speeds
@@ -143,9 +163,9 @@ centotype export --format csv      # Export data for analysis
 - **Error Analysis**: Substitution, insertion, deletion, transposition patterns
 - **Consistency**: Speed variance and fatigue analysis
 
-## ⚙️ Configuration
+## ⚙️ Configuration (Interface Complete)
 
-**Customize Your Experience**
+**Customize Your Experience (CLI Ready)**
 ```bash
 # View current settings
 centotype config --show
@@ -158,6 +178,7 @@ centotype config --set sound enabled
 # Reset to defaults
 centotype config --reset
 ```
+*Note: Command structure operational, configuration system implementation needed*
 
 **Configuration Options**:
 - **Visual**: Theme (dark/light), colors, progress indicators
@@ -194,10 +215,10 @@ centotype config --reset
 - ✅ macOS: Terminal.app, iTerm2, Hyper
 - ✅ Windows: Windows Terminal, PowerShell, cmd.exe
 
-**Performance Targets** (Validated):
-- **Startup**: <200ms (P95)
-- **Input Latency**: <25ms (P99)
-- **Render Rate**: <33ms per frame (30fps equivalent)
+**Performance Targets** (Architectural - Awaiting Implementation Validation):
+- **Startup**: <200ms (P95) - ready for measurement once game mechanics complete
+- **Input Latency**: <25ms (P99) - framework ready for validation
+- **Render Rate**: <33ms per frame (30fps equivalent) - ratatui integration pending
 
 ## 🛠️ Development & Contributing
 

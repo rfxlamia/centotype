@@ -238,6 +238,37 @@ impl<'a> Drop for TypingModeGuard<'a> {
     }
 }
 
+/// Arc-based typing mode guard that doesn't hold references across await points
+pub struct AsyncTypingModeGuard {
+    tty_manager: std::sync::Arc<parking_lot::RwLock<TtyManager>>,
+}
+
+impl AsyncTypingModeGuard {
+    pub fn new(tty_manager: std::sync::Arc<parking_lot::RwLock<TtyManager>>) -> Result<Self> {
+        {
+            let mut tty = tty_manager.write();
+            tty.enter_typing_mode()?;
+        }
+        Ok(Self { tty_manager })
+    }
+}
+
+impl Drop for AsyncTypingModeGuard {
+    fn drop(&mut self) {
+        if let Some(mut tty) = self.tty_manager.try_write() {
+            if let Err(e) = tty.exit_typing_mode() {
+                error!("Failed to exit typing mode in async guard: {}", e);
+            }
+        } else {
+            warn!("Could not acquire lock for typing mode cleanup - using emergency cleanup");
+            // Fallback to emergency cleanup without lock
+            if let Some(mut tty) = self.tty_manager.try_write() {
+                tty.emergency_cleanup();
+            }
+        }
+    }
+}
+
 /// Re-export for convenience
 pub use TtyManager as Tty;
 

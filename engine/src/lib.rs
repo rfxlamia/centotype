@@ -16,7 +16,7 @@ pub use event::Event as EngineEvent;
 pub use input::Input as InputProcessor;
 pub use performance::{Performance as PerformanceMonitor, LatencyProfiler, InputCycleTimer};
 pub use render::Render as Renderer;
-pub use tty::{Tty as TtyManager, TypingModeGuard};
+pub use tty::{Tty as TtyManager, TypingModeGuard, AsyncTypingModeGuard};
 
 use centotype_analytics::AnalyticsEngine;
 use centotype_content::ContentManager;
@@ -126,41 +126,38 @@ impl CentotypeEngine {
         let session_id = self.core.start_session(mode, content.clone())?;
         info!("Started session {}", session_id);
 
-        // 3. Setup terminal for typing mode (scoped lifetime)
+        // 3. Setup terminal for typing mode using async-safe guard
+        let _typing_guard = AsyncTypingModeGuard::new(self.tty_manager.clone())?;
+
+        // 3a. Initialize renderer for terminal UI
         {
-            let mut tty = self.tty_manager.write();
-            let _typing_guard = TypingModeGuard::new(&mut *tty)?;
-
-            // 3a. Initialize renderer for terminal UI
-            {
-                let mut renderer = self.renderer.write();
-                renderer.initialize()?;
-                renderer.check_terminal_size()?;
-                debug!("TUI renderer initialized");
-            }
-
-            // 4. Configure input processor for this training mode
-            {
-                let mut input = self.input_processor.write();
-                input.set_training_mode(mode);
-            }
-
-            // 5. Main typing loop
-            let result = self.run_typing_loop(session_id, &content).await?;
-
-            // 6. Session completed - cleanup handled by guards
-            let total_duration = session_start.elapsed();
-            info!(
-                "Session {} completed in {:?} with skill index {:.1}",
-                session_id, total_duration, result.skill_index
-            );
-
-            // 7. Persist session results
-            self.persistence.save_session_result(&result)?;
-            debug!("Session results persisted");
-
-            return Ok(result);
+            let mut renderer = self.renderer.write();
+            renderer.initialize()?;
+            renderer.check_terminal_size()?;
+            debug!("TUI renderer initialized");
         }
+
+        // 4. Configure input processor for this training mode
+        {
+            let mut input = self.input_processor.write();
+            input.set_training_mode(mode);
+        }
+
+        // 5. Main typing loop (now safe to await without holding locks)
+        let result = self.run_typing_loop(session_id, &content).await?;
+
+        // 6. Session completed - cleanup handled by guards
+        let total_duration = session_start.elapsed();
+        info!(
+            "Session {} completed in {:?} with skill index {:.1}",
+            session_id, total_duration, result.skill_index
+        );
+
+        // 7. Persist session results
+        self.persistence.save_session_result(&result)?;
+        debug!("Session results persisted");
+
+        Ok(result)
     }
 
     /// Emergency shutdown - restore terminal state immediately

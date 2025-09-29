@@ -2,8 +2,9 @@
 //! Tests all critical security vectors including escape sequences, input sanitization,
 //! file system permissions, and fuzzing resistance.
 
-use centotype_content::{ContentGenerator, ContentValidator};
+use centotype_content::{CentotypeContentGenerator, ContentValidator};
 use centotype_core::types::*;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
@@ -87,7 +88,7 @@ impl SecurityReport {
 }
 
 /// Fuzz test crash report
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FuzzCrash {
     pub input: String,
     pub error: String,
@@ -95,7 +96,7 @@ pub struct FuzzCrash {
     pub crash_type: CrashType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CrashType {
     Panic,
     Timeout,
@@ -149,7 +150,7 @@ pub struct PermissionReport {
     pub paths_tested: Vec<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PermissionIssue {
     WorldReadable { path: String, mode: u32 },
     GroupWritable { path: String, mode: u32 },
@@ -187,14 +188,15 @@ impl PermissionReport {
 /// Main security validator for comprehensive testing
 pub struct SecurityAuditor {
     validator: ContentValidator,
-    generator: ContentGenerator,
+    generator: CentotypeContentGenerator,
 }
 
 impl SecurityAuditor {
     pub fn new() -> Result<Self> {
+        let validator = Arc::new(ContentValidator::new()?);
         Ok(Self {
             validator: ContentValidator::new()?,
-            generator: ContentGenerator::new()?,
+            generator: CentotypeContentGenerator::new(validator),
         })
     }
 
@@ -214,16 +216,16 @@ impl SecurityAuditor {
             report.total_content_tested += 1;
 
             // Test 1: Escape sequence detection
-            self.check_escape_sequences(&content, level_id, &mut report);
+            self.check_escape_sequences(&content, level_id.into(), &mut report);
 
             // Test 2: Shell injection patterns
-            self.check_shell_injection(&content, level_id, &mut report);
+            self.check_shell_injection(&content, level_id.into(), &mut report);
 
             // Test 3: Control character detection
-            self.check_control_characters(&content, level_id, &mut report);
+            self.check_control_characters(&content, level_id.into(), &mut report);
 
             // Test 4: Unicode anomalies
-            self.check_unicode_anomalies(&content, level_id, &mut report);
+            self.check_unicode_anomalies(&content, level_id.into(), &mut report);
 
             // Test 5: Content integrity
             self.check_content_integrity(&content, level, &mut report);
@@ -265,7 +267,7 @@ impl SecurityAuditor {
             if content.contains(sequence) {
                 report.add_violation(SecurityViolation::EscapeSequence {
                     level_id,
-                    content: content.clone(),
+                    content: content.to_string(),
                     sequence: sequence.to_string(),
                 });
             }
@@ -275,7 +277,7 @@ impl SecurityAuditor {
         if content.contains('\x1b') {
             report.add_violation(SecurityViolation::EscapeSequence {
                 level_id,
-                content: content.clone(),
+                content: content.to_string(),
                 sequence: "Generic ESC character".to_string(),
             });
         }
@@ -295,7 +297,7 @@ impl SecurityAuditor {
                 report.add_violation(SecurityViolation::ShellInjection {
                     level_id,
                     pattern: pattern.to_string(),
-                    content: content.clone(),
+                    content: content.to_string(),
                 });
             }
         }
@@ -308,7 +310,7 @@ impl SecurityAuditor {
                 report.add_violation(SecurityViolation::ControlCharacter {
                     level_id,
                     character: ch,
-                    content: content.clone(),
+                    content: content.to_string(),
                 });
             }
         }
@@ -318,7 +320,7 @@ impl SecurityAuditor {
             report.add_violation(SecurityViolation::ControlCharacter {
                 level_id,
                 character: '\0',
-                content: content.clone(),
+                content: content.to_string(),
             });
         }
     }
@@ -341,7 +343,7 @@ impl SecurityAuditor {
                 report.add_violation(SecurityViolation::UnicodeAnomaly {
                     level_id,
                     description: format!("Suspicious Unicode character: U+{:04X}", suspicious_char as u32),
-                    content: content.clone(),
+                    content: content.to_string(),
                 });
             }
         }
@@ -355,7 +357,7 @@ impl SecurityAuditor {
                 report.add_violation(SecurityViolation::UnicodeAnomaly {
                     level_id,
                     description: format!("Private use area character: U+{:04X}", code_point),
-                    content: content.clone(),
+                    content: content.to_string(),
                 });
             }
         }
@@ -367,7 +369,7 @@ impl SecurityAuditor {
         match self.validator.validate_security(content) {
             validation if !validation.is_valid() => {
                 report.add_violation(SecurityViolation::ContentIntegrity {
-                    level_id: level.0,
+                    level_id: level.0 as u32,
                     issue: validation.error_message().unwrap_or("Unknown validation error").to_string(),
                 });
             }
@@ -377,14 +379,14 @@ impl SecurityAuditor {
         // Additional integrity checks
         if content.is_empty() {
             report.add_violation(SecurityViolation::ContentIntegrity {
-                level_id: level.0,
+                level_id: level.0 as u32,
                 issue: "Empty content generated".to_string(),
             });
         }
 
         if content.len() > 10_000 {
             report.add_violation(SecurityViolation::ContentIntegrity {
-                level_id: level.0,
+                level_id: level.0 as u32,
                 issue: format!("Excessive content length: {}", content.len()),
             });
         }
@@ -449,7 +451,7 @@ impl SecurityAuditor {
             let char_class = rng.gen_range(0..20);
             let ch = match char_class {
                 0..=10 => rng.gen_range(b' '..=b'~') as char, // Printable ASCII
-                11..=12 => rng.gen_range(0..=31) as char,     // Control characters
+                11..=12 => char::from_u32(rng.gen_range(0..=31)).unwrap_or('\0'),     // Control characters
                 13 => '\x1b',                                  // Escape character
                 14 => '\0',                                    // Null character
                 15 => '\x7f',                                  // DEL character

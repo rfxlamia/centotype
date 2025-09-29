@@ -123,14 +123,17 @@ impl ContentManager {
 
     /// Get content for a specific level with caching and validation
     pub async fn get_level_content(&self, level_id: LevelId, seed: Option<u64>) -> Result<String> {
-        let config = self.config.read();
-        let effective_seed = seed.or(config.default_seed).unwrap_or_else(|| {
-            use std::collections::hash_map::DefaultHasher;
-            use std::hash::{Hash, Hasher};
-            let mut hasher = DefaultHasher::new();
-            level_id.hash(&mut hasher);
-            hasher.finish()
-        });
+        let (effective_seed, enable_validation, enable_preloading) = {
+            let config = self.config.read();
+            let effective_seed = seed.or(config.default_seed).unwrap_or_else(|| {
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut hasher = DefaultHasher::new();
+                level_id.hash(&mut hasher);
+                hasher.finish()
+            });
+            (effective_seed, config.enable_validation, config.enable_preloading)
+        };
 
         debug!(
             "Requesting content for level {} with seed {}",
@@ -141,13 +144,13 @@ impl ContentManager {
         let content = self.cache.get_content(level_id, effective_seed).await?;
 
         // Validate content if enabled
-        if config.enable_validation {
+        if enable_validation {
             self.generator
                 .validate_content_difficulty(&content, level_id);
         }
 
         // Trigger preloading for upcoming levels if enabled
-        if config.enable_preloading {
+        if enable_preloading {
             if let Err(e) = self.cache.preload_upcoming_levels(level_id).await {
                 warn!("Failed to preload upcoming levels: {}", e);
                 // Don't fail the request for preloading errors
@@ -164,14 +167,16 @@ impl ContentManager {
 
     /// Get cached content only (no generation on miss)
     pub async fn get_cached_content(&self, level_id: LevelId, seed: Option<u64>) -> Option<String> {
-        let config = self.config.read();
-        let effective_seed = seed.or(config.default_seed).unwrap_or_else(|| {
-            use std::collections::hash_map::DefaultHasher;
-            use std::hash::{Hash, Hasher};
-            let mut hasher = DefaultHasher::new();
-            level_id.hash(&mut hasher);
-            hasher.finish()
-        });
+        let effective_seed = {
+            let config = self.config.read();
+            seed.or(config.default_seed).unwrap_or_else(|| {
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut hasher = DefaultHasher::new();
+                level_id.hash(&mut hasher);
+                hasher.finish()
+            })
+        };
 
         self.cache
             .get_cached_content(level_id, effective_seed)
@@ -189,14 +194,16 @@ impl ContentManager {
 
     /// Invalidate cached content for a specific level
     pub async fn invalidate_level(&self, level_id: LevelId, seed: Option<u64>) {
-        let config = self.config.read();
-        let effective_seed = seed.or(config.default_seed).unwrap_or_else(|| {
-            use std::collections::hash_map::DefaultHasher;
-            use std::hash::{Hash, Hasher};
-            let mut hasher = DefaultHasher::new();
-            level_id.hash(&mut hasher);
-            hasher.finish()
-        });
+        let effective_seed = {
+            let config = self.config.read();
+            seed.or(config.default_seed).unwrap_or_else(|| {
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut hasher = DefaultHasher::new();
+                level_id.hash(&mut hasher);
+                hasher.finish()
+            })
+        };
 
         self.cache.invalidate(level_id, effective_seed).await;
         debug!("Invalidated cached content for level {}", level_id.0);

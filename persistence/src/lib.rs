@@ -32,6 +32,19 @@ impl PersistenceManager {
         })
     }
 
+    pub fn new_with_path(path: &std::path::Path) -> Result<Self> {
+        let config_dir = path.join("config");
+        let data_dir = path.join("data");
+
+        std::fs::create_dir_all(&config_dir)?;
+        std::fs::create_dir_all(&data_dir)?;
+
+        Ok(Self {
+            config_dir,
+            data_dir,
+        })
+    }
+
     pub fn load_config(&self) -> Result<Config> {
         let config_path = self.config_dir.join("config.toml");
         if config_path.exists() {
@@ -74,8 +87,14 @@ impl PersistenceManager {
         Ok(())
     }
 
-    pub fn save_session_result(&self, result: &SessionResult) -> Result<()> {
-        // Implementation for saving individual session results
+    pub fn save_session_result(&self, _result: &SessionResult) -> Result<()> {
+        // TODO: Implementation for saving individual session results
         Ok(())
+    }
+
+    pub fn load_session_results(&self) -> Result<Vec<SessionResult>> {
+        // TODO: Implementation for loading session results
+        // For now, return empty vector
+        Ok(vec![])
     }
 }

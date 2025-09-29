@@ -79,6 +79,38 @@ pub enum DrillCategory {
     Operators,
 }
 
+impl std::str::FromStr for DrillCategory {
+    type Err = CentotypeError;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s.to_lowercase().as_str() {
+            "numbers" => Ok(DrillCategory::Numbers),
+            "punctuation" => Ok(DrillCategory::Punctuation),
+            "symbols" => Ok(DrillCategory::Symbols),
+            "camelcase" => Ok(DrillCategory::CamelCase),
+            "snakecase" => Ok(DrillCategory::SnakeCase),
+            "operators" => Ok(DrillCategory::Operators),
+            _ => Err(CentotypeError::State(format!("Unknown drill category: {}", s))),
+        }
+    }
+}
+
+impl TryFrom<&str> for DrillCategory {
+    type Error = CentotypeError;
+
+    fn try_from(s: &str) -> Result<Self> {
+        s.parse()
+    }
+}
+
+impl TryFrom<String> for DrillCategory {
+    type Error = CentotypeError;
+
+    fn try_from(s: String) -> Result<Self> {
+        s.as_str().parse()
+    }
+}
+
 /// Language for text content
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Language {

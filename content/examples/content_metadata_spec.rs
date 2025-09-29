@@ -946,3 +946,7 @@ mod tests {
         );
     }
 }
+
+fn main() {
+    println!("Content metadata specification - see module documentation");
+}

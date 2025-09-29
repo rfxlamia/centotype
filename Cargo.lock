@@ -207,12 +207,14 @@ dependencies = [
  "centotype-engine",
  "centotype-persistence",
  "centotype-platform",
+ "chrono",
  "clap",
  "rand 0.9.2",
  "tempfile",
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]

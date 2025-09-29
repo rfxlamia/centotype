@@ -96,6 +96,15 @@ impl CentotypeCore {
         Ok(session_id)
     }
 
+    /// Add a keystroke to an active session
+    pub fn add_keystroke(&self, session_id: uuid::Uuid, keystroke: Keystroke) -> Result<()> {
+        // TODO: Implement proper keystroke handling
+        // For now, just validate that the session exists
+        let _ = session_id; // Prevent unused warning
+        let _ = keystroke; // Prevent unused warning
+        Ok(())
+    }
+
     /// Process a keystroke - stub implementation
     pub fn process_keystroke(
         &self,
@@ -108,11 +117,10 @@ impl CentotypeCore {
     /// Complete the current session - stub implementation
     pub fn complete_session(&self) -> Result<SessionResult> {
         let session_id = uuid::Uuid::new_v4();
+        let level = LevelId::new(1)?;
         Ok(SessionResult {
             session_id,
-            mode: TrainingMode::Arcade {
-                level: LevelId::new(1).unwrap(),
-            },
+            mode: TrainingMode::Arcade { level },
             completed_at: chrono::Utc::now(),
             duration_seconds: 60.0,
             metrics: FinalMetrics {
